@@ -1,0 +1,96 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>5G Wifi Configuration</title>
+    <link rel="stylesheet" type="text/css" href="wificonfigstyle.css">
+</head>
+<body>
+    <div class="sidebar">
+        <ul class="sidebar-links">
+            <h3>WebUI</h3>
+            <li><a href="#">Status</a></li>
+            <li><a href="2gConfig.html">2G Configuration</a></li>
+            <li><a href="5gConfig.html">5G Configuration</a></li>
+            <li><a href="6gConfig.html">6G Configuration</a></li>
+        </ul>
+    </div>
+
+    <div id="5gconfig">
+        <h2>5G Wifi</h2>
+
+        <label for="status5g">Status:</label>
+        <select id="status5g" name="status5g">
+            <option value="0">Enabled</option>
+            <option value="1">Disabled</option>
+        </select>
+
+        <label for="ssid5g">SSID:</label>
+        <input class="text-input" type="text" id="ssid5g" name="ssid5g" placeholder="Enter SSID">
+
+        <label for="mode5g">Mode:</label>
+        <select id="mode5g" name="mode5g">
+            <option value="ap">Access Point</option>
+            <option value="sta">Client</option>
+        </select>
+
+        <label for="bandwidth5g">Bandwidth:</label>
+        <select class="channel-select" id="bandwidth5g" name="bandwidth5g">
+            <option value="20">20 MHz</option>
+            <option value="40">40 MHz</option>
+            <option value="80">80 MHz</option>
+            <option value="160">160 MHz</option>
+        </select>
+
+        <label for="channel5g">Channel:</label>
+        <select class="channel-select" id="channel5g" name="channel5g">
+            <option value="36">36</option>
+            <option value="38">38</option>
+            <option value="40">40</option>
+            <option value="42">42</option>
+            <option value="44">44</option>
+            <option value="46">46</option>
+            <option value="48">48</option>
+            <option value="52">52</option>
+            <option value="56">56</option>
+            <option value="60">60</option>
+            <option value="64">64</option>
+            <option value="100">100</option>
+            <option value="104">104</option>
+            <option value="108">108</option>
+            <option value="112">112</option>
+            <option value="116">116</option>
+            <option value="120">120</option>
+            <option value="124">124</option>
+            <option value="128">128</option>
+            <option value="132">132</option>
+            <option value="136">136</option>
+            <option value="140">140</option>
+            <option value="149">149</option>
+            <option value="153">153</option>
+            <option value="157">157</option>
+            <option value="161">161</option>
+            <option value="165">165</option>
+            <option value="169">169</option>
+            <option value="173">173</option>
+            <option value="auto">auto</option>
+        </select>
+
+        <hr />
+        <h2>Security Options</h2>
+
+        <label for="encryption5g">Encryption:</label>
+        <select class="channel-select" id="encryption5g" name="encryption5g">
+            <option value="none">Open</option>
+            <option value="sae">SAE</option>
+            <option value="">WPA3</option>
+        </select>
+
+        <label for="password5g">Password:</label>
+        <input class="text-input" type="password" id="password5g" name="password5g" placeholder="Enter 5G Password">
+
+        <br />
+        <button onclick="saveConfig()">Save and Apply</button>
+</body>
+</html>

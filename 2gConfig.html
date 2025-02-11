@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>2G Wifi Configuration</title>
+    <link rel="stylesheet" type="text/css" href="wificonfigstyle.css">
+</head>
+<body>
+    <div class="sidebar">
+        <ul class="sidebar-links">
+            <h3>WebUI</h3>
+            <li><a href="#">Status</a></li>
+            <li><a href="2gConfig.html">2G Configuration</a></li>
+            <li><a href="5gConfig.html">5G Configuration</a></li>
+            <li><a href="6gConfig.html">6G Configuration</a></li>
+        </ul>
+    </div>
+    <!--2g configure-->
+    <h2>2G Wifi</h2>
+    <label for="status2g">Status:</label>
+    <select id="status2g" name="status2g">
+        <option value="0">Enabled</option>
+        <option value="1">Disabled</option>
+    </select>
+
+    <label for="ssid2g">SSID:</label>
+    <input class="text-input" type="text" id="ssid2g" name="ssid2g" placeholder="Enter SSID">
+
+    <label for="mode2g">Mode:</label>
+    <select id="mode2g" name="mode2g">
+        <option value="ap">Access Point</option>
+        <option value="sta">Client</option>
+    </select>
+
+    <label for="bandwidth2g">Bandwidth:</label>
+    <select class="channel-select" id="bandwidth2g" name="bandwidth2g">
+        <option value="20">20 MHz</option>
+        <option value="40">40 MHz</option>
+    </select>
+
+    <label for="channel2g">Channel:</label>
+    <select class="channel-select" id="channel2g" name="channel2g">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+        <option value="11">11</option>
+        <option value="12">12</option>
+        <option value="auto">auto</option>
+    </select>
+
+    <hr />
+    <h2>Security Options</h2>
+
+    <label for="encryption2g">Encryption:</label>
+    <select class="channel-select" id="encryption2g" name="encryption2g">
+        <option value="none">Open</option>
+        <option value="sae">SAE</option>
+        <option value="">WPA3</option>
+    </select>
+
+    <label for="password2g">Password:</label>
+    <input class="text-input" type="password" id="password2g" name="password2g" placeholder="Enter Password">
+
+    <br />
+    <button onclick="saveConfig()">Save and Apply</button>
+</body>
+</html>
+
+

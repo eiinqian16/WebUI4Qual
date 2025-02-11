@@ -1,0 +1,108 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>6G Wifi Configuration</title>
+    <link rel="stylesheet" type="text/css" href="wificonfigstyle.css">
+</head>
+<body>
+    <div class="sidebar">
+        <ul class="sidebar-links">
+            <h3>WebUI</h3>
+            <li><a href="#">Status</a></li>
+            <li><a href="2gConfig.html">2G Configuration</a></li>
+            <li><a href="5gConfig.html">5G Configuration</a></li>
+            <li><a href="6gConfig.html">6G Configuration</a></li>
+        </ul>
+    </div>
+
+    <div id="6gconfig">
+        <h2>6G Wifi</h2>
+
+        <label for="status5g">Status:</label>
+        <select id="status5g" name="status5g">
+            <option value="0">Enabled</option>
+            <option value="1">Disabled</option>
+        </select>
+
+        <label for="ssid6g">SSID:</label>
+        <input class="text-input" type="text" id="ssid6g" name="ssid6g" placeholder="Enter SSID">
+
+        <label for="mode6g">Mode:</label>
+        <select id="mode6g" name="mode6g">
+            <option value="ap">Access Point</option>
+            <option value="sta">Client</option>
+        </select>
+
+        <label for="bandwidth6g">Bandwidth:</label>
+        <select class="channel-select" id="bandwidth6g" name="bandwidth6g">
+            <option value="20">20 MHz</option>
+            <option value="40">40 MHz</option>
+            <option value="80">80 MHz</option>
+            <option value="160">160 MHz</option>
+            <option value="320">320 MHz</option>
+        </select>
+
+        <label for="channel6g">Channel:</label>
+        <select id="channel6g" name="channel6g">
+            <option value="37">37</option>
+            <option value="41">41</option>
+            <option value="45">45</option>
+            <option value="49">49</option>
+            <option value="53">53</option>
+            <option value="57">57</option>
+            <option value="61">61</option>
+            <option value="105">105</option>
+            <option value="109">109</option>
+            <option value="113">113</option>
+            <option value="117">117</option>
+            <option value="121">121</option>
+            <option value="125">125</option>
+            <option value="129">129</option>
+            <option value="133">133</option>
+            <option value="137">137</option>
+            <option value="141">141</option>
+            <option value="145">145</option>
+            <option value="149">149</option>
+            <option value="153">153</option>
+            <option value="157">157</option>
+            <option value="161">161</option>
+            <option value="165">165</option>
+            <option value="169">169</option>
+            <option value="173">173</option>
+            <option value="177">177</option>
+            <option value="181">181</option>
+            <option value="185">185</option>
+            <option value="189">189</option>
+            <option value="193">193</option>
+            <option value="197">197</option>
+            <option value="201">201</option>
+            <option value="205">205</option>
+            <option value="209">209</option>
+            <option value="213">213</option>
+            <option value="217">217</option>
+            <option value="221">221</option>
+            <option value="225">225</option>
+            <option value="229">229</option>
+            <option value="233">233</option>
+        </select>
+
+        <hr />
+        <h2>Security Options</h2>
+
+        <label for="encryption6g">Encryption:</label>
+        <select class="channel-select" id="encryption6g" name="encryption6g">
+            <option value="none">Open</option>
+            <option value="sae">SAE</option>
+            <option value="">WPA3</option>
+        </select>
+
+        <label for="password6g">Password:</label>
+        <input class="text-input" type="password" id="password6g" name="password6g" placeholder="Enter 6G Password">
+    </div>
+    <br />
+    <button onclick="saveConfig()">Save and Apply</button>
+
+</body>
+</html>
