@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Interfaces</title>
+    <link rel="stylesheet" type="text/css" href="wificonfigstyle.css">
+</head>
+<body>
+    <div class="sidebar">
+        <ul class="sidebar-links">
+            <h3>WebUI</h3>
+            <li><a href="overview.html">Overview</a></li>
+            <li><a href="statusPage.html">Status</a></li>
+            <li><a href="lanConfig.html">Network</a></li>
+            <li><a href="">Wireless</a></li>
+        </ul>
+    </div>
+    <h1>LAN Configuration</h1>
+    <hr style="width:100%;text-align:left;margin-left:0">
+    <div class="interface">
+    <div id="lanIP"></div>
+    </div>
+    <p id="result"></p>
+
+    <h1>WAN Configuration</h1>
+    <hr style="width:100%;text-align:left;margin-left:0">
+    <div class="interface">
+        <div id="wanIP"></div>
+    </div>
+
+    <!--<p id="wanResult"></p>-->
+    <br>
+    <button onclick="refreshPage()">Refresh Stats</button>
+    <!--<button onclick="">Add new interface</button>-->
+    <script src="lanConfigure.js"></script>
+    <script>
+        getCurLanIf();
+        getCurWanIf();
+    </script>
+</body>

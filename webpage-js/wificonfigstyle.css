@@ -1,0 +1,112 @@
+﻿body {
+    font-family: serif;
+    margin: 300px;
+    background-color: rgb(44, 44, 44);
+    margin-top: 0px;
+    color:rgb(255, 255, 255);
+}
+
+.interface {
+    border-radius: 25px;
+    padding: 20px;
+    width: 350px;  /* Width for each box */
+    margin-top: 30px;
+    background: rgb(97, 97, 97);
+    text-align: left;  /* Align text inside the box */
+}
+
+h1 {
+    text-align: left;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+button {
+    font-family: Candara;
+    background-color:blue;
+}
+
+.text-input {
+    width: 240px;
+    padding: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+select {
+    width: 250px;
+    padding: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.channel-select {
+    max-height: 50px;
+    overflow-y: auto;
+}
+
+.box {
+    width: 1000px;
+    height: 400px;
+    padding: 10px;
+    margin: 10px;
+    background-color: darkgray;
+}
+
+.hidden {
+    display: none;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 200px; /* Width of the sidebar */
+    background-color: #161a2d; /* Sidebar background color */
+    padding: 20px;
+    transition: width 0.3s; /* Smooth transition for width */
+}
+
+.sidebar-links a {
+    text-decoration: none; /* Remove underline from links */
+    color: #fff; /* Link text color */
+    padding: 10px;
+    display: block; /* Make links fill the entire width */
+}
+
+.sidebar-links a:hover {
+    background-color: #4f52ba; /* Change background on hover */
+}
+
+.sidebar-links li {
+    margin: 10px 0; /* Spacing between links */
+}
+
+ul {
+    list-style: none;
+    color: snow;
+}
+
+hr {
+    width: 150%;
+    text-align: left;
+    color: black;
+    background-color: black;
+    border-width: 0px;
+    height: 2px;
+}

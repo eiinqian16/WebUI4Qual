@@ -1,0 +1,103 @@
+
+body {
+    font-family: serif;
+    margin: 300px;
+    background-color: rgb(44, 44, 44);
+    margin-top: 0px;
+    color:rgb(255, 255, 255);
+}
+
+#wireless {
+    display: flex;
+    flex-wrap: wrap;  /* Allows items to wrap onto the next line if needed */
+    justify-content: space-around;  /* Distributes items evenly */
+    gap: 20px; 
+}
+
+#disabled {
+    display: flex;
+    flex-wrap: wrap;  /* Allows items to wrap onto the next line if needed */
+    justify-content: space-around;  /* Distributes items evenly */
+    gap: 20px; 
+}
+
+#lan {
+    display: flex;
+    flex-wrap: wrap;  /* Allows items to wrap onto the next line if needed */
+    justify-content: space-around;  /* Distributes items evenly */
+    gap: 20px; 
+}
+
+.interface {
+    border-radius: 25px;
+    padding: 20px;
+    width: 350px;  /* Width for each box */
+    margin-top: 30px;
+    background: rgb(97, 97, 97);
+    text-align: left;  /* Align text inside the box */
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 200px; /* Width of the sidebar */
+    background-color: #161a2d; /* Sidebar background color */
+    padding: 20px;
+    transition: width 0.3s; /* Smooth transition for width */
+}
+
+.sidebar-links a {
+    text-decoration: none; /* Remove underline from links */
+    color: #fff; /* Link text color */
+    padding: 10px;
+    display: block; /* Make links fill the entire width */
+}
+
+.sidebar-links a:hover {
+    background-color: #4f52ba; /* Change background on hover */
+}
+
+.sidebar-links li {
+    margin: 10px 0; /* Spacing between links */
+}
+
+ul {
+    list-style: none;
+    color: snow;
+}
+
+hr {
+    width: 150%;
+    text-align: left;
+    color: black;
+    background-color: black;
+    border-width: 0px;
+    height: 2px;
+}
+
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #444;
+}
+
+.status-label {
+    font-weight: bold;
+    color: #ccc;
+}
+
+.status-value {
+    text-align: justify;
+    color: white;
+}
+
+.status-container {
+    width: 60%;
+    background-color: #333;
+    padding: 20px;
+    border-radius: 8px;
+}
+

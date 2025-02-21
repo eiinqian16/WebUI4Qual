@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title> Overview</title>
+        <link rel="stylesheet" href="wifistatusstyle.css">
+    </head>
+    <body>
+        <div class="sidebar">
+            <ul class="sidebar-links">
+                <h3>WebUI</h3>
+                <li><a href="overview.html">Overview</a></li>
+                <li><a href="statusPage.html">Status</a></li>
+                <li><a href="lanConfig.html">Network</a></li>
+                <li><a href="">Wireless</a></li>
+            </ul>
+        </div>
+        <h2>System</h2>
+        <div id="sys"></div>
+        <div id="storage"></div>
+
+        <script src="processJson.js"></script>
+        <script>
+            fetchSysStats();
+            fetchStorageStats();
+        </script>
+
+    </body>
