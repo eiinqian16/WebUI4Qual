@@ -6,7 +6,7 @@ echo ""
 read INPUT
 #INPUT="IP=192.168.1.10&Netmask=255.255.0.0&gateway=192.168.1.100"
 #INPUT="IP=192.168.1.10&Netmask=255.255.0.0"
-echo "$INPUT"
+#echo "$INPUT"
 
 ip=$(echo "$INPUT" | grep "IP" | awk -F'=' '{print $2}' | awk -F'&' '{print $1}');
 mask=$(echo "$INPUT" | grep "Netmask" | awk -F'=' '{print $3}' | awk -F'&' '{print $1}');

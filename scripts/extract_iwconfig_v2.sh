@@ -10,12 +10,14 @@ extract_data() {
     iwconfig_output=$(iwconfig "$1")
 
     # Determine network type
-    if [ "$1" = "ath0" ] || [[ "$1" == ath0* ]]; then
-        network="2g"
-    elif [ "$1" = "ath1" ] || [[ "$1" == ath1* ]]; then
-        network="5g"
-    elif [ "$1" = "ath2" ] || [[ "$1" == ath2* ]]; then
-        network="6g"
+    parent=$(cat /sys/class/net/"$1"/parent);
+    band=$(cat /sys/class/net/"$parent"/supported_bands);
+    if [[ "$band" == 2* ]]; then
+        network="2G"
+    elif [[ "$band" == 5* ]]; then
+        network="5G"
+    elif [[ "$band" == 6* ]]; then
+        network="6G"
     else
         network="N/A"
     fi
@@ -54,7 +56,7 @@ extract_data() {
     echo "$json_output"
 }
 
-# Directory where the WiFi interfaces reside
+# Directory of WiFi interfaces 
 dir="/sys/class/net"
 
 # Use find to get all interfaces starting with "ath*" and capture the output of the loop.
