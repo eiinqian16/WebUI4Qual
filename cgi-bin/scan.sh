@@ -140,4 +140,3 @@ scan_vap() {
 check_and_enable_device $WIFI_DEVICE
 create_temp_vap $WIFI_DEVICE
 read_vap_from_file
-
