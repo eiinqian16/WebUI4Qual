@@ -5,29 +5,39 @@
         <meta charset="utf-8" />
         <title> Status</title>
         <link rel="stylesheet" href="wifistatusstyle.css">
+        <script src="common.js"></script>
     </head>
     <body>
         <div class="sidebar">
-            <ul class="sidebar-links">
-                <h3>WebUI</h3>
+            <h2>WebUI</h2>
+            <ul>
                 <li><a href="overview.html">Overview</a></li>
-                <li><a href="statusPage.html">Status</a></li>
-                <li><a href="lanConfig.html">Network</a></li>
                 <li><a href="">Wireless</a></li>
+                <li class="sidebar-dropdown">
+                    <span onclick="toggleDropdown('network')">Network</span>
+                </li>
+                    <ul id="network" class="dropdownContent">
+                        <li><a href="lanStat.html">Status</a></li>
+                        <li><a href="lanConfig.html">LAN/WAN</a></li>
+                        <li><a href="dhcp.html">DHCP</a></li>
+                    </ul>
+                <li><a href="user.html">Administration</a></li>
             </ul>
         </div>
         <h1>Wireless Interface</h1>
-        <div id="wireless"></div>
+        <div id="wireless">Loading ...</div>
         <div id="disabled"></div>
         <br>
         <hr style="width:100%;text-align:left;margin-left:0">
         <h1>Wired Interface</h1>
-        <div id="lan"></div>
+        <div id="lan">Loading ...</div>
+        <br>
         <script src="processJson.js"></script>
         
         <script>
             fetchWiFiStatus();
             fetchLanStatus();
+            setInterval(refreshStatus, 5000);
         </script>
             
     </body>

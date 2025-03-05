@@ -93,7 +93,9 @@ function getCurWanIf() {
             console.log("Successfully fetched current WAN data:", data);
 
             let html = "";
-            html += `<h3> Internet </h3>`
+            html += `<h1>WAN Configuration</h1>
+                    <p class="description">View and configure Internet settings</p>
+                    <hr>`;
             const wanIP = document.getElementById("wanIP");
             //const curNetmask = document.getElementById("curNetmask");
             //const curDev = document.getElementById("curDev");
@@ -118,21 +120,24 @@ function getCurWanIf() {
             }
            
             html += `
+            <div class="wanForm">
             <label for="dev">Device:</label>
             <select class="dev-select" id="dev" name="dev">
                 <option value=""></option>
             </select>
+            <br>
             <label for="proto">Connection Type:</label>
             <select class="proto-select" id="proto" name="proto" onchange="toggleIPConfig()">
                 <option value="dhcp">Dynamic IP</option>
                 <option value="static">Static IP</option>
-            </select>`
+            </select>
+            <br>`
             html += `
             <form id="wanConfig" style="display: none;">
-                <label for="ip">IPv4 address: </label>
+                <label for="wanIp">IPv4 address: </label>
                 <input type="text" id="wanIp" name="wanIp" required> <br>
                 <br>
-                <label for="netmask">IPv4 netmask: </label>
+                <label for="wanNnetmask">IPv4 netmask: </label>
                 <input type="text" id="wanNetmask" name="wanNetmask" required> <br>
                 <br>
                 <label for="gateway">IPv4 gateway: </label>
@@ -148,6 +153,7 @@ function getCurWanIf() {
                 <input type="text" id="dns2" name="dns2"> <br>
                 <br>
             </form>
+            </div>
             `
 
             html += `<button onclick="configWan()">Save and Apply</button>`
@@ -207,26 +213,28 @@ function getCurLanIf() {
             console.log("Successfully fetched data:", data);
 
             let html = "";
-            html += `<h3> LAN </h3>`
+            html += `<h1>LAN Configuration</h1>
+                    <p class="description">View and configure LAN settings</p>
+                    <hr>`;
             const curIP = document.getElementById("lanIP");
             //const curNetmask = document.getElementById("curNetmask");
             //const curDev = document.getElementById("curDev");
             const brLan = data.find(item => item.iface === "br-lan");
             if (brLan && brLan.IP) {
-                html += `<p><strong>Current IP Address: </strong>${brLan.IP || 'N/A'}</p>`
+                html += `<div class="curIp"><p><strong>Current IP Address: </strong>${brLan.IP || 'N/A'}</p>`
             }
             if (brLan && brLan.netmask) {
                 html += `<p><strong>Current Subnet Mask: </strong>${brLan.netmask || 'N/A'}</p>`
             }
             if (brLan && brLan.iface) {
-                html += `<p><strong>Device: </strong>${brLan.iface || 'N/A'}</p>`
+                html += `<p><strong>Device: </strong>${brLan.iface || 'N/A'}</p></div>`
             }
             html += `
             <form id="ipConfig">
-                <label for="ip">IPv4 address: </label>
+                <label for="ip"><strong>IPv4 address: </strong></label>
                 <input type="text" id="ip" name="ip" required> <br>
                 <br>
-                <label for="netmask">IPv4 netmask: </label>
+                <label for="netmask"><strong>IPv4 netmask: </strong></label>
                 <input type="text" id="netmask" name="netmask" required> <br>
                 <br>
                 <button onclick="configIP()">Save and Apply</button>

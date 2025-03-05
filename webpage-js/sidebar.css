@@ -1,0 +1,115 @@
+/* side bar */
+/* General Sidebar Styling */
+.sidebar {
+    width: 200px;
+    height: 100vh;
+    /*background: #f5f9fc;*/
+    background: rgb(94, 9, 9);
+    color: rgb(0, 0, 0);
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+/* Sidebar Header */
+.sidebar h2 {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 15px;
+    font-size: 20px;
+    /*color: rgb(94, 9, 9);*/
+    color:#f5f9fc;
+}
+
+/* Sidebar Menu Items */
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    padding: 12px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display:flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sidebar ul li:hover {
+    /*background: #acacac;*/
+    background:rgb(173, 15, 15);
+    border-radius: 5px;
+}
+
+/* Dropdown Toggle */
+.sidebar-dropdown {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Dropdown Arrow */
+.sidebar-dropdown span {
+    font-family: Arial, sans-serif;
+    transition: transform 0.3s ease;
+    /*color: rgb(94, 9, 9);*/
+    color:#f5f9fc;
+    font-weight: bold;
+    display:flex;
+    align-items: center;
+}
+
+/* Rotate Arrow When Active */
+.sidebar ul .active span {
+    transform: rotate(90deg);
+}
+
+/* Dropdown Content (Initially Hidden) */
+.dropdownContent {
+    list-style: none;
+    padding-left: 20px;
+    display: none;
+    /*background: #ffffff;*/
+    background:rgb(109, 11, 11);
+    border-radius: 5px;
+}
+
+/* Dropdown Items */
+.dropdownContent li {
+    padding: 10px;
+    font-size: 14px;
+    transition: background 0.3s ease;
+    text-indent: 30px;
+}
+
+.dropdownContent li:hover {
+    /*background: #868686;*/
+    background:rgb(173, 15, 15);
+    border-radius: 5px;
+}
+
+/* Show Dropdown When Active */
+.sidebar ul .active + .dropdownContent {
+    display: block;
+}
+
+.sidebar a {
+    font-family: Arial, sans-serif;
+    text-decoration: none;
+    display: flex;
+    /*color: rgb(94, 9, 9);*/
+    color:#f5f9fc;
+    font-weight: bold;
+}
+
+img {
+    height: auto;
+    width: 20px;
+    padding-left: 10px;
+    filter:invert(1);
+    align-items: right;
+}

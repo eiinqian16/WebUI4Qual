@@ -3,7 +3,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title> Overview</title>
+        <title> Network Status</title>
         <link rel="stylesheet" href="wifistatusstyle.css">
         <link rel="stylesheet" href="sidebar.css">
         <script src="common.js"></script>
@@ -37,17 +37,25 @@
             </ul>
         </div>
         <div class="box">
-            <h1>System Overview</h1>
+            <h2>LAN</h2>
             <hr>
-            <h3>System</h3>
-            <div id="sys"></div>
-            <div id="storage"></div>
+            <div id="lan"></div>
+            <br>
+            <h2>WAN</h2>
+            <hr>
+            <div id="wan"></div>
+            <br>
+            <h2>Other Interfaces</h2>
+            <hr>
+            <div id="other"></div>
         </div>
-
+        
         <script src="processJson.js"></script>
+        
         <script>
-            fetchSysStats();
-            fetchStorageStats();
+            fetchLanStatus();
+            fetchWanStatus();
+            fetchOthStatus()
+            setInterval(refreshStatus, 5000);
         </script>
-
     </body>

@@ -26,7 +26,7 @@ function fetchStorageStats() {
             const perFwMem = data.perFwMem > 0 ? ((fwUsedMem / fwTotMem) * 100).toFixed(2) : 'N/A'
 
             let html = `
-                <h2>Storage</h2>
+                <h3>Storage</h3>
                 <div class="status-item">
                     <span class="status-label">Disk Space</span>
                     <span class="status-value"> ${(usedStorage/1000).toFixed(2)}MB / ${(totStorage/1000).toFixed(2)}MB (${perStorage}%)</span>
@@ -92,7 +92,7 @@ function fetchSysStats() {
                     <span class="status-label">Date</span>
                     <span class="status-value"> ${data.date || 'N/A'}</span>
                 </div>
-                <h2>Memory</h2>
+                <h3>Memory</h3>
                 <div class="status-item">
                     <span class="status-label">Total Available</span>
                     <span class="status-value"> ${(data.memAvail/1000).toFixed(2) || 'N/A'}MB / ${(data.memTotal/1000).toFixed(2) || 'N/A'}MB (${percentAvailMem}%)</span>
@@ -105,6 +105,8 @@ function fetchSysStats() {
                     <span class="status-label">Cached</span>
                     <span class="status-value"> ${(data.cache/1000).toFixed(2) || 'N/A'}MB / ${(data.memTotal/1000).toFixed(2) || 'N/A'}MB (${percentCache}%)</span>
                 </div>
+
+                    
             `;
             sysInfo.innerHTML = html;
             
@@ -128,22 +130,108 @@ function fetchLanStatus() {
             // Display network status
             let html = "";
             data.forEach(iface => { 
-                const lanstat = document.getElementById("lan");
+                if (iface.type === "LAN") {
+                    const lanstat = document.getElementById("lan");
+                    html += `
+                    <div class="interface"> 
+                        <h2><strong>${iface.iface || 'N/A'}</strong> </h2>
+                        <p><strong>MAC Address:</strong> <span>${iface.MAC || 'N/A'}</span></p>
+                        <p><strong>IP Addr:</strong> <span>${iface.IP || 'N/A'}</span></p>
+                        <p><strong>Subnet Mask:</strong><span> ${iface.netmask || 'N/A'}</span></p>
+                        <p><strong>Protocol:</strong> <span>${iface.proto || 'N/A'}</span></p>
+                        <p><strong>Interface Type:</strong> <span>${iface.type || 'N/A'}</span></p>
+                        <p><strong>TX Packets:</strong> <span>${iface.txpkt || 'N/A'}</span></p>
+                        <p><strong>RX Packets:</strong> <span>${iface.rxpkt || 'N/A'}</span></p>
+                        <p><strong>TX Bytes:</strong> <span>${iface.txbytes || 'N/A'}</span></p>
+                        <p><strong>RX Bytes:</strong> <span>${iface.rxbytes || 'N/A'}</span></p>
+                    </div>
+                    `;
+                    lanstat.innerHTML = html;
+                }
+            });
+            
+        })
+        .catch(error => {
+            console.error("Fetch Error:", error);
+            document.getElementById("errorMessage").innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+        });
+}
+
+function fetchWanStatus() {
+    fetch('/cgi-bin/extract_wired_data.sh')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Successfully fetched data:", data);
+            const wanIf = data.find(iface => iface.type === "WAN");
+            const wanstat = document.getElementById("wan");
+            // Display network status
+            let html = "";
+            if (wanIf) {
+            data.forEach(iface => {
+                if (iface.type === "WAN") {
                 html += `
                 <div class="interface">
-                    <h2>${iface.iface || 'N/A'}</h2>
-                    <p><strong>MAC Address:</strong> ${iface.MAC || 'N/A'}</p>
-                    <p><strong>IP Addr:</strong> ${iface.IP || 'N/A'}</p>
-                    <p><strong>Subnet Mask:</strong> ${iface.netmask || 'N/A'}</p>
-                    <p><strong>Protocol:</strong> ${iface.proto || 'N/A'}</p>
-                    <p><strong>Interface Type:</strong> ${iface.type || 'N/A'}</p>
-                    <p><strong>TX Packets:</strong> ${iface.txpkt || 'N/A'}</p>
-                    <p><strong>RX Packets:</strong> ${iface.rxpkt || 'N/A'}</p>
-                    <p><strong>TX Bytes:</strong> ${iface.txbytes || 'N/A'}</p>
-                    <p><strong>RX Bytes:</strong> ${iface.rxbytes || 'N/A'}</p>
+                    <h2><strong>${iface.iface || 'N/A'}</strong></h2>
+                    <p><strong>MAC Address:</strong><span>${iface.MAC || 'N/A'}</span></p>
+                    <p><strong>IP Addr:</strong> <span>${iface.IP || 'N/A'}</span></p>
+                    <p><strong>Subnet Mask:</strong> <span>${iface.netmask || 'N/A'}</span></p>
+                    <p><strong>Protocol:</strong> <span>${iface.proto || 'N/A'}</span></p>
+                    <p><strong>Interface Type:</strong> <span>${iface.type || 'N/A'}</span></p>
+                    <p><strong>TX Packets:</strong> <span>${iface.txpkt || 'N/A'}</span></p>
+                    <p><strong>RX Packets:</strong> <span>${iface.rxpkt || 'N/A'}</span></p>
+                    <p><strong>TX Bytes:</strong> <span>${iface.txbytes || 'N/A'}</span></p>
+                    <p><strong>RX Bytes:</strong> <span>${iface.rxbytes || 'N/A'}</span></p>
                 </div>
                 `;
-                lanstat.innerHTML = html;
+                }
+            });
+            wanstat.innerHTML = html;
+        } else {
+            wanstat.innerHTML = `<p>No WAN interface configured</p>`;
+        }
+            
+        })
+        .catch(error => {
+            console.error("Fetch Error:", error);
+            document.getElementById("errorMessage").innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+        });
+}
+
+function fetchOthStatus() {
+    fetch('/cgi-bin/extract_wired_data.sh')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Successfully fetched data:", data);
+            // Display network status
+            let html = "";
+            data.forEach(iface => { 
+                if (iface.type === "other") {
+                    const lanstat = document.getElementById("other");
+                    html += `
+                    <div class="interface">
+                        <h2><strong>${iface.iface || 'N/A'}</strong></h2>
+                        <p><strong>MAC Address:</strong><span>${iface.MAC || 'N/A'}</span></p>
+                        <p><strong>IP Addr:</strong> <span>${iface.IP || 'N/A'}</span></p>
+                        <p><strong>Subnet Mask:</strong> <span>${iface.netmask || 'N/A'}</span></p>
+                        <p><strong>Protocol:</strong> <span>${iface.proto || 'N/A'}</span></p>
+                        <p><strong>TX Packets:</strong> <span>${iface.txpkt || 'N/A'}</span></p>
+                        <p><strong>RX Packets:</strong> <span>${iface.rxpkt || 'N/A'}</span></p>
+                        <p><strong>TX Bytes:</strong> <span>${iface.txbytes || 'N/A'}</span></p>
+                        <p><strong>RX Bytes:</strong> <span>${iface.rxbytes || 'N/A'}</span></p>
+                    </div>
+                    `;
+                    lanstat.innerHTML = html;
+                }
             });
             
         })
@@ -169,13 +257,13 @@ function fetchWiFiStatus() {
             let html = "";
             data.forEach(network => { 
                 const statusDiv = document.getElementById("wireless");
-                if (network.Network === "2g") {
+                if (network.Network === "2G") {
                     //statusDiv = document.getElementById("2gstatus");
                     networksFound["2g"] = true;
-                } else if (network.Network === "5g") {
+                } else if (network.Network === "5G") {
                     //statusDiv = document.getElementById("5gstatus");
                     networksFound["5g"] = true;
-                } else if (network.Network === "6g") {
+                } else if (network.Network === "6G") {
                     //statusDiv = document.getElementById("6gstatus");
                     networksFound["6g"] = true;
                 } else {
@@ -219,7 +307,7 @@ function fetchWiFiStatus() {
 }
 
 // Function to refresh JSON data
-function refreshStatus(filename) {
+function refreshStatus() {
     fetchWiFiStatus();
     fetchLanStatus();
 }

@@ -1,0 +1,63 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #eeeeee;
+    color:rgb(0, 0, 0);
+}
+
+h1 {
+    font-size: 25px;
+}
+
+.usr {
+    border-radius: 25px;
+    padding: 20px;
+    background: rgb(255, 253, 253);
+    text-align: left;  /* Align text inside the box */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    margin-left:300px;
+    max-width: 600px;
+}
+
+.usr #cred label {
+    width: 100px;
+    margin-right: 10px;
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+.usr input[type="password"] { 
+    flex: 1; 
+    width:200px;
+    height: 25px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding-left: 5px;
+    margin-bottom: 10px;
+    align-self: center;
+}
+
+.usr input[type="text"] { 
+    flex: 1; 
+    width:150px;
+    height: 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding-left: 5px;
+    margin-bottom: 10px;
+}
+
+.usr input[type="checkbox"] {
+    margin-right:8px;
+    margin-bottom:10px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: sans-serif;
+}

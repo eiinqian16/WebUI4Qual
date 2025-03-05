@@ -34,7 +34,7 @@ extract_ifconfig() {
         #echo "Error: Device $1 not found in LAN or WAN configuration."
         #exit 1
         proto=$(echo "")
-        type=$(echo "")
+        type=$(echo "other")
         gateway=$(echo "")
         bcast=$(echo "")
     fi
@@ -59,7 +59,7 @@ extract_ifconfig() {
 }
 
 dir="/sys/class/net"
-json_objects=$(find "$dir" -maxdepth 1 \( -name "eth*" -o -name "br*" -o -name "wan*" \) | while read -r file; do
+json_objects=$(find "$dir" -maxdepth 1 \( -name "br*" -o -name "eth*" -o -name "wan*" \) | while read -r file; do
     filename=$(basename "$file")
     extract_ifconfig "$filename"
 done)

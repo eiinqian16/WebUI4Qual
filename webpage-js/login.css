@@ -1,0 +1,76 @@
+body {
+    font-family: serif;
+    margin: 300px;
+    background-color: rgb(44, 44, 44);
+    margin-top: 0px;
+    color:rgb(255, 255, 255);
+}
+
+.container {
+    background: #5a5a5a;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+    margin-top: 100px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: sans-serif;
+}
+
+input {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    border-radius: 4px;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 200px; /* Width of the sidebar */
+    background-color: #161a2d; /* Sidebar background color */
+    padding: 20px;
+    transition: width 0.3s; /* Smooth transition for width */
+}
+
+.sidebar-links a {
+    text-decoration: none; /* Remove underline from links */
+    color: #fff; /* Link text color */
+    padding: 10px;
+    display: block; /* Make links fill the entire width */
+}
+
+.sidebar-links a:hover {
+    background-color: #4f52ba; /* Change background on hover */
+}
+
+.sidebar-links li {
+    margin: 10px 0; /* Spacing between links */
+}
+
+ul {
+    list-style: none;
+    color: snow;
+}
+
+.chkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Adjust space between checkbox and label */
+    justify-content: flex-start; 
+}

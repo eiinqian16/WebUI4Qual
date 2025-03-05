@@ -3,9 +3,9 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Network Configuration</title>
+    <title>DHCP</title>
     <link rel="stylesheet" type="text/css" href="wificonfigstyle.css">
-    <link rel="stylesheet" href="sidebar.css">
+    <link rel="stylesheet" type="text/css" href="sidebar.css">
     <script src="common.js"></script>
 </head>
 <body>
@@ -36,22 +36,19 @@
 
         </ul>
     </div>
-    <div class="interface">
-    <div id="lanIP">Loading ...</div>
-    </div>
-    <p id="result"></p>
+    <div id="curDhcp">Loading ...</div>
+    <br>
+    <div id="client">Loading ...</div>
 
-    <div class="interface">
-        <div id="wanIP">Loading ...</div>
+    <div id="errorMessage"></div>
+    <div id="bodyOutput"></div>
     </div>
 
-    <!--<p id="wanResult"></p>-->
     <br>
     <button onclick="refreshPage()">Refresh</button>
-    <!--<button onclick="">Add new interface</button>-->
-    <script src="lanConfigure.js"></script>
+    <script src="dhcpConfig.js"></script>
     <script>
-        getCurLanIf();
-        getCurWanIf();
+        fetchCurDhcpConfig();
+        fetchDchpClient();
     </script>
 </body>

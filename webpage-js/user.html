@@ -3,9 +3,9 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title> Overview</title>
-        <link rel="stylesheet" href="wifistatusstyle.css">
-        <link rel="stylesheet" href="sidebar.css">
+        <title> Administration</title>
+        <link rel="stylesheet" type="text/css" href="sidebar.css">
+        <link rel="stylesheet" type="text/css" href="usr.css">
         <script src="common.js"></script>
     </head>
     <body>
@@ -36,18 +36,12 @@
 
             </ul>
         </div>
-        <div class="box">
-            <h1>System Overview</h1>
-            <hr>
-            <h3>System</h3>
-            <div id="sys"></div>
-            <div id="storage"></div>
-        </div>
+        <div id="cred"></div>
+        <div id="body"></div>
+        <div id="output"></div>
 
-        <script src="processJson.js"></script>
+        <script src="user.js"></script>
         <script>
-            fetchSysStats();
-            fetchStorageStats();
+            getCred();
         </script>
-
     </body>
