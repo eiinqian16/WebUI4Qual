@@ -1,0 +1,443 @@
+
+.wifi-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    table-layout: fixed;
+}
+
+.wifi-table thead {
+    background-color: #ffffff !important; 
+}
+
+.wifi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wifi-table th {
+    border-top: none; 
+    border-right: none; 
+    border-left: none; 
+    border-bottom: 2px solid #ddd; 
+    background-color: inherit; 
+    padding: 10px;
+    text-align: left;
+}
+
+.wifi-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.wifi-table tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.wifi-table td:first-child {
+    width: 80%;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.wifi-table td:last-child {
+    width: 20%;
+    white-space: nowrap; 
+}
+
+.scan-btn, .add-btn {
+    background-color: rgba(255, 255, 255, 0.3); /* 白色半透明背景 */
+    color: #1ab2b8;
+    padding: 5px 10px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    transition: background 0.3s, color 0.3s, opacity 0.3s;
+    margin-right: 5px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.scan-btn:hover, .add-btn:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+    color: #36bbd9;
+}
+
+.edit-btn, .delete-btn {
+    width: 80px; 
+    height: 36px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff; 
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s, opacity 0.3s;
+}
+
+.edit-btn {
+    background-color: #1aa34c; 
+}
+
+.edit-btn:hover {
+    background-color: #174E28;
+    opacity: 0.85;
+}
+
+.delete-btn {
+    background-color: #8B0000;
+}
+
+.delete-btn:hover {
+    background-color: #6B0000; 
+    opacity: 0.85;
+}
+
+
+.modal-overlay {
+    visibility: hidden;
+    opacity: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    transition: opacity 0.3s ease, visibility 0s;
+}
+
+.modal-overlay.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.modal {
+    visibility: hidden;
+    opacity: 0;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    width: 50%;
+    max-width: 600px;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.3s ease, visibility 0s;
+}
+
+.modal.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    font-size: 1.5em;
+    color: #333;
+}
+
+.modal-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.modal-content table, 
+.modal-content th, 
+.modal-content td {
+    border: 1px solid #ddd;
+}
+
+.modal-content th,
+.modal-content td {
+    padding: 10px;
+    text-align: left;
+}
+
+.modal-content th {
+    background-color: #f4f4f9;
+    font-weight: bold;
+}
+
+.modal-content button {
+    background: #1aa34c;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.modal-content button:hover {
+    background: #218838;
+}
+
+.modal-content .modal-close-btn {
+    background: #c22121 !important;
+    color: white;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-top: 10px;
+    border-radius: 5px;
+    transition: background 0.3s;
+    font-weight: bold;
+}
+
+.modal-content .modal-close-btn:hover {
+    background: #db2727 !important;
+}
+.scan-overlay {
+    visibility: hidden;
+    opacity: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9997;
+    transition: opacity 0.3s ease, visibility 0s;
+}
+
+.scan-overlay.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+#scanModal {
+    max-width: 90%;
+    width: 700px;
+    max-height: 80vh;
+    overflow: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9998;
+}
+
+#scan-modal-content {
+    max-width: 100%;
+    overflow-x: auto; 
+}
+
+#scan-modal-content table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+#scan-modal-content th, #scan-modal-content td {
+    padding: 8px 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+    white-space: normal;
+    word-break: break-word; 
+}
+
+#scan-modal-content th {
+    background-color: #f4f4f4;
+}
+
+#scan-modal-content thead {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 2;
+}
+
+.join-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.join-btn:hover {
+    background-color: #218838;
+}
+
+#password-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    display: none;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0s;
+}
+
+#password-modal.show {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+}
+
+#loading-overlay {
+    visibility: hidden;
+    opacity: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    transition: opacity 0.3s ease, visibility 0s;
+}
+
+#loading-overlay.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 6px solid rgba(255, 255, 255, 0.3);
+    border-top: 6px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.wifi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-direction: column;
+    flex: 0 0 80%;
+}
+
+.wifi-header-content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+}
+
+.wifi-header h3 {
+    margin-bottom: 5px;
+}
+
+.wifi-info {
+    font-size: 12px;
+    color: #178748;
+    margin-top: 2px;
+}
+
+
+.main-wifi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.header-buttons {
+    flex: 0 0 20%; 
+    display: flex;
+    gap: 10px;
+}
+
+.station-box table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    table-layout: fixed;
+}
+
+.station-box th, .station-box td {
+    padding: 10px;
+    border: 1px solid #ddd; 
+    text-align: center;
+    border: 0px solid #ddd;
+    border-bottom: 1px solid #ddd; 
+    padding: 10px;
+    text-align: left;
+}
+
+.station-box th {
+    color: #000000;
+    border-top: none; 
+    border-right: none; 
+    border-left: none; 
+    border-bottom: 2px solid #ddd; 
+    background-color: inherit; 
+    padding: 10px;
+    text-align: left;
+}
+
+.ssid-mode-bssid-column {
+    padding-left: 10px;
+}
+
+.ssid-mode-bssid-wrapper {
+    display: flex;
+    align-items: center; 
+    width: 100%;
+    gap: 6px;
+}
+
+.ssid {
+    font-size: 22px;
+    white-space: nowrap;
+}
+
+.mode-bssid {
+    display: flex;
+    flex-direction: column;
+}
+
+.mode {
+    font-size: 12px;
+    color: #777;
+}
+
+.bssid {
+    font-size: 12px;
+    color: #777;
+}
+

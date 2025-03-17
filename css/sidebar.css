@@ -1,0 +1,168 @@
+
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    /*background: #f5f9fc;*/
+    /*background: #3d0000;*/
+    background: #a30707; /*960303*/
+    color: rgb(0, 0, 0);
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+
+.sidebar h2 {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 15px;
+    font-size: 20px;
+    color:#f5f9fc;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    padding: 12px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    display:flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sidebar ul li:hover {
+    background:#e34646;
+    border-radius: 5px;
+}
+
+.sidebar-dropdown {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-dropdown span {
+    font-family: Arial, sans-serif;
+    transition: transform 0.3s ease;
+    color:#FFFFFF;
+    font-weight: bold;
+    display:flex;
+    align-items: center;
+    font-size: 18px;
+}
+
+.sidebar ul .active span {
+    transform: rotate(90deg);
+}
+
+.dropdownContent {
+    list-style: none;
+    padding-left: 20px;
+    display: none;
+    background:rgb(109, 11, 11);
+    border-radius: 5px;
+}
+
+.dropdownContent li {
+    padding: 10px;
+    font-size: 14px;
+    text-indent: 30px;
+}
+
+.dropdownContent li:hover {
+    /*background: #868686;*/
+    background:#f2cbcb;
+    border-radius: 5px;
+}
+
+.sidebar ul .active + .dropdownContent {
+    display: block;
+}
+
+.sidebar a {
+    font-family: Arial, sans-serif;
+    text-decoration: none;
+    display: flex;
+    /*color: rgb(94, 9, 9);*/
+    color:#FFFFFF;
+    font-weight: bold;
+    font-size:18px;
+}
+
+img {
+    height: auto;
+    width: 22px;
+    padding-left: 10px;
+    filter:invert(1);
+    align-items: right;
+    border-radius: 10%;
+}
+
+.logo-container {
+    position: relative; /* 让子元素可以定位 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px; /* 调整外边距 */
+}
+
+.logo-container::after {
+    content: ""; /* 必须要有 */
+    position: absolute;
+    width: 120px;  /* 半透明背景的大小 */
+    height: 120px;
+    background-color: rgba(255, 255, 255, 0.3); /* 50% 透明白色 */
+    border-radius: 15px; /* 圆角 */
+    z-index: -1; /* 让它在 logo 后面 */
+    transition: transform 0.3s ease-in-out;
+}
+
+.logo-container img {
+    width: 80px;  /* 放大 Logo */
+    transition: transform 0.3s ease-in-out;
+}
+
+.logo-container:hover::after {
+    transform: scale(1.2);  /* 鼠标悬浮时放大背景 */
+}
+
+.logo-container:hover img {
+    transform: scale(1.1);  /* 鼠标悬浮时放大 Logo */
+}
+
+.logo {
+    width: 80px;
+    height: auto;
+    padding-left: 0; 
+    filter: none; 
+    display: block;
+    margin: 10px auto;
+    filter: brightness(0.9) contrast(1.2);
+}
+
+/* 选中的菜单项高亮 */
+.sidebar ul li.active {
+    background: rgba(255, 255, 255, 0.2); /* 透明背景 */
+    border-radius: 8px;
+    position: relative;
+}
+
+/* 选中的菜单项左侧加一个白色高亮条 */
+.sidebar ul li.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 10%;
+    height: 80%;
+    width: 5px;
+    background: #ffffff;
+    border-radius: 2px;
+}
+
+

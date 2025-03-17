@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wireless Configuration</title>
+    <link rel="stylesheet" href="css/wifi_status_style.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <script src="js/index.js"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <a href="https://compex.com.sg/" class="logo-container" target="_blank">
+          <img src="/logo/logo.png" alt="WebUI Logo" class="logo">
+        </a>
+        <br><br>
+
+        <ul>
+            <li onclick="showSection('overview');">
+                <a href="#">Overview</a>
+                <img src="/logo/system.jpg">
+            </li>
+            <li onclick="showSection('wireless');">
+                <a href="#">Wireless</a>
+                <img src="/logo/wifi.png">
+            </li>
+            <li class="sidebar-dropdown">
+                <span onclick="toggleDropdown('network')">Network</span>
+                <img src="/logo/network.png">
+            </li>
+            <ul id="network" class="dropdownContent">
+                <li onclick="showSection('lan_stat');"><a href="#">Status</a></li>
+                <li onclick="showSection('lan_config');"><a href="#">LAN/WAN</a></li>
+                <li onclick="showSection('dhcp');"><a href="#">DHCP</a></li>
+            </ul>
+            <li onclick="showSection('user')";>
+                <a href="#">Administration</a>
+                <img src="/logo/admin.png" style="filter: brightness(15);">
+            </li>
+            <li onclick="logout()";>
+                <a href="#">Logout</a>
+                <img src="/logo/logout.png" style="filter: brightness(15);">
+            </li>
+        </ul>
+    </div>
+
+    <div class="content" id="main-content">
+    </div>
+</body>
+</html>
