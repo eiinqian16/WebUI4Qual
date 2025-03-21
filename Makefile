@@ -33,17 +33,17 @@ define Build/Compile
 endef
 
 define Package/webUI/install
-	# Install files into /www
-	$(INSTALL_DIR) $(1)/www/
-	$(CP) $(PKG_BUILD_DIR)/css $(1)/www/
-	$(CP) $(PKG_BUILD_DIR)/js $(1)/www/
-	$(CP) $(PKG_BUILD_DIR)/logo $(1)/www/
-	$(CP) $(PKG_BUILD_DIR)/README.md $(1)/www/
-	$(CP) $(PKG_BUILD_DIR)/*.html $(1)/www/
-
-	# Install cgi-bin files into /www/luci/cgi-bin
-	$(INSTALL_DIR) $(1)/www/cgi-bin/
-	$(CP) $(PKG_BUILD_DIR)/cgi-bin/* $(1)/www/cgi-bin/
+	$(INSTALL_DIR) $(1)/www/test/
+	$(CP) $(PKG_BUILD_DIR)/css $(1)/www/test/
+	$(CP) $(PKG_BUILD_DIR)/js $(1)/www/test/
+	$(CP) $(PKG_BUILD_DIR)/logo $(1)/www/test/
+	$(CP) $(PKG_BUILD_DIR)/README.md $(1)/www/test/
+	$(CP) $(PKG_BUILD_DIR)/*.html $(1)/www/test/
+	$(INSTALL_DIR) $(1)/etc/config/
+	$(CP) $(PKG_BUILD_DIR)/*.txt $(1)/etc/config/login
+	$(INSTALL_DIR) $(1)/www/test/cgi-bin/
+	$(CP) $(PKG_BUILD_DIR)/cgi-bin/* $(1)/www/test/cgi-bin/
+	chmod +x $(1)/www/test/cgi-bin/*
 endef
 
 
