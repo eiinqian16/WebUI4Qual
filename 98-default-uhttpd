@@ -1,0 +1,5 @@
+#!/bin/sh
+uci set uhttpd.main.home='/www/test'
+uci set uhttpd.main.index_page='login.html'
+uci del uhttpd.main.lua_prefix
+uci commit uhttpd
