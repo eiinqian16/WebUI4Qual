@@ -10,6 +10,7 @@ cp ./* qsdk/package/system/
 echo "CONFIG_PACKAGE_compex-web-ui=y" >> .config
 
 -----------------------------------------------------------
+
 #Please modify “option home” and “index_page” in the following path:
 ./qsdk/package/network/services/uhttpd/files/uhttpd.config
 
@@ -19,3 +20,6 @@ config uhttpd main
 	option home		/www/compex-web-ui/     #ADD PATH
 
 -----------------------------------------------------------
+
+#if want switch web UI path，Please modify Makefile:
+WEBUI_DIR=webUI_WPQ530MR 	##or WPQ530
