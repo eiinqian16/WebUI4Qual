@@ -1,0 +1,17 @@
+#copy all file to .../qsdk/package/system/compex-web-ui
+cp ./* qsdk/package/system/
+
+#.conf
+echo "CONFIG_PACKAGE_compex-web-ui=y" >> .config
+
+Please modify “option home” and “index_page” in the following path:
+./qsdk/package/network/services/uhttpd/files/uhttpd.config
+
+.......
+# Server configuration
+config uhttpd main
+	# Server document root
+	option home		/www/compex-web-ui/     #ADD PATH
+	option index_page	'login.html'		#ADD INDEX PAGE
+.......
+
