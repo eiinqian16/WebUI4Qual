@@ -1,0 +1,66 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #eeeeee;
+    color:rgb(0, 0, 0);
+}
+
+h1 {
+    font-size: 25px;
+}
+
+.usr {
+    border-radius: 25px;
+    padding: 20px;
+    background: rgb(255, 253, 253);
+    text-align: left;  
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    margin-left:300px;
+    max-width: 600px;
+}
+
+.usr #cred label {
+    width: 100px;
+    margin-right: 10px;
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+.usr input[type="password"] { 
+    flex: 1; 
+    width:200px;
+    height: 25px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding-left: 5px;
+    margin-bottom: 10px;
+    align-self: center;
+}
+
+.usr input[type="text"] { 
+    flex: 1; 
+    width:150px;
+    height: 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding-left: 5px;
+    margin-bottom: 10px;
+}
+
+.usr input[type="checkbox"] {
+    margin-right:8px;
+    margin-bottom:10px;
+}
+
+button {
+    width: 120px; 
+    height: 36px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff; 
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s, opacity 0.3s;
+    background-color: #1aa34c;
+}

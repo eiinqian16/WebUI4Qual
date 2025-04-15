@@ -1,0 +1,46 @@
+#!/bin/sh /etc/rc.common
+START=99
+
+start() {
+    TMP_FILE="/tmp/mld_phyname"
+    > "$TMP_FILE"
+
+    echo "Starting mld_phyname detection..." > /dev/console
+
+    MAX_WAIT=30
+    WAIT_TIME=0
+    while true; do
+        wifi_count=$(ls /sys/class/net/wifi*/mldphy_name 2>/dev/null | wc -l)
+        if [ "$wifi_count" -ge 3 ]; then 
+            break
+        fi
+        sleep 2
+        WAIT_TIME=$((WAIT_TIME + 2))
+        if [ "$WAIT_TIME" -ge "$MAX_WAIT" ]; then
+            echo "Timeout waiting for Wi-Fi devices" > /dev/console
+            break
+        fi
+    done
+
+    echo "Wi-Fi devices detected, collecting mld_phyname..." > /dev/console
+
+    for iface in /sys/class/net/wifi*/mldphy_name; do
+        [ -f "$iface" ] || continue
+        wifi_iface=$(basename $(dirname "$iface"))
+        mld_name=$(cat "$iface")
+
+        band_file="/sys/class/net/$wifi_iface/supported_bands"
+        if [ -f "$band_file" ]; then
+            band=$(cat "$band_file")
+        else
+            band="unknown"
+        fi
+
+        if [ "$mld_name" = "mld-phy0" ]; then
+            echo "$wifi_iface $mld_name $band" >> "$TMP_FILE"
+        fi
+    done
+
+    echo "mld_phyname detection completed!" > /dev/console
+}
+

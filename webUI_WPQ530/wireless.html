@@ -1,0 +1,101 @@
+<link rel="stylesheet" href="css/wireless.css">
+<div class="box">
+  <div class="wireless-header">
+    <h1>Wireless </h1>
+    <span class="info-icon" onclick="toggleInfoTooltip()">?</span>
+    <button id="mlo-btn" onclick="openMloModal()" style="display: none;">Setup MLO</button>
+  </div>  
+  <hr>
+	<div id="info-tooltip" class="info-tooltip">
+	    <strong>⚠ Note:</strong>
+	    <p>-When switching <code>wifi1</code> to <strong>5G/6G</strong>, the system will <strong>clear</strong> other <code>iface</code>.</p>
+	    <p>-If switching <code>wifi1</code> to <strong>6G fails</strong>, try setting the <strong>channel</strong> to <code>Channel 1</code> and retry.</p>
+	</div>
+  
+  <div class="modal-overlay" id="mloOverlay"></div>
+
+  <div class="modal" id="mloModal">
+      <div class="modal-content">
+          <h3>MLO Configuration</h3>
+          
+          <label>MLO Status:</label>
+          <label><input type="radio" name="mlo-status" id="mlo-enabled" value="enabled"> Enable</label>
+          <label><input type="radio" name="mlo-status" id="mlo-disabled" value="disabled" checked> Disable</label>
+
+          <table id="mlo-table">
+              <tr>
+                  <td><label for="mlo-ssid">SSID:</label></td>
+                  <td><input type="text" id="mlo-ssid" required></td>
+              </tr>
+              <tr>
+                  <td><label for="mlo-password">Password:</label></td>
+                  <td><input type="password" id="mlo-password" required minlength="8"></td>
+              </tr>
+              <tr>
+                  <td><label>MLO Bands:</label></td>
+                  <td>
+                      <div class="mlo-bands">
+                          <label><input type="checkbox" id="mlo-2G" value="2G"> 2.4GHz</label>
+                          <label><input type="checkbox" id="mlo-5G" value="5G"> 5GHz</label>
+                          <label><input type="checkbox" id="mlo-6G" value="6G"> 6GHz</label>
+                      </div>
+                  </td>
+              </tr>
+          </table>
+          <br>
+          <button onclick="setupMLO()">Save</button>
+          <button class="modal-close-btn" onclick="closeMloModal()">Close</button>
+      </div>
+  </div>
+
+
+  <div id="wifi-list"></div>
+
+  <div class="modal-overlay" id="modalOverlay"></div>
+
+
+  <div id="editModal" class="modal">
+      <div class="modal-content">
+          <div id="edit-modal-content"></div>
+      </div>
+  </div>
+
+  <div class="scan-overlay" id="scanOverlay"></div>
+
+  <div id="loading-overlay">
+      <div class="loading-spinner"></div>
+      <div id="loading-text">Compex</div>
+  </div>
+
+
+  <div class="modal" id="scanModal">
+      <div class="modal-content">
+          <div id="scan-modal-content"></div>
+      </div>
+  </div>
+
+</div>
+
+<div class="box">
+    <h1>Associated Stations</h1>
+    <hr>
+    <div class="station-box">
+        <table>
+            <thead>
+                <tr>
+                    <th>SSID</th>
+                    <th>Mode</th>
+                    <th>MAC Address</th>
+                    <th>Signal (dBm)</th>
+                    <th>RX Rate (Mbps)</th>
+                    <th>TX Rate (Mbps)</th>
+                </tr>
+            </thead>
+            <tbody id="associated-stations">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</div>
+

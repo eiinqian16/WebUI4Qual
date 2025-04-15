@@ -1,0 +1,193 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 300px;
+    background-color: #eeeeee;
+    margin-top: 0px;
+    color:rgb(0, 0, 0);
+}
+
+.interface {
+    flex: 1;
+    padding: 30px;
+    background: white;
+    margin: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    margin-bottom: 5px;
+}
+
+.dhcp {
+    border-radius: 25px;
+    padding: 20px;
+    margin-top: 30px;
+    background: rgb(255, 253, 253);
+    text-align: left;  /* Align text inside the box */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: left;
+}
+
+.dhcp label {
+    margin-bottom: 5px;
+    white-space: nowrap;
+}
+
+.dhcp input[type="checkbox"] {
+    margin-bottom:10px;
+}
+
+#dhcpConfig label {
+    width:150px;
+    margin-bottom:10px;
+    text-align: left;
+}
+
+#dhcpConfig input[type="text"] {
+    width:150px;
+    height: 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding-left: 5px;
+    margin-bottom: 10px;
+}
+
+.dhcpForm input[type="number"] {
+    width:150px;
+    height: 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding-left: 5px;
+}
+
+button {
+    width: 80px; 
+    height: 36px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff; 
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s, opacity 0.3s;
+    background-color: #1aa34c;
+}
+
+.wanForm {
+    display: flex;
+    width:500px;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.wanForm label {
+    width: 150px; /* Adjust width for alignment */
+    font-weight: bold;
+    text-align: left;
+    margin-bottom:10px;
+    /*flex: 0 0 150px;*/ 
+}
+
+.wanForm select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    min-width: 200px;
+    margin-right: 100px;
+    margin-bottom: 10px;
+}
+
+.wanForm #wanConfig label {
+    display:block;
+    width: 200px; /* Adjust width for alignment */
+    font-weight: bold;
+    text-align: left;
+    margin-right: 20px;
+}
+
+.wanForm #wanConfig input[type="text"] {
+    width:150px;
+    height: 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding-left: 5px;
+}
+
+.curIP strong {
+    width: 150px;
+    margin-right: 10px;
+}
+
+#ipConfig label {
+    width:150px;
+    margin-right:10px;
+}
+
+#ipConfig input[type="text"] {
+    width:150px;
+    height: 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding-left: 5px;
+}
+
+/* dhcp client table */
+hr {
+    width: 100%;
+    text-align: left;
+    color: rgb(204, 204, 204);
+    background-color: rgb(204, 204, 204);
+    border-width: 0px;
+    height: 2px;
+}
+
+table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+th, td {
+    width: 25%; /* Adjust based on column count */
+    text-align: left;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+.description {
+    color: rgb(110, 110, 110);
+    font-size: 12px;
+    font-family: sans-serif;
+    margin-bottom: 15px;
+}
+
+@media (max-width: 600px) {
+    .form-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .form-group label {
+        margin-bottom: 5px;
+    }
+
+    .ip-range {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .ip-range span {
+        margin: 5px 0;
+    }
+
+    .dhcp-container {
+        width: 90%;
+        padding: 15px;
+    }
+}
+
