@@ -33,17 +33,17 @@ define Build/Compile
 endef
 
 define Package/webUI/install
-	$(INSTALL_DIR) $(1)/www/test/
-	$(CP) $(PKG_BUILD_DIR)/css $(1)/www/test/
-	$(CP) $(PKG_BUILD_DIR)/js $(1)/www/test/
-	$(CP) $(PKG_BUILD_DIR)/logo $(1)/www/test/
-	$(CP) $(PKG_BUILD_DIR)/README.md $(1)/www/test/
-	$(CP) $(PKG_BUILD_DIR)/*.html $(1)/www/test/
+	$(INSTALL_DIR) $(1)/www/webUI/
+	$(CP) $(PKG_BUILD_DIR)/css $(1)/www/webUI/
+	$(CP) $(PKG_BUILD_DIR)/js $(1)/www/webUI/
+	$(CP) $(PKG_BUILD_DIR)/logo $(1)/www/webUI/
+	$(CP) $(PKG_BUILD_DIR)/README.md $(1)/www/webUI/
+	$(CP) $(PKG_BUILD_DIR)/*.html $(1)/www/webUI/
 	$(INSTALL_DIR) $(1)/etc/config/
 	$(CP) $(PKG_BUILD_DIR)/*.txt $(1)/etc/config/login
-	$(INSTALL_DIR) $(1)/www/test/cgi-bin/
-	$(CP) $(PKG_BUILD_DIR)/cgi-bin/* $(1)/www/test/cgi-bin/
-	chmod +x $(1)/www/test/cgi-bin/*
+	$(INSTALL_DIR) $(1)/www/webUI/cgi-bin/
+	$(CP) $(PKG_BUILD_DIR)/cgi-bin/* $(1)/www/webUI/cgi-bin/
+	chmod +x $(1)/www/webUI/cgi-bin/*
 endef
 
 
