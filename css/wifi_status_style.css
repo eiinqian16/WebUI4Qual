@@ -4,6 +4,7 @@ body {
     margin: 300px;
     background-color: #eeeeee;
     margin-top: 0px;
+    margin-right: 0px;
     color:rgb(0, 0, 0);
 }
 
@@ -90,7 +91,7 @@ ul {
 }
 
 .memory-item {
-    margin-bottom: 10px;s
+    margin-bottom: 10px;
     padding-bottom: 10px;
     border-bottom: 1px solid #ddd;
 }

@@ -40,10 +40,10 @@ function configDhcp() {
         })
         .then(response => response.text())
         .then(data => {
-            document.getElementById("wanResult").innerText = "Response: " + data;
+           // document.getElementById("wanResult").innerText = "Response: " + data;
         })
         .catch(error => {
-            document.getElementById("wanResult").innerText = "Error: " + error;
+           // document.getElementById("wanResult").innerText = "Error: " + error;
         });
     } 
 }

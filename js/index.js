@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
         currentItem.classList.add("active");
     }
 });
-
+/*
 window.addEventListener("hashchange", () => {
     console.log("Current Hash:", location.hash);
 
@@ -180,12 +180,13 @@ window.addEventListener("hashchange", () => {
         history.replaceState(null, "", "#overview");
     }
 });
-
+*/
+/*
 window.addEventListener("popstate", () => {
     let section = location.hash.replace("#", "") || "overview";
     loadSection(section);
 });
-
+*/
 document.addEventListener("DOMContentLoaded", function () {
 
     let dropdownToggles = document.querySelectorAll(".sidebar-dropdown");

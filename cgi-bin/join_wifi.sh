@@ -24,7 +24,7 @@ if [ -z "$DEVICE" ] || [ -z "$SSID" ] || [ -z "$BSSID" ]; then
     exit 1
 fi
 
-# ✅ 先检查是否已有相同 BSSID 的 iface
+# 先检查是否已有相同 BSSID 的 iface
 EXISTING_IFACE=$(uci show wireless | grep -E "wireless.@wifi-iface\[[0-9]+\].bssid='$BSSID'" | awk -F'=' '{print $1}')
 
 if [ -n "$EXISTING_IFACE" ]; then
@@ -46,7 +46,7 @@ else
     EXISTING_IFACE="wireless.@wifi-iface[$NEW_IFACE_INDEX]"
 fi
 
-# ✅ 更新已有的 iface 或新创建的 iface
+# 更新已有的 iface 或新创建的 iface
 uci set $EXISTING_IFACE.device="$DEVICE"
 uci set $EXISTING_IFACE.network="wwan"
 uci set $EXISTING_IFACE.mode="sta"

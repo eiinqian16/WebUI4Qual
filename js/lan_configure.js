@@ -1,5 +1,5 @@
+
 function configWan() {
-    let dev = document.getElementById("dev").value;
     let proto = document.getElementById("proto").value;
     let ip = document.getElementById("wanIp").value;
     let mask = document.getElementById("wanNetmask").value;
@@ -8,6 +8,13 @@ function configWan() {
     let dns1 = document.getElementById("dns1").value;
     let dns2 = document.getElementById("dns2").value;
     let body = "";
+    let dev;
+
+    if (proto === "lte") {
+        dev = document.getElementById("lteDev").value;
+    } else {
+        dev = document.getElementById("dev").value;
+    }
 
     if (dev) {
         body += "dev=" + encodeURIComponent(dev);
@@ -15,6 +22,16 @@ function configWan() {
 
     if (proto) {
         body += "&proto=" + encodeURIComponent(proto);
+    }
+
+    if (proto === "dhcp" || proto === "static" || proto === "lte") {
+        if (!dev) {
+            alert(`Device is required for ${proto.toUpperCase()} configuration.`);
+            return false;
+        }
+        if (!body.includes("dev=")) {
+            body += "&dev=" + encodeURIComponent(dev);
+        }
     }
 
     if (proto === "static") {
@@ -62,21 +79,53 @@ function configWan() {
         body += "&dns2=" + encodeURIComponent(dns2);
     }
 
-    let confirmation = confirm(`Saving and applying the changes will restart both network and WiFi interfaces. Continue?`)
+    if (proto === "lte") {
+        const lteDev = document.getElementById("lteDev").value;
+        const lteService = document.getElementById("lteService").value;
+        const lteApn = document.getElementById("lteApn").value;
+        const ltePin = document.getElementById("ltePin").value;
+        const lteDial = document.getElementById("lteDial").value;
+        const lteSimSlot = document.getElementById("lteSimSlot").value;
+    
+        if (!lteApn || !lteDev) {
+            alert("APN and Modem Device are required for LTE configuration.");
+            return false;
+        }
+    
+        // Append LTE parameters to the POST body (ensure lowercase names match backend)
+        body += "&lteDev=" + encodeURIComponent(lteDev) +
+                "&lteService=" + encodeURIComponent(lteService) +
+                "&lteApn=" + encodeURIComponent(lteApn) +
+                "&ltePin=" + encodeURIComponent(ltePin) +
+                "&lteDial=" + encodeURIComponent(lteDial) +
+                "&lteSimSlot=" + encodeURIComponent(lteSimSlot);
+    }
 
-    console.log(body);
+    let confirmation = confirm(`Saving and applying the changes will restart both network and WiFi interfaces. Continue?\n\nNote: Setting LTE/UMTS will reboot the device.`);
+
     if (confirmation) {
-        fetch("/cgi-bin/configWan.sh", {
+        showLoading();
+        fetch("/cgi-bin/config_wan.sh", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: body
         })
-        .then(response => response.text())
+        .then(response => {
+            console.log('HTTP Status:', response.status);
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.statusText);
+            }
+            return response.text();
+        })
         .then(data => {
-            document.getElementById("wanResult").innerText = "Response: " + data;
+            alert('done.\n\nNote: Setting LTE/UMTS will reboot the device.');
+            getCurWanIf();
+            hideLoading();
         })
         .catch(error => {
-            document.getElementById("wanResult").innerText = "Error: " + error;
+            console.log("error");
+            alert("error");
+            hideLoading();
         });
     }
 }
@@ -121,23 +170,35 @@ function getCurWanIf() {
            
             html += `
             <div class="wanForm">
-            <label for="dev">Device:</label>
-            <select class="dev-select" id="dev" name="dev">
-                <option value=""></option>
-            </select>
-            <br>
-            <label for="proto">Connection Type:</label>
+             <label for="proto">Connection Type:</label>
             <select class="proto-select" id="proto" name="proto" onchange="toggleIPConfig()">
+                <option value="none">None</option>
                 <option value="dhcp">Dynamic IP</option>
                 <option value="static">Static IP</option>
+                <option value="lte">LTE/UMTS/GPRS/EV-DO</option>
             </select>
+            `
+            html += `
+            <form id="noneConfig" style="display: none;">
+            </form>
+            </div>
+            `
+            html += `
+            <form id="dhcpConfig" style="display: none;">
+                <label for="dev">Device:</label>
+                <select class="dev-select" id="dev" name="dev">
+                <option value=""></option>
+                </select>
+                <br>
+            </form>
+            </div>
             <br>`
             html += `
             <form id="wanConfig" style="display: none;">
                 <label for="wanIp">IPv4 address: </label>
                 <input type="text" id="wanIp" name="wanIp" required> <br>
                 <br>
-                <label for="wanNnetmask">IPv4 netmask: </label>
+                <label for="wanNetmask">IPv4 netmask: </label>
                 <input type="text" id="wanNetmask" name="wanNetmask" required> <br>
                 <br>
                 <label for="gateway">IPv4 gateway: </label>
@@ -155,7 +216,43 @@ function getCurWanIf() {
             </form>
             </div>
             `
-
+            html += `
+            <form id="lteConfig" style="display: none;">
+                <label for="lteDev">Device: </label>
+                <select class="lteDev-select" id="lteDev" name="lteDev">
+                    <option value="/dev/ttyMSM0">ttyMSM0</option>
+                    <option value="/dev/ttyMSM1">ttyMSM1</option>
+                    <option value="/dev/ttyMSM2">ttyMSM2</option>
+                    <option value="/dev/ttyUSB0">ttyUSB0</option>
+                    <option value="/dev/ttyUSB1">ttyUSB1</option>
+                    <option value="/dev/ttyUSB2">ttyUSB2</option>
+                    <option value="/dev/ttyUSB3">ttyUSB3</option>
+                    <option value="/dev/cdc-wdm0">cdc-wdm0</option>
+                </select>
+                <br><br>
+                <label for="lteService">Service: </label>
+                <select class="lteService-select" id="lteService" name="lteService">
+                    <option value="umts">UMTS</option>
+                </select>
+                <br><br>
+                <label for="lteApn">APN: </label>
+                <input type="text" id="lteApn" name="lteApn"> <br>
+                <br>
+                <label for="ltePin">PIN: </label>
+                <input type="text" id="ltePin" name="ltePin"> <br>
+                <br>
+                <label for="lteDial">Dial Number: </label>
+                <input type="text" id="lteDial" name="lteDial"> <br>
+                <br>
+                <label for="lteSimSlot">Sim Slot: </label>
+                <select class="SimSlot-select" id="lteSimSlot" name="lteSimSlot">
+                    <option value="sim1">Sim 1</option>
+                    <option value="sim2">Sim 2</option>
+                </select>
+                <br><br>
+            </form>
+            </div>
+            `
             html += `<button onclick="configWan()">Save</button>`
             wanIP.innerHTML = html;
             window.onload = loadDev();
@@ -191,15 +288,32 @@ function loadDev() {
 }
 
 function toggleIPConfig() {
-    let proto = document.getElementById("proto").value;
-    let ipConfig = document.getElementById("wanConfig");
+    const proto = document.getElementById('proto').value;
+    const dhcpConfig = document.getElementById('dhcpConfig');
+    const wanConfig = document.getElementById('wanConfig');
+    const lteConfig = document.getElementById('lteConfig');
+    const noneConfig = document.getElementById('noneConfig');
+    const devDropdown = document.getElementById('dev');
 
-    if (proto === "static") {
-        wanConfig.style.display = "block";
-    } else {
-        wanConfig.style.display = "none";
+    dhcpConfig.style.display = 'none';
+    wanConfig.style.display = 'none';
+    lteConfig.style.display = 'none';
+    noneConfig.style.display = 'none';
+
+    if (proto === 'dhcp') {
+        dhcpConfig.style.display = 'block';
+    } else if (proto === 'static') {
+        dhcpConfig.style.display = 'block';
+        wanConfig.style.display = 'block';
+    } else if (proto === 'lte') {
+        lteConfig.style.display = 'block';
+        devDropdown.value = ''; // Reset dev dropdown
+    } else if (proto === 'none') {
+        noneConfig.style.display = 'block';
     }
+
 }
+
 
 function getCurLanIf() {
     fetch('/cgi-bin/extract_wired_data.sh')
@@ -232,12 +346,14 @@ function getCurLanIf() {
             html += `
             <form id="ipConfig">
                 <label for="ip"><strong>IPv4 address: </strong></label>
-                <input type="text" id="ip" name="ip" required> <br>
-                <br>
+                <input type="text" id="ip" name="ip" required>
+
                 <label for="netmask"><strong>IPv4 netmask: </strong></label>
-                <input type="text" id="netmask" name="netmask" required> <br>
-                <br>
-                <button onclick="configIP()">Save</button>
+                <input type="text" id="netmask" name="netmask" required>
+
+                <div class="form-actions">
+                <button type="button" onclick="configIP()">Save</button>
+                </div>
             </form>
             `
             curIP.innerHTML = html;
@@ -279,7 +395,7 @@ function configIP() {
     let confirmation = confirm(`Saving and applying the changes will restart both network and WiFi interfaces. Continue?`)
 
     if (confirmation) {
-        fetch("/cgi-bin/configLan.sh", {
+        fetch("/cgi-bin/config_lan.sh", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: body
@@ -315,4 +431,30 @@ function validateSubnetMask(mask) {
 
 function refreshPage() {
     location.reload();
+}
+
+function showLoading(message = "Loading...") {
+    let overlay = document.getElementById("loading-overlay");
+    let loadingText = document.getElementById("loading-text");
+
+    if (!overlay) {
+        console.error("showLoading: loading-overlay not found!");
+        return;
+    }
+
+    if (loadingText) {
+        loadingText.textContent = message; 
+    }
+
+    overlay.classList.add("show");
+}
+
+
+function hideLoading() {
+    let overlay = document.getElementById("loading-overlay");
+    if (!overlay) {
+        console.error("hideLoading: loading-overlay not found!");
+        return;
+    }
+    overlay.classList.remove("show");
 }

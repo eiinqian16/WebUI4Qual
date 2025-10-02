@@ -8,7 +8,11 @@ extract_ifconfig() {
     ifconfig_output=$(ifconfig "$1")
     #lanDev=$(uci get network.lan.device)
     lan_device=$(uci get network.lan.device 2>/dev/null)
+    
     wan_device=$(uci get network.wan.device 2>/dev/null)
+    if [ -z "$wan_device" ]; then
+        wan_device=$(uci get network.wan.ifname 2>/dev/null)
+    fi
 
     # extract data
     iface=$(echo "$1");
@@ -19,24 +23,26 @@ extract_ifconfig() {
     txpkt=$(echo "$ifconfig_output" | grep "TX packets:" | awk -F':' '{print $2}' | awk '{print $1}');
     rxbytes=$(echo "$ifconfig_output" | grep "RX bytes" | awk -F'(' '{print $2}' | awk -F ")" '{print $1}');
     txbytes=$(echo "$ifconfig_output" | grep "TX bytes" | awk -F'(' '{print $2}' | awk -F ")" '{print $1}');
-    if [ "$lan_device" = "$1" ]; then
+   if [ "$lan_device" = "$1" ]; then
         proto=$(uci get network.lan.proto 2>/dev/null)
         type="LAN"
-        gateway=$(echo "")
-        bcast=$(ifconfig "$1" | grep "Bcast" | awk -F':' '{print $3}'| awk '{print $1}')
-        
+        gateway=""
+        bcast=$(ifconfig "$1" | grep "Bcast" | awk -F':' '{print $3}' | awk '{print $1}')
     elif [ "$wan_device" = "$1" ]; then
         proto=$(uci get network.wan.proto 2>/dev/null)
         type="WAN"
         gateway=$(ip route | grep "default via" | awk '{print $3}')
-        bcast=$(ifconfig "$1" | grep "Bcast" | awk -F':' '{print $3}'| awk '{print $1}')
+        bcast=$(ifconfig "$1" | grep "Bcast" | awk -F':' '{print $3}' | awk '{print $1}')
+     elif [[ "$1" == 3g* ]]; then
+        proto=$(uci get network.wan.proto 2>/dev/null)
+        type="WAN"
+        gateway=$(ip route | grep "default via" | awk '{print $3}')
+        bcast=$(ifconfig "$1" | grep "Bcast" | awk -F':' '{print $3}' | awk '{print $1}')
     else
-        #echo "Error: Device $1 not found in LAN or WAN configuration."
-        #exit 1
-        proto=$(echo "")
-        type=$(echo "other")
-        gateway=$(echo "")
-        bcast=$(echo "")
+        proto=""
+        type="other"
+        gateway=""
+        bcast=""
     fi
 
     # output as JSON
@@ -59,7 +65,7 @@ extract_ifconfig() {
 }
 
 dir="/sys/class/net"
-json_objects=$(find "$dir" -maxdepth 1 \( -name "br*" -o -name "eth*" -o -name "wan*" \) | while read -r file; do
+json_objects=$(find "$dir" -maxdepth 1 \( -name "br*" -o -name "eth*" -o -name "wan*" -o -name "3g*" \) | while read -r file; do
     filename=$(basename "$file")
     extract_ifconfig "$filename"
 done)

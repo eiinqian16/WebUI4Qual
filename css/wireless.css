@@ -92,7 +92,7 @@
     transition: background 0.3s, color 0.3s, opacity 0.3s;
     margin-right: 5px;
     font-weight: bold;
-    font-size: 16px;
+    font-size: 1vw;
 }
 
 .scan-btn:hover, .add-btn:hover {
@@ -101,9 +101,10 @@
 }
 
 .edit-btn, .delete-btn {
-    width: 80px; 
-    height: 36px;
-    font-size: 14px;
+    width: 4vw; 
+    height: 2vw;
+    padding: 5px 10px;
+    font-size: 0.8vw;
     font-weight: bold;
     color: #ffffff; 
     border: none;
@@ -395,11 +396,12 @@
 }
 
 .wifi-header h3 {
+    font-size: 1.2vw;
     margin-bottom: 5px;
 }
 
 .wifi-info {
-    font-size: 12px;
+    font-size: 0.7vw;
     color: #178748;
     margin-top: 2px;
 }
@@ -462,7 +464,7 @@
 }
 
 .ssid {
-    font-size: 22px;
+    font-size: 1.1vw;
     white-space: nowrap;
 }
 
@@ -472,12 +474,12 @@
 }
 
 .mode {
-    font-size: 12px;
+    font-size: 0.7vw;
     color: #777;
 }
 
 .bssid {
-    font-size: 12px;
+    font-size: 0.7vw;
     color: #777;
 }
 

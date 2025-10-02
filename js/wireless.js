@@ -628,7 +628,27 @@ function validateCountryCode(device) {
 }            
 
 function saveConfig(device, iface) {
+
+    const getSelectedValue = (id) => {
+        const element = document.getElementById(id);
+        if (!element) {
+            console.error(`Error: Element with ID '${id}' not found.`);
+            return "";
+        }
+        return element.value;
+    };
+
     console.log(`Saving config for device: ${device}, iface: ${iface}`);
+    const passwordInput = document.getElementById(`iface-key-${iface}`);
+    const password = passwordInput.value.trim();
+    let encryption = getSelectedValue(`iface-encryption-${iface}`);
+
+    if (encryption !== "none" && password.length < 8) {
+        alert("Password must be at least 8 characters.");
+        //ssidInput.focus();
+        hideLoading();
+        return;
+    }
 
     if (!validateCountryCode(device)) {
         alert("Invalid country code! Please enter a valid ISO 3166-1 alpha-2 country code.");
@@ -644,15 +664,6 @@ function saveConfig(device, iface) {
             return "";
         }
         return element.value.trim();
-    };
-
-    const getSelectedValue = (id) => {
-        const element = document.getElementById(id);
-        if (!element) {
-            console.error(`Error: Element with ID '${id}' not found.`);
-            return "";
-        }
-        return element.value;
     };
 
     let rawChannel = getSelectedValue(`device-channel-${device}`);
@@ -717,7 +728,7 @@ function saveConfig(device, iface) {
         htmode = null; 
     }
 
-    let encryption = getSelectedValue(`iface-encryption-${iface}`);
+    //let encryption = getSelectedValue(`iface-encryption-${iface}`);
     let cipher = getSelectedValue(`iface-cipher-${iface}`);
 
     if (["psk", "psk2", "sae", "sae-mixed"].includes(encryption) && cipher && cipher !== "auto") {

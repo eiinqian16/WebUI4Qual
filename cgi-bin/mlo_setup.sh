@@ -145,7 +145,6 @@ for dev in wifi0 wifi1 wifi2 wifi3; do
 done
 
 
-
 for IFACE in $(uci show wireless | grep -oE "wireless.@wifi-iface\[[0-9]+\]" | sort -u | awk -F'[][]' '{print $2}'); do
     if ! echo "$USED_IFACES" | tr ' ' '\n' | grep -Fxq "$IFACE"; then
         echo "Setting unused iface index $IFACE SSID to '-'" >> $LOG_FILE

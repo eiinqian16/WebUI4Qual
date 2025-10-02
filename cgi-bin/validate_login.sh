@@ -10,7 +10,7 @@ pwdInput=$(echo "$INPUT" | sed -n 's/^.*pwd=\([^&]*\).*$/\1/p' | sed 's/%20/ /g'
 
 echo "Debug: nameInput='$nameInput', pwdInput='$pwdInput'" >&2  # 输出到系统日志
 
-USER_DB="/etc/config/login"
+USER_DB="/etc/init.d/login"
 SESSION_DIR="/tmp/sessions"
 
 mkdir -p "$SESSION_DIR"
