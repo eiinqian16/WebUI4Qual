@@ -144,7 +144,6 @@ function fetchDchpClient() {
                 return;
             }
             console.log("Successfully fetched data:", data);
-            // Display network status
             html += `
             <table>
                 <tr>

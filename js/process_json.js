@@ -1,3 +1,85 @@
+function fetchSysStats() {
+    fetch('/cgi-bin/extract_system_info.sh')
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+
+        })
+        .then(data => {
+            console.log("Successfully fetched data:", data);
+
+
+            const percentAvailMem = ((data.memAvail / data.memTotal * 100).toFixed(2));
+            const percentUsedMem = ((data.memUsed / data.memTotal * 100).toFixed(2));
+            const percentCache = ((data.cache / data.memTotal * 100).toFixed(2));
+            const sysInfo = document.getElementById("sys");
+
+            let html = `
+                <div class="status-item">
+                    <span class="status-label">Model</span>
+
+                    <span class="status-value"> ${data.model || 'N/A'}</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Host</span>
+
+                    <span class="status-value"> ${data.host || 'N/A'}</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Architecture</span>
+
+                    <span class="status-value"> ${data.arch || 'N/A'}</span>
+                </div>
+                <div class="status-item">
+
+                    <span class="status-label">Target Platform</span>
+                    <span class="status-value"> ${data.target || 'N/A'}</span>
+                </div>
+                <div class="status-item">
+
+                    <span class="status-label">Kernel Version</span>
+                    <span class="status-value"> ${data.kernel || 'N/A'}</span>
+                </div>
+                <div class="status-item">
+
+                    <span class="status-label">Date</span>
+                    <span class="status-value"> ${data.date || 'N/A'}</span>
+                </div>
+                <br>
+                <h3>Memory</h3>
+                <div class="memory-item">
+                    <span class="memory-label">Total Available</span>
+
+                    <progress class="memory-progress" value="${data.memAvail}" max="${data.memTotal}"></progress>
+                    <span class="memory-value">${(data.memAvail / 1000).toFixed(2)}MB / ${(data.memTotal / 1000).toFixed(2)}MB (${percentAvailMem}%)</span>
+                </div>
+                <div class="memory-item">
+
+                    <span class="memory-label">Used</span>
+                    <progress class="memory-progress" value="${data.memUsed}" max="${data.memTotal}"></progress>
+                    <span class="memory-value">${(data.memUsed / 1000).toFixed(2)}MB / ${(data.memTotal / 1000).toFixed(2)}MB (${percentUsedMem}%)</span>
+                </div>
+
+                <div class="memory-item">
+                    <span class="memory-label">Cached</span>
+                    <progress class="memory-progress" value="${data.cache}" max="${data.memTotal}"></progress>
+                    <span class="memory-value">${(data.cache / 1000).toFixed(2)}MB / ${(data.memTotal / 1000).toFixed(2)}MB (${percentCache}%)</span>
+                </div>
+            `;
+
+
+            sysInfo.innerHTML = html;
+        })
+        .catch(error => {
+            console.error("Fetch Error:", error);
+
+            document.getElementById("errorMessage").innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+        });
+}
+
 function fetchStorageStats() {
     const storeInfo = document.getElementById("storage");
     const errorMessage = document.getElementById("errorMessage");
@@ -63,74 +145,6 @@ function fetchStorageStats() {
         });
 }
 
-
-function fetchSysStats() {
-    fetch('/cgi-bin/extract_system_info.sh')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Successfully fetched data:", data);
-
-            const percentAvailMem = ((data.memAvail / data.memTotal * 100).toFixed(2));
-            const percentUsedMem = ((data.memUsed / data.memTotal * 100).toFixed(2));
-            const percentCache = ((data.cache / data.memTotal * 100).toFixed(2));
-            const sysInfo = document.getElementById("sys");
-            let html = `
-                <div class="status-item">
-                    <span class="status-label">Model</span>
-                    <span class="status-value"> ${data.model || 'N/A'}</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-label">Host</span>
-                    <span class="status-value"> ${data.host || 'N/A'}</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-label">Architecture</span>
-                    <span class="status-value"> ${data.arch || 'N/A'}</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-label">Target Platform</span>
-                    <span class="status-value"> ${data.target || 'N/A'}</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-label">Kernel Version</span>
-                    <span class="status-value"> ${data.kernel || 'N/A'}</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-label">Date</span>
-                    <span class="status-value"> ${data.date || 'N/A'}</span>
-                </div>
-                <br>
-                <h3>Memory</h3>
-                <div class="memory-item">
-                    <span class="memory-label">Total Available</span>
-                    <progress class="memory-progress" value="${data.memAvail}" max="${data.memTotal}"></progress>
-                    <span class="memory-value">${(data.memAvail / 1000).toFixed(2)}MB / ${(data.memTotal / 1000).toFixed(2)}MB (${percentAvailMem}%)</span>
-                </div>
-                <div class="memory-item">
-                    <span class="memory-label">Used</span>
-                    <progress class="memory-progress" value="${data.memUsed}" max="${data.memTotal}"></progress>
-                    <span class="memory-value">${(data.memUsed / 1000).toFixed(2)}MB / ${(data.memTotal / 1000).toFixed(2)}MB (${percentUsedMem}%)</span>
-                </div>
-                <div class="memory-item">
-                    <span class="memory-label">Cached</span>
-                    <progress class="memory-progress" value="${data.cache}" max="${data.memTotal}"></progress>
-                    <span class="memory-value">${(data.cache / 1000).toFixed(2)}MB / ${(data.memTotal / 1000).toFixed(2)}MB (${percentCache}%)</span>
-                </div>
-            `;
-
-            sysInfo.innerHTML = html;
-        })
-        .catch(error => {
-            console.error("Fetch Error:", error);
-            document.getElementById("errorMessage").innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
-        });
-}
-
 function fetchLanStatus() {
     fetch('/cgi-bin/extract_wired_data.sh')
         .then(response => {
@@ -182,7 +196,6 @@ function fetchWanStatus() {
             console.log("Successfully fetched data:", data);
             const wanIf = data.find(iface => iface.type === "WAN");
             const wanstat = document.getElementById("wan");
-            // Display network status
             let html = "";
             if (wanIf) {
             data.forEach(iface => {
@@ -225,7 +238,6 @@ function fetchOthStatus() {
         })
         .then(data => {
             console.log("Successfully fetched data:", data);
-            // Display network status
             let html = "";
             data.forEach(iface => { 
                 if (iface.type === "other") {
@@ -254,72 +266,6 @@ function fetchOthStatus() {
         });
 }
 
-function fetchWiFiStatus() {
-    fetch('/cgi-bin/extract_iwconfig_v2.sh')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Successfully fetched data:", data);
-
-            let networksFound = {"2g": false, "5g": false, "6g": false};
-            // Display network status
-            let html = "";
-            data.forEach(network => { 
-                const statusDiv = document.getElementById("wireless");
-                if (network.Network === "2G") {
-                    //statusDiv = document.getElementById("2gstatus");
-                    networksFound["2g"] = true;
-                } else if (network.Network === "5G") {
-                    //statusDiv = document.getElementById("5gstatus");
-                    networksFound["5g"] = true;
-                } else if (network.Network === "6G") {
-                    //statusDiv = document.getElementById("6gstatus");
-                    networksFound["6g"] = true;
-                } else {
-                    console.warn("Unknown network");
-                }
-                html += `
-                <div class="interface">
-                    <h2>${network.Network} WiFi (${network.iface})</h2>
-                    <h4>SSID: ${network.ESSID || 'N/A'}</h4>
-                    <p><strong>Mode:</strong> ${network.Mode || 'N/A'}</p>
-                    <p><strong>Frequency:</strong> ${network.Frequency || 'N/A'}</p>
-                    <p><strong>Access Point:</strong> ${network.AccessPoint || 'N/A'}</p>
-                    <p><strong>Bitrate:</strong> ${network.BitRate || 'N/A'}</p>
-                    <p><strong>TxPower:</strong> ${network.TxPower || 'N/A'}</p>
-                    <p><strong>Encryption Key:</strong> ${network.EncryptionKey || 'N/A'}</p>
-                    <p><strong>Signal Level:</strong> ${network.SignalLevel || 'N/A'}</p>
-                    <p><strong>Noise Level:</strong> ${network.NoiseLevel || 'N/A'}</p>
-                    <p><strong>MAC Address:</strong> ${network.macAddr || 'N/A'}</p>
-                </div>
-                `;
-                wireless.innerHTML = html;
-                
-            });
-            Object.keys(networksFound).forEach(key => {
-                if(!networksFound[key]){
-                    let disabled = document.getElementById("disabled");
-                    if (disabled) {
-                        disabled.innerHTML=`
-                        <div class="interface">
-                        <p>${key} WiFi Disabled</p>
-                        </div>
-                        `;
-                    }
-                }
-            })
-        })
-        .catch(error => {
-            console.error("Fetch Error:", error);
-            document.getElementById("errorMessage").innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
-        });
-}
-
 function refreshStatus() {
-    fetchWiFiStatus();
     fetchLanStatus();
 }

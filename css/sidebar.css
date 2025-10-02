@@ -2,8 +2,6 @@
 .sidebar {
     width: 250px;
     height: 100vh;
-    /*background: #f5f9fc;*/
-    /*background: #3d0000;*/
     background: #a30707; /*960303*/
     color: rgb(0, 0, 0);
     position: fixed;
@@ -105,35 +103,35 @@ img {
 }
 
 .logo-container {
-    position: relative; /* 让子元素可以定位 */
+    position: relative; 
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px; /* 调整外边距 */
+    padding: 20px; 
 }
 
 .logo-container::after {
-    content: ""; /* 必须要有 */
+    content: ""; 
     position: absolute;
-    width: 120px;  /* 半透明背景的大小 */
+    width: 120px; 
     height: 120px;
-    background-color: rgba(255, 255, 255, 0.3); /* 50% 透明白色 */
-    border-radius: 15px; /* 圆角 */
-    z-index: -1; /* 让它在 logo 后面 */
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 15px; 
+    z-index: -1; 
     transition: transform 0.3s ease-in-out;
 }
 
 .logo-container img {
-    width: 80px;  /* 放大 Logo */
+    width: 80px;  
     transition: transform 0.3s ease-in-out;
 }
 
 .logo-container:hover::after {
-    transform: scale(1.2);  /* 鼠标悬浮时放大背景 */
+    transform: scale(1.2); 
 }
 
 .logo-container:hover img {
-    transform: scale(1.1);  /* 鼠标悬浮时放大 Logo */
+    transform: scale(1.1);  
 }
 
 .logo {
@@ -146,14 +144,12 @@ img {
     filter: brightness(0.9) contrast(1.2);
 }
 
-/* 选中的菜单项高亮 */
 .sidebar ul li.active {
-    background: rgba(255, 255, 255, 0.2); /* 透明背景 */
+    background: rgba(255, 255, 255, 0.2); 
     border-radius: 8px;
     position: relative;
 }
 
-/* 选中的菜单项左侧加一个白色高亮条 */
 .sidebar ul li.active::before {
     content: "";
     position: absolute;

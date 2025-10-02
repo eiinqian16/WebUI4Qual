@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wireless Configuration</title>
+    <title>Compex WPQ530 GUI Demo ver0.4</title>
     <link rel="stylesheet" href="css/wifi_status_style.css">
     <link rel="stylesheet" href="css/sidebar.css">
     <script src="js/index.js"></script>
@@ -20,10 +20,20 @@
                 <a href="#">Overview</a>
                 <img src="/logo/system.jpg">
             </li>
+<!--
             <li onclick="showSection('wireless');">
                 <a href="#">Wireless</a>
                 <img src="/logo/wifi.png">
             </li>
+-->
+            <li class="sidebar-dropdown">
+                <span onclick="toggleDropdown('wireless')">Wireless</span>
+                <img src="/logo/wifi.png">
+            </li>
+            <ul id="wireless" class="dropdownContent">
+                <li onclick="showSection('wireless');"><a href="#">Wireless Setting</a></li>
+                <li onclick="showSection('acktimeout');"><a href="#">Acktimeout</a></li>
+            </ul>
             <li class="sidebar-dropdown">
                 <span onclick="toggleDropdown('network')">Network</span>
                 <img src="/logo/network.png">

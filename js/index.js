@@ -8,13 +8,19 @@ function loadSection(section) {
                 return;
             }
             mainContent.innerHTML = html;
+
+            if (section === 'overview') {
+                    loadScript('js/process_json.js', () => {
+                        fetchSysStats();
+                        fetchStorageStats();
+                    });
+            }
             setTimeout(() => {
                 if (section === 'wireless') {
                     loadScript('js/wireless.js', () => {
                         if (typeof getConfig === 'function') {
                             getConfig();
                             fetchAssociatedStations();
-                            
                             if (!window.associatedStationsInterval) {
                                 window.associatedStationsInterval = setInterval(fetchAssociatedStations, 5000);
                             }
@@ -41,11 +47,11 @@ function loadSection(section) {
                         window.wifiInfoInterval = null;
                     }
                 }
-
-                if (section === 'overview') {
-                    loadScript('js/process_json.js', () => {
-                        fetchSysStats();
-                        fetchStorageStats();
+            
+                if (section === 'acktimeout') {
+                    loadScript('js/acktimeout.js', () => {
+                        initAckTimeout();
+                        console.log('test acktimeout test');
                     });
                 }
                 if (section === 'lan_stat') {
@@ -77,7 +83,7 @@ function loadSection(section) {
                 }
                 if (section === 'user') {
                     loadScript('js/user.js', () => {
-                        getCred()
+                        getCred();
                     });
                 }
             }, 100);
@@ -118,7 +124,7 @@ function loadScript(src, callback) {
 function showSection(section) {
     if (!section || section.trim() === "") {
         console.warn("showSection received empty section, defaulting to overview");
-        section = "overview"; // 防止空 `#`
+        section = "overview";
     }
 
     let currentHash = location.hash.replace("#", "") || "overview";
@@ -155,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!section || section.trim() === "") {
         console.warn("DOMContentLoaded detected empty section, defaulting to overview");
         section = "overview";
-        history.replaceState(null, "", "#overview"); // 修正 URL
+        history.replaceState(null, "", "#overview"); 
     }
 
     loadSection(section);

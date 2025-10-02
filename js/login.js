@@ -28,6 +28,13 @@ function getLoginCred() {
     </form>
     `;
     loginCont.innerHTML = html;
+
+    document.getElementById("login").addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); 
+            validateCred(); 
+        }
+    });
 }
 
 function validateCred() {
@@ -40,7 +47,6 @@ function validateCred() {
         return;
     }
 
-    // 禁用按钮，显示加载图标
     loginBtn.innerHTML = `<span class="loader"></span> Logging in...`;
     loginBtn.disabled = true;
 
@@ -76,8 +82,6 @@ function validateCred() {
         }, 2000);
     });
 }
-
-
 
 function showPwd() {
     let passwordFields = document.querySelectorAll("#pwd");

@@ -33,17 +33,28 @@ define Build/Compile
 endef
 
 define Package/webUI/install
-	$(INSTALL_DIR) $(1)/www/webUI/
-	$(CP) $(PKG_BUILD_DIR)/css $(1)/www/webUI/
-	$(CP) $(PKG_BUILD_DIR)/js $(1)/www/webUI/
-	$(CP) $(PKG_BUILD_DIR)/logo $(1)/www/webUI/
-	$(CP) $(PKG_BUILD_DIR)/README.md $(1)/www/webUI/
-	$(CP) $(PKG_BUILD_DIR)/*.html $(1)/www/webUI/
+	$(INSTALL_DIR) $(1)/etc/hotplug.d/net/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/hotplug/99-acktimeout $(1)/etc/hotplug.d/net/
+	chmod +x $(1)/etc/hotplug.d/net/99-acktimeout
+
+	$(INSTALL_DIR) $(1)/etc/config/
+	$(INSTALL_DIR) $(1)/etc/init.d/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/init/acktimeout $(1)/etc/init.d/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/init/mld_phyname $(1)/etc/init.d/
+	chmod +x $(1)/etc/init.d/acktimeout
+	chmod +x $(1)/etc/init.d/mld_phyname
+
+	$(INSTALL_DIR) $(1)/www/test/
+	$(CP) $(PKG_BUILD_DIR)/css $(1)/www/test/
+	$(CP) $(PKG_BUILD_DIR)/js $(1)/www/test/
+	$(CP) $(PKG_BUILD_DIR)/logo $(1)/www/test/
+	$(CP) $(PKG_BUILD_DIR)/README.md $(1)/www/test/
+	$(CP) $(PKG_BUILD_DIR)/*.html $(1)/www/test/
 	$(INSTALL_DIR) $(1)/etc/config/
 	$(CP) $(PKG_BUILD_DIR)/*.txt $(1)/etc/config/login
-	$(INSTALL_DIR) $(1)/www/webUI/cgi-bin/
-	$(CP) $(PKG_BUILD_DIR)/cgi-bin/* $(1)/www/webUI/cgi-bin/
-	chmod +x $(1)/www/webUI/cgi-bin/*
+	$(INSTALL_DIR) $(1)/www/test/cgi-bin/
+	$(CP) $(PKG_BUILD_DIR)/cgi-bin/* $(1)/www/test/cgi-bin/
+	chmod +x $(1)/www/test/cgi-bin/*
 endef
 
 

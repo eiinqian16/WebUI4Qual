@@ -24,6 +24,25 @@ get_current_channel(){
     iw dev | awk -v dev="$device" '$0 ~ "Interface " dev "$" {found=1} found && /channel/ {print $2; exit}'
 }
 
+get_current_freq() {
+    local device=$1
+    iw dev | awk -v dev="$device" '$0 ~ "Interface " dev "$" {found=1} found && /channel/ {print $2, $3; exit}' | awk -F '[()]' '{print $2}'
+}
+
+
+get_current_band() {
+    local freq_mhz=$1
+    if [ "$freq_mhz" -ge 2412 ] && [ "$freq_mhz" -le 2484 ]; then
+        echo "2.4GHz"
+    elif [ "$freq_mhz" -ge 5180 ] && [ "$freq_mhz" -le 5885 ]; then
+        echo "5GHz"
+    elif [ "$freq_mhz" -ge 5955 ] && [ "$freq_mhz" -le 7115 ]; then
+        echo "6GHz"
+    else
+        echo "Unknown"
+    fi
+}
+
 get_bitrate_from_iwconfig() {
     local device=$1
     local iface=""
@@ -39,8 +58,8 @@ get_bitrate_from_iwconfig() {
         return
     fi
 
-    iwconfig "$iface" 2>/dev/null | grep "Bit Rate" >&2 
-    iwconfig "$iface" 2>/dev/null | grep "Bit Rate" | awk -F'[: ]+' '{print $4, $5}'
+    iwconfig "$iface" 2>/dev/null | grep "Bit Rate" >&2
+    iwconfig "$iface" 2>/dev/null | grep "Bit Rate" | awk -F'[: ]+' '{print $4,$5}'
 }
 
 get_iface_ssid_map() {
@@ -70,8 +89,28 @@ get_bssid_by_ssid() {
     echo "$bssid"
 }
 
+if [ -f "$MLO_STATUS_FILE" ]; then
+    MLO_INFO=$(cat "$MLO_STATUS_FILE")
+else
+    MLO_INFO="0,-"
+fi
+
+MLO_STATUS_FILE="/www/compex-web-ui/cgi-bin/mlo-status"
+
+if [ -f "$MLO_STATUS_FILE" ]; then
+    MLO_INFO=$(cat "$MLO_STATUS_FILE" | tr -d '\r') 
+else
+    MLO_INFO="0,-"
+fi
+
+MLO_STATUS=$(echo "$MLO_INFO" | cut -d',' -f1)
+MLO_BANDS=$(echo "$MLO_INFO" | cut -d',' -f2)
 
 echo "{"
+echo "  \"mlo_status\": \"$MLO_STATUS\","
+echo "  \"mlo_bands\": \"$MLO_BANDS\","
+
+
 wifi_devices=$(uci show wireless | grep "=wifi-device" | cut -d. -f2 | cut -d= -f1)
 total_devices=$(echo "$wifi_devices" | wc -l)
 count=0
@@ -80,18 +119,21 @@ for device in $wifi_devices; do
     type=$(uci get wireless.$device.type 2>/dev/null)
     channel=$(uci get wireless.$device.channel 2>/dev/null)
     current_channel=$(get_current_channel $device)
+    current_freq=$(get_current_freq "$device")
+    current_band=$(get_current_band "$current_freq")
     bitrate=$(get_bitrate_from_iwconfig $device)
     hwmode=$(uci get wireless.$device.hwmode 2>/dev/null)
-    htmode=$(uci get wireless.$device.htmode 2>/dev/null) 
+    htmode=$(uci get wireless.$device.htmode 2>/dev/null)
     disabled=$(uci get wireless.$device.disabled 2>/dev/null)
     txpower=$(uci get wireless.$device.txpower 2>/dev/null)
     country=$(uci get wireless.$device.country 2>/dev/null)
-	
+
     echo "  \"$device\": {"
     echo "    \"device\": \"$device\","
     echo "    \"type\": \"$type\","
     echo "    \"channel\": \"$channel\","
     echo "    \"current_channel\": \"$current_channel\","
+    echo "    \"current_band\": \"$current_band\","
     echo "    \"bitrate\": \"$bitrate\","
     echo "    \"hwmode\": \"$hwmode\","
 
@@ -117,11 +159,11 @@ for device in $wifi_devices; do
                 channels_24="$channels_24 \"$channel_num ($freq MHz)\","
             fi
         done
-	if [ -n "$channels_24" ]; then
-	    if [ "$first_band" -eq 0 ]; then echo ","; fi
-	    first_band=0
-	    echo "      \"2.4GHz\": [\"auto (2.4GHz)\",${channels_24%?}]"
-	fi
+        if [ -n "$channels_24" ]; then
+            if [ "$first_band" -eq 0 ]; then echo ","; fi
+            first_band=0
+            echo "      \"2.4GHz\": [\"auto (2.4GHz)\",${channels_24%?}]"
+        fi
 
         channels_5=""
         for freq in $freq_list; do
@@ -130,11 +172,11 @@ for device in $wifi_devices; do
                 channels_5="$channels_5 \"$channel_num ($freq MHz)\","
             fi
         done
-	if [ -n "$channels_5" ]; then
-	    if [ "$first_band" -eq 0 ]; then echo ","; fi
-	    first_band=0
-	    echo "      \"5GHz\": [\"auto (5GHz)\",${channels_5%?}]"
-	fi
+        if [ -n "$channels_5" ]; then
+            if [ "$first_band" -eq 0 ]; then echo ","; fi
+            first_band=0
+            echo "      \"5GHz\": [\"auto (5GHz)\",${channels_5%?}]"
+        fi
 
         channels_6=""
         for freq in $freq_list; do
@@ -143,10 +185,10 @@ for device in $wifi_devices; do
                 channels_6="$channels_6 \"$channel_num ($freq MHz)\","
             fi
         done
-	if [ -n "$channels_6" ]; then
-	    if [ "$first_band" -eq 0 ]; then echo ","; fi
-	    echo "      \"6GHz\": [\"auto (6GHz)\",${channels_6%?}]"
-	fi
+        if [ -n "$channels_6" ]; then
+            if [ "$first_band" -eq 0 ]; then echo ","; fi
+            echo "      \"6GHz\": [\"auto (6GHz)\",${channels_6%?}]"
+        fi
 
         echo "    },"
     fi
@@ -157,19 +199,18 @@ for device in $wifi_devices; do
     else
         supported_bands="unknown"
     fi
-	
+
     echo "    \"supported_bands\": \"$supported_bands\","
 
     echo "    \"interfaces\": ["
 
-    wifi_ifaces=$(uci show wireless | grep "=wifi-iface" | cut -d. -f2 | cut -d= -f1)
+    wifi_ifaces=$(uci show wireless | grep "=wifi-iface" | cut -d. -f2 | cut -d=                                                                                                                             -f1)
     first_iface=1
 
     get_iface_ssid_map
 
     for iface in $wifi_ifaces; do
         iface_device=$(uci get wireless.$iface.device 2>/dev/null)
-
         if [ "$iface_device" = "$device" ]; then
             network=$(uci get wireless.$iface.network 2>/dev/null)
             mode=$(uci get wireless.$iface.mode 2>/dev/null)
@@ -199,6 +240,12 @@ for device in $wifi_devices; do
                 fi
                 key=$(uci get wireless.$iface.key 2>/dev/null)
             fi
+            bssid=$(get_bssid_by_ssid "$ssid" "$mode")
+
+            if [ "$first_iface" -eq 0 ]; then
+                echo ","
+            fi
+
             first_iface=0
 
             echo "      {"
@@ -229,3 +276,4 @@ for device in $wifi_devices; do
 done
 
 echo "}"
+

@@ -12,21 +12,32 @@ async function getConfig(updateOnly = false) {
                                                                                                                           
         if (!updateOnly) {
             deviceConfig = {};
-            Object.keys(data).forEach(device => {                                                                    
-                deviceConfig[device] = {                                                                                 
-                    ...data[device],                                                                               
-                    interfaces: Array.isArray(data[device].interfaces) ? data[device].interfaces : []                                  
-                };                                                                                                            
-            });                                                                                                                   
+
+            window.mloStatus = data.mlo_status ? parseInt(data.mlo_status, 10) : 0;
+            window.mloBands = data.mlo_bands || "";
+
+            Object.keys(data).forEach(device => {     
+                if (device !== "mlo_status" && device !== "mlo_bands") {                                                              
+                    deviceConfig[device] = {                                                                                 
+                        ...data[device],                                                                               
+                        interfaces: Array.isArray(data[device].interfaces) ? data[device].interfaces : []                                  
+                    };   
+                }                                                                                                          
+            });           
+            
+            updateMloState(window.mloStatus, window.mloBands);                                                                                                  
             renderWifiList(); 
         } else {
             console.log("Updating only bitrate, channel, BSSID..."); 
 
             Object.keys(data).forEach(device => {
-                if (deviceConfig[device]) {
+                if (device === "mlo_status") {
+                    window.mloStatus = parseInt(data.mlo_status, 10);
+                } else if (device === "mlo_bands") {
+                    window.mloBands = data.mlo_bands || "";
+                } else if (deviceConfig[device]) {
                     deviceConfig[device].bitrate = data[device].bitrate || deviceConfig[device].bitrate;
                     deviceConfig[device].current_channel = data[device].current_channel || deviceConfig[device].current_channel;
-                    
                     data[device].interfaces.forEach((iface, index) => {
                         if (deviceConfig[device].interfaces[index]) {
                             deviceConfig[device].interfaces[index].bssid = iface.bssid || deviceConfig[device].interfaces[index].bssid;
@@ -42,7 +53,6 @@ async function getConfig(updateOnly = false) {
     }                                                                                                                     
 }
 
-            
 
 function renderWifiList() {                                                                                          
     const wifiListContainer = document.getElementById('wifi-list');
@@ -104,6 +114,7 @@ function renderWifiList() {
         wifiListContainer.appendChild(table);
     });
 
+
     document.querySelectorAll('.scan-btn').forEach(btn => {                                                               
         btn.addEventListener('click', function() {                                                                            
             const device = this.getAttribute('data-device');                                                     
@@ -128,10 +139,20 @@ function renderWifiList() {
 
     document.querySelectorAll('.add-btn').forEach(btn => {                                                                    
         btn.addEventListener('click', function() {                                                               
-            const device = this.getAttribute('data-device');                                                         
+            const device = this.getAttribute('data-device');                                                        
             openAddModal(device);                                                                              
         });                                                                                                                        
     });
+
+    if (window.mloStatus === 1) {
+        document.querySelectorAll('.scan-btn, .add-btn, .edit-btn, .delete-btn').forEach(btn => {
+            btn.disabled = true;
+        });
+    } else {
+        document.querySelectorAll('.scan-btn, .add-btn, .edit-btn, .delete-btn').forEach(btn => {
+            btn.disabled = false;
+        });
+    }
 }                             
     
 function updateWifiInfoUI() {
@@ -158,15 +179,13 @@ async function openEditModal(device, iface) {
     const modal = document.getElementById('editModal');                                                                            
     const overlay = document.getElementById('modalOverlay');                                                              
                                                                                                                               
-    const wifi = deviceConfig[device];                                                                           
-    if (!wifi) {                                                                                                     
-        console.error(`Device ${device} not found.`);                                                          
+    const wifi = deviceConfig[device];                                                                      
+    if (!wifi) {                                                                                                                                                              
         return;                                                                                                                    
     }                                                                                                                     
                                                                                                                               
     const ifaceConfig = wifi.interfaces.find(i => i.iface === iface);                                            
-    if (!ifaceConfig) {                                                                                              
-        console.error(`Interface ${iface} not found.`);                                                        
+    if (!ifaceConfig) {                                                                                                                                                     
         return;                                                                                                                    
     }                                                                                                                     
                                                                                                                               
@@ -175,70 +194,95 @@ async function openEditModal(device, iface) {
     const txpowerOptions = [5, 8, 11, 14, 17, 20, 23, "MAX"].map(value =>                                              
         `<option value="${value}" ${txpowerValue == value ? "selected" : ""}>${value}</option>`                                    
     ).join('');                                                                                                           
+            
                                                                                                                               
-    let channelOptionsHtml = "";                                                                                 
-    if (wifi.channel_options) {                                                                                      
-        Object.keys(wifi.channel_options).forEach(band => {                                                    
-            channelOptionsHtml += `<optgroup label="--- ${band} ---"></optgroup>`;                                                 
-            wifi.channel_options[band].forEach(chan => {                                                                  
-                let selected = (chan.startsWith(wifi.channel)) ? "selected" : "";                                             
-                channelOptionsHtml += `<option value="${chan}" ${selected}>${chan}</option>`;                    
-            });                                                                                                      
-        });                                                                                                    
-    }                                                                                                                              
+let channelOptionsHtml = "";
 
-    let hwmodeValue = wifi.hwmode || "11bea";  // .........                                                      
-    let htmodeValue = wifi.htmode || "EHT320"; // .........                                                          
-                                                                                                               
-    console.log(`Current hwmode: ${hwmodeValue}, htmode: ${htmodeValue}`);                                                         
-     
-    let is6GHz = wifi.supported_bands && wifi.supported_bands.includes("6G"); 
+if (wifi.channel_options) {
+    console.log("🔹 wifi.channel_options:", wifi.channel_options); 
 
-    console.log(`Editing ${device}, is6GHz: ${is6GHz}`);
+    Object.keys(wifi.channel_options).forEach(band => {
+        console.log("🔹 Processing band:", band); 
+
+        channelOptionsHtml += `<optgroup label="--- ${band} ---"></optgroup>`;
+
+        wifi.channel_options[band].forEach(chan => {
+            let chanNumber = chan.split(" ")[0]; 
+            let selected = (chan === wifi.channel) ? "selected" : ""; 
+
+            console.log("🔹 Processing channel:", chan, "chanNumber:", chanNumber);
+
+            if (chanNumber === "auto") {
+                console.log("🔹 Found 'auto' channel: ", chan); 
+
+
+                if (wifi.current_band === "5GHz" && band === "5GHz" && chan.includes("auto (5GHz)")) {
+                    selected = "selected";
+                    console.log("🔹 Selected 'auto (5GHz)' for 5GHz band.");
+                } else if (wifi.current_band === "6GHz" && band === "6GHz" && chan.includes("auto (6GHz)")) {
+                    selected = "selected";
+                    console.log("🔹 Selected 'auto (6GHz)' for 6GHz band.");
+                } else if (wifi.current_band === "2.4GHz" && band === "2.4GHz" && chan.includes("auto (2.4GHz)")) {
+                    selected = "selected"; 
+                    console.log("🔹 Selected 'auto (2.4GHz)' for 2.4GHz band.");
+                }
+            }
+
+            let optionValue = chan; 
+            if (chanNumber === "auto") {
+                if (wifi.current_band === "5GHz" && band === "5GHz") {
+                    optionValue = "auto (5GHz)";
+                    console.log("🔹 Setting optionValue to 'auto (5GHz)' for 5GHz band.");
+                } else if (wifi.current_band === "6GHz" && band === "6GHz") {
+                    optionValue = "auto (6GHz)";
+                    console.log("🔹 Setting optionValue to 'auto (6GHz)' for 6GHz band.");
+                } else if (wifi.current_band === "2.4GHz" && band === "2.4GHz") {
+                    optionValue = "auto (2.4GHz)";
+                    console.log("🔹 Setting optionValue to 'auto (2.4GHz)' for 2.4GHz band.");
+                }
+            }
+
+            console.log("🔹 Option value:", optionValue, "selected:", selected); // 打印选项的值和是否选中
+
+            // 生成选项HTML
+            channelOptionsHtml += `<option value="${optionValue}" ${selected}>${chan}</option>`;
+        });
+    });
+}
+
+
+
+
+                                                                                                                        
+
+    let hwmodeValue = wifi.hwmode || "11bea";                                                       
+    let htmodeValue = wifi.htmode || "EHT320";                                                        
+                                                                                                                                                                      
                                                                                   
     let hwModesResponse = await fetch(`/cgi-bin/get_hw_modes.sh?device=${device}`);                              
     let hwModesData = await hwModesResponse.json();                                                                  
-    console.log("Available HW Modes:", hwModesData);
 
     let hwmodeOptions = Object.keys(hwModesData.hw_modes)                                                                     
         .map(hw => `<option value="${hw}" ${hw === hwmodeValue ? "selected" : ""}>${hw.toUpperCase()}</option>`) 
         .join('');                                                                                                   
 
     const modeValue = ifaceConfig.mode || "ap"; 
-    updateCipherOptions(iface, modeValue,device);
     
-    let encryptionValue = is6GHz ? "ccmp" : (ifaceConfig.encryption || "none");
-    let cipherValue = ifaceConfig.cipher || "auto";
-    
-    let encryptionOptions = is6GHz ? `
-        <option value="ccmp" selected>WPA3-SAE (Forced for 6GHz)</option>
-    ` : `
-        <option value="none" ${encryptionValue === "none" ? "selected" : ""}>None</option>
-        <option value="psk" ${encryptionValue === "psk" ? "selected" : ""}>WPA-PSK (WPA1)</option>
-        <option value="psk2" ${encryptionValue === "psk2" ? "selected" : ""}>WPA2-PSK</option>
-        <option value="psk-mixed" ${encryptionValue === "psk-mixed" ? "selected" : ""}>WPA1/WPA2 Mixed</option>
-        <option value="sae" ${encryptionValue === "sae" ? "selected" : ""}>WPA3-SAE</option>
-        <option value="owe" ${encryptionValue === "owe" ? "selected" : ""}>OWE (Enhanced Open)</option>
-    `;
-
-    let cipherOptions = `
-        <option value="auto" ${cipherValue === "auto" ? "selected" : ""}>Auto</option>
-        <option value="CCMP" ${cipherValue === "CCMP" ? "selected" : ""}>CCMP</option>
-        <option value="TKIP" ${cipherValue === "TKIP" ? "selected" : ""}>TKIP</option>
-        <option value="GCMP" ${cipherValue === "GCMP" ? "selected" : ""}>GCMP</option>
-    `;
+	let encryptionValue = ifaceConfig.encryption || "none";   
+	console.log("ifaceConfig.encryption:",ifaceConfig.encryption);
+    let cipherOptions ="";
 
     let modalHtml = `                                                                                                              
-        <h3>Edit Device: ${device}</h3>                                                                                   
+        <h4>Device Configuration: ${device}</h4>                                                                                   
         <table>                                                                                                               
             <tr><td>Type:</td><td><input type="text" id="device-type-${device}" value="${wifi.type || ''}" disabled></td></tr>
             <tr>                                                                                                              
                 <td>Channel:</td>                                                                                             
-                <td>                                                                                                               
-                    <select id="device-channel-${device}">                                                                
-                        ${channelOptionsHtml}                                                                                 
-                    </select>                                                                                    
-                </td>                                                                                                
+		<td>                                                                                                               
+		    <select id="device-channel-${device}" onchange="updateChannelBand('${device}', '${iface}')">                                                                
+			${channelOptionsHtml}                                                                                 
+		    </select>                                                                                    
+		</td>                                                                                               
             </tr>                                                                                                             
             <tr>                                                                                                                   
                 <td>TX Power:</td>                                                                                        
@@ -281,7 +325,7 @@ async function openEditModal(device, iface) {
             </tr>                                                                                                             
         </table>                                                                                                                   
                                                                                                                               
-        <h3>Edit Interface: ${iface}</h3>                                                                                     
+        <h4>Interface Configuration</h4>                                                                                     
         <table>                                                                                                               
             <tr><td>Network:</td><td><input type="text" id="iface-network-${iface}" value="${ifaceConfig.network || ''}"></td></tr>
             <tr><td>SSID:</td><td><input type="text" id="iface-ssid-${iface}" value="${ifaceConfig.ssid || ''}"></td></tr>    
@@ -300,8 +344,7 @@ async function openEditModal(device, iface) {
             <tr>                                                                                                                   
                 <td>Encryption:</td>                                                                                               
                 <td>                                                                                                               
-                    <select id="iface-encryption-${iface}" ${is6GHz ? "disabled" : ""} onchange="updateCipherOptions('${iface}', document.getElementById('iface-mode-${iface}').value,'${device}'); togglePasswordField('${iface}');">
-                        ${encryptionOptions}
+                    <select id="iface-encryption-${iface}" onchange="updateCipherOptions('${iface}', document.getElementById('iface-mode-${iface}').value,'${device}'); togglePasswordField('${iface}');">
                     </select>                                                                                               
                 </td>                                                                                                              
             </tr>  
@@ -311,129 +354,130 @@ async function openEditModal(device, iface) {
                     <select id="iface-cipher-${iface}"></select>
                 </td>
             </tr>
-            <tr id="password-row-${iface}" style="display: ${ifaceConfig.encryption === "none" ? "none" : "table-row"};">          
-                <td>Password:</td>                                                                                                 
-                <td><input type="password" id="iface-key-${iface}" value="${ifaceConfig.key || ''}"></td>                          
-            </tr>       
+            <tr id="password-row-${iface}" style="display: ${encryptionValue === "none" ? "none" : "table-row"};">
+                <td>Password:</td>
+                <td>
+                    <input type="password" id="iface-key-${iface}" 
+                           value="${ifaceConfig.sae_password || ifaceConfig.key || ''}" 
+                           ${encryptionValue === "sae" ? "placeholder='SAE Password'" : ""}>
+                </td>
+            </tr>
                                                                                                      
         </table>                                                                                                                   
-                                                                                                                                   
-        <button onclick="saveConfig('${device}', '${iface}')">Save</button>                                                        
-        <button class="modal-close-btn" onclick="closeEditModal()">Close</button>                                                  
+        
+        <button class="modal-save-btn" onclick="saveConfig('${device}', '${iface}')">Save</button>                                                        
+        <button class="modal-close-btn" onclick="closeEditModal()">Close</button>   
+        <button class="modal-reset-btn" onclick="resetConfig('${device}', '${iface}')">Reset</button>                                               
     `;                                                                                                                             
                   
+                  
     modalContent.innerHTML = modalHtml; 
-    updateHtmode(device, htmodeValue);
-    document.getElementById(`iface-encryption-${iface}`).innerHTML = encryptionOptions;
-    document.getElementById(`iface-cipher-${iface}`).innerHTML =cipherOptions;    
-    updateCipherOptions(iface, modeValue, device);                                                                       
+    
+    updateChannelBand(device, iface)
+    updateHtmode(device, htmodeValue); 
+    document.getElementById(`iface-encryption-${iface}`).value=encryptionValue;        
+    updateCipherOptions(iface, modeValue, device); 
+    //document.getElementById(`iface-encryption-${iface}`).value=encryptionValue;                                                                     
     togglePasswordField(iface);                                                                                                    
     overlay.classList.add('show');                                                                                                 
     modal.classList.add('show');                                                                                                   
-}                                
+}          
 
-function updateCipherOptions(iface, mode, device) { 
-    const encryptionSelect = document.getElementById(`iface-encryption-${iface}`);
+function updateCipherOptions(iface, mode, device, band = null) {
+    let encryptionSelect = document.getElementById(`iface-encryption-${iface}`);
     const cipherRow = document.getElementById(`cipher-row-${iface}`);
     const cipherSelect = document.getElementById(`iface-cipher-${iface}`);
 
     if (!encryptionSelect || !cipherRow || !cipherSelect) {
-        console.error(`Missing elements for iface: ${iface}`);
+        console.error(`❌ Missing elements for ${iface}`);
         return;
     }
+
+    console.log(`Updating cipher options for ${iface}, mode: ${mode}, device: ${device}`);
+
+    let selectedEnc = encryptionSelect.value || "none";
 
     if (!mode) {
         const modeSelect = document.getElementById(`iface-mode-${iface}`);
         mode = modeSelect ? modeSelect.value : "ap"; 
     }
 
-    let selectedEnc = encryptionSelect.value || "none";
-    let selectedCipher = cipherSelect.value || "auto";
-    let cipherOptions = [];
+    const selectedChannel = document.getElementById(`device-channel-${device}`).value;
+    console.log("selectedChannel:",selectedChannel);
+    let currentBand = "Unknown";
+    let freq = null;
 
-    console.log(`Updating cipher options for iface: ${iface}, mode: ${mode}, encryption: ${selectedEnc}`);
+	if (selectedChannel.includes("MHz")) {
+	    const match = selectedChannel.match(/\((\d+)\s*MHz\)/);
+	    if (match) {
+		freq = parseInt(match[1], 10);
+	    }
+	} else if (selectedChannel.includes("auto")) { 
+	    if (selectedChannel.includes("6GHz")) {
+		currentBand = "6GHz";
+	    } else if (selectedChannel.includes("5GHz")) {
+		currentBand = "5GHz";
+	    } else if (selectedChannel.includes("2.4GHz")) {
+		currentBand = "2.4GHz";
+	    }
+	}
 
-    const wifi = deviceConfig[device];
-    if (!wifi) {
-        console.error(`❌ Device ${device} not found in deviceConfig!`);
-        return;
+    if (freq) {
+        console.log("Frequency:", freq);
+        if (freq >= 2412 && freq <= 2472) {
+            currentBand = "2.4GHz";
+        } else if (freq >= 5180 && freq <= 5900) {
+            currentBand = "5GHz";
+        } else if (freq >= 5955 && freq <= 7115) {
+            currentBand = "6GHz";
+        }
     }
 
-    console.log("🔹 DeviceConfig entry:", wifi);
-    console.log("🔹 Current Channel:", wifi.current_channel);
+    console.log("Current band:", currentBand);
 
-    let freqMHz = null;
-    Object.values(wifi.channel_options || {}).forEach(bandChannels => {
-        bandChannels.forEach(ch => {
-            const match = ch.match(/\((\d+) MHz\)/);
-            if (match && parseInt(ch) === parseInt(wifi.current_channel)) {
-                freqMHz = parseInt(match[1]); 
-            }
-        });
-    });
+    let encryptionOptions = "";
+    if (currentBand === "6GHz") {
+        encryptionOptions = `<option value="sae" selected>WPA3-SAE (Forced for 6GHz)</option>`;
+        selectedEnc = "sae"; 
+        encryptionSelect.disabled = true; 
+    } else {
+        encryptionSelect.disabled = false; 
+        encryptionOptions = `
+            <option value="none" ${selectedEnc === "none" ? "selected" : ""}>None</option>
+            <option value="psk" ${selectedEnc === "psk" ? "selected" : ""}>WPA-PSK (WPA1)</option>
+            <option value="psk2" ${selectedEnc === "psk2" ? "selected" : ""}>WPA2-PSK</option>
+            <option value="psk-mixed" ${selectedEnc === "psk-mixed" ? "selected" : ""}>WPA1/WPA2 Mixed</option>
+            <option value="sae" ${selectedEnc === "sae" ? "selected" : ""}>WPA3-SAE</option>
+            <option value="owe" ${selectedEnc === "owe" ? "selected" : ""}>OWE (Enhanced Open)</option>
+        `;
+    }
 
-    console.log(`🔹 Detected Frequency: ${freqMHz} MHz`);
+    encryptionSelect.innerHTML = encryptionOptions;
 
-    const is6GHz = freqMHz !== null && freqMHz >= 5955 && freqMHz <= 7115;
-    console.log(`🔹 is6GHz for ${device}:`, is6GHz);
+    let cipherOptions = [];
+    let selectedCipher = cipherSelect.value || "auto";
 
-    if (selectedEnc === "sae") {
+    if (selectedEnc === "sae" || currentBand === "6GHz") {
         cipherOptions = [{ value: "ccmp", text: "CCMP (Forced for SAE)" }];
-        selectedCipher = "CCMP"; 
-    } else if (is6GHz) {
-        cipherOptions = [{ value: "ccmp", text: "CCMP (Forced for SAE)" }];
-        selectedCipher = "CCMP"; 
+        selectedCipher = "ccmp";
     } else if (mode === "ap") {
-        switch (selectedEnc) {
-            case "psk":  
-                cipherOptions = [
-                    { value: "auto", text: "Auto (Default)" },
-                    { value: "tkip", text: "TKIP" },
-                    { value: "ccmp", text: "CCMP" },
-                    { value: "ccmp+tkip", text: "CCMP+TKIP (Legacy)" }
-                ];
-                break;
-            case "psk2": 
-                cipherOptions = [
-                    { value: "auto", text: "Auto (Default)" },
-                    { value: "ccmp", text: "CCMP" },
-                    { value: "ccmp+tkip", text: "CCMP+TKIP (Legacy)" }
-                ];
-                break;
-            case "psk-mixed":
-                cipherOptions = [
-                    { value: "auto", text: "Auto (Default)" },
-                    { value: "tkip", text: "TKIP" },
-                    { value: "ccmp", text: "CCMP" },
-                    { value: "ccmp+tkip", text: "CCMP+TKIP (Legacy)" }
-                ];
-                break;
-            case "sae": 
-                cipherOptions = [
-                    { value: "ccmp", text: "CCMP" }
-                ]; 
-                break;
-            case "owe":  
-                cipherOptions = [
-                    { value: "auto", text: "Auto (Default)" },
-                    { value: "ccmp", text: "CCMP" },
-                    { value: "gcmp", text: "GCMP" }
-                ];
-                break;
-            default:
-                cipherOptions = [{ value: "auto", text: "Auto (Default)" }];
-        }
+        const cipherMap = {
+            "psk": ["auto", "tkip", "ccmp", "ccmp+tkip"],
+            "psk2": ["auto", "ccmp", "ccmp+tkip"],
+            "psk-mixed": ["auto", "tkip", "ccmp", "ccmp+tkip"],
+            "owe": ["auto", "ccmp", "gcmp"]
+        };
+
+        cipherOptions = (cipherMap[selectedEnc] || ["auto"]).map(c => ({
+            value: c,
+            text: c.toUpperCase()
+        }));
     } else if (mode === "sta") {
         cipherOptions = [{ value: "auto", text: "Auto (Default)" }];
-        if (["psk", "psk2"].includes(selectedEnc)) {
-            cipherOptions.push({ value: "ccmp", text: "CCMP" });
-        } else if (selectedEnc === "sae") {
+        if (["psk", "psk2", "sae"].includes(selectedEnc)) {
             cipherOptions.push({ value: "ccmp", text: "CCMP" });
         } else if (selectedEnc === "owe") {
-            cipherOptions.push(
-                { value: "ccmp", text: "CCMP" },
-                { value: "gcmp", text: "GCMP" }
-            );
+            cipherOptions.push({ value: "ccmp", text: "CCMP" }, { value: "gcmp", text: "GCMP" });
         }
     }
 
@@ -441,16 +485,50 @@ function updateCipherOptions(iface, mode, device) {
         `<option value="${opt.value}" ${opt.value === selectedCipher ? "selected" : ""}>${opt.text}</option>`
     ).join('');
 
-    if (mode === "sta" && !cipherSelect.querySelector('option[value="auto"]')) {
-        let autoOption = document.createElement("option");
-        autoOption.value = "auto";
-        autoOption.textContent = "Auto (Default)";
-        cipherSelect.insertBefore(autoOption, cipherSelect.firstChild);
-    }
-
-    cipherSelect.value = selectedCipher || "auto";
+    setTimeout(() => {
+        if (!cipherSelect.querySelector(`option[value="${selectedCipher}"]`)) {
+            console.warn(`⚠️ selectedCipher "${selectedCipher}" not found, setting to 'auto'`);
+            cipherSelect.value = "auto";
+        } else {
+            cipherSelect.value = selectedCipher;
+        }
+    }, 0);
 
     cipherRow.style.display = cipherOptions.length > 0 ? "table-row" : "none";
+}
+
+
+
+function updateChannelBand(device, iface) {
+    let channel = document.getElementById('device-channel-' + device).value;
+    console.log(`🔹 Selected Channel: ${channel}`);
+
+    let band;
+    if (channel.includes("5GHz")) {
+        band = "5GHz"; 
+    } else if (channel.includes("6GHz")) {
+        band = "6GHz";
+    } else if (channel.includes("2.4GHz")) {
+        band = "2.4GHz";
+    } else {
+        let match = channel.match(/\((\d+) MHz\)/);
+        let freq = match ? parseInt(match[1]) : null;
+
+        if (freq >= 2412 && freq <= 2484) {
+            band = "2.4GHz";
+        } else if (freq >= 5170 && freq <= 5895) {
+            band = "5GHz"; 
+        } else if (freq >= 5925) {
+            band = "6GHz"; 
+        } else {
+            band = "Unknown";
+        }
+    }
+
+    console.log(`🔹 Computed Band: ${band}`);
+
+    updateCipherOptions(iface, document.getElementById('iface-mode-' + iface).value, device, band);
+    togglePasswordField(iface);
 }
 
 function updateHtmode(device, htmodeValue) {      
@@ -596,17 +674,17 @@ function saveConfig(device, iface) {
     } else {
         let bandMatch = rawChannel.match(/\((.*?)\)/);
         if (bandMatch) {
-            bandInfo = bandMatch[1]; // 5GHz 或 6GHz
+            bandInfo = bandMatch[1];
         }
     }
 
     if (currentChannelMHz !== null) {
         if (currentChannelMHz >= 2412 && currentChannelMHz <= 2484) {
-            band = 1; // 2.4GHz
+            band = 1;
         } else if (currentChannelMHz >= 5180 && currentChannelMHz <= 5885) {
-            band = 2; // 5GHz
+            band = 2;
         } else if (currentChannelMHz >= 5955 && currentChannelMHz <= 7115) {
-            band = 3; // 6GHz
+            band = 3;
         }
     } else if (bandInfo === "5GHz") {
         band = 2;
@@ -662,7 +740,7 @@ function saveConfig(device, iface) {
         country: getValue(`device-country-${device}`),
         hwmode: hwmode,
         htmode: htmode,
-        band: band,  // ✅ 传 `band` 值
+        band: band, 
         disabled: getValue(`device-disabled-${device}`) || "0",
         iface: {
             iface: iface, 
@@ -714,8 +792,6 @@ function saveConfig(device, iface) {
     });
 }
 
-
-
 function closeEditModal() {
     document.getElementById('modalOverlay').classList.remove('show');
     document.getElementById('editModal').classList.remove('show');
@@ -765,6 +841,49 @@ function deleteIface(iface) {
     });
 }
 
+function resetConfig(device, iface) {
+    function resetSelect(id, optionIndex = 0) {
+        let el = document.getElementById(id);
+        if (el && el.options.length > 0) {
+            if (optionIndex === -1) {
+                el.selectedIndex = el.options.length - 1; 
+            } else if (optionIndex === -2) {
+                el.selectedIndex = Math.max(0, el.options.length - 2); 
+            } else {
+                el.selectedIndex = Math.max(0, Math.min(optionIndex, el.options.length - 1));
+            }
+        }
+    }
+
+    function resetInput(id, value = "") {
+        let el = document.getElementById(id);
+        if (el) el.value = value;
+    }
+
+    resetSelect(`device-channel-${device}`, 0);  
+    resetSelect(`device-txpower-${device}`, -1);
+    resetSelect(`device-hwmode-${device}`, -1);
+    resetSelect(`device-htmode-${device}`, -1);
+    resetSelect(`device-disabled-${device}`, 0); 
+    resetInput(`device-country-${device}`, "US");
+
+    resetInput(`iface-network-${iface}`, "lan");
+    resetInput(`iface-ssid-${iface}`, "MyAP");
+    resetSelect(`iface-mode-${iface}`, 0);
+    resetSelect(`iface-encryption-${iface}`, -2);
+    resetSelect(`iface-cipher-${iface}`, 0);
+    resetInput(`iface-key-${iface}`, "");
+
+    let encryptionValue = document.getElementById(`iface-encryption-${iface}`).value;
+    let modeValue = document.getElementById(`iface-mode-${iface}`).value;
+
+    console.log(`Reset: Encryption=${encryptionValue}, Mode=${modeValue}, Country=US`);
+
+    updateCipherOptions(iface, modeValue, device); 
+    togglePasswordField(iface);
+}
+
+
 function disableButtons(disable) {
     document.querySelectorAll("button").forEach(button => {
         button.disabled = disable;
@@ -788,7 +907,6 @@ async function openAddModal(device) {
         console.error(`Device ${device} not found in deviceConfig.`);
         return;
     }
-
     let hwModesData = wifi.hw_modes || {};
 
     if (Object.keys(hwModesData).length === 0) {
@@ -806,9 +924,9 @@ async function openAddModal(device) {
 
     let defaultHtmode = wifi.htmode;
     if (!defaultHtmode && hwModesData[defaultHwmode] && hwModesData[defaultHwmode].length > 0) {
-        defaultHtmode = hwModesData[defaultHwmode][0];  // 选第一个可用 HT Mode
+        defaultHtmode = hwModesData[defaultHwmode][0]; 
     }
-    defaultHtmode = defaultHtmode || "EHT40";  // 兜底防止 undefined
+    defaultHtmode = defaultHtmode || "EHT40";
 
     console.log(`Default HW Mode: ${defaultHwmode}, Default HT Mode: ${defaultHtmode}`);
 
@@ -820,7 +938,7 @@ async function openAddModal(device) {
         ? hwModesData[defaultHwmode].map(ht => `<option value="${ht}" ${ht === defaultHtmode ? "selected" : ""}>${ht}</option>`).join('')
         : `<option value="">No HT Modes Available</option>`;
 
-    let channelOptionsHtml = `<option value="auto" selected>Auto</option>`;
+    let channelOptionsHtml = ``;
     if (wifi.channel_options) {
         Object.keys(wifi.channel_options).forEach(band => {
             channelOptionsHtml += `<optgroup label="--- ${band} ---"></optgroup>`;
@@ -834,13 +952,15 @@ async function openAddModal(device) {
         `<option value="${value}" ${value === "MAX" ? "selected" : ""}>${value}</option>`
     ).join('');
 
+    let cipherOptions ="";
+    
     let modalHtml = `
         <h3>Add Interface to ${device}</h3>
         <table>
             <tr>
                 <td>Channel:</td>
                 <td>
-                    <select id="device-channel-${device}">
+                    <select id="device-channel-${device}" onchange="updateChannelBand('${device}', 'new')">
                         ${channelOptionsHtml}
                     </select>
                 </td>
@@ -893,7 +1013,7 @@ async function openAddModal(device) {
             <tr>
                 <td>Mode:</td>
                 <td>
-                    <select id="iface-mode-new" onchange="updateCipherOptions('new', this.value); togglePasswordField('new');">
+                    <select id="iface-mode-new" onchange="updateCipherOptions('new', this.value,'${device}'); togglePasswordField('new');">
                         <option value="ap" selected>Access Point (AP)</option>
                         <option value="sta">Station (STA)</option>
                     </select>
@@ -902,13 +1022,7 @@ async function openAddModal(device) {
             <tr>
                 <td>Encryption:</td>
                 <td>
-                    <select id="iface-encryption-new" onchange="updateCipherOptions('new', document.getElementById('iface-mode-new').value); togglePasswordField('new');">
-                        <option value="none" selected>None</option>
-                        <option value="psk">WPA-PSK (WPA1)</option>
-                        <option value="psk2">WPA2-PSK</option>
-                        <option value="psk-mixed">WPA1/WPA2 Mixed</option>
-                        <option value="sae">WPA3-SAE</option>
-                        <option value="owe">OWE (Enhanced Open)</option>
+                    <select id="iface-encryption-new" onchange="updateCipherOptions('new', document.getElementById('iface-mode-new').value,'${device}'); togglePasswordField('new');">
                     </select>
                 </td>
             </tr>
@@ -918,7 +1032,7 @@ async function openAddModal(device) {
                     <select id="iface-cipher-new"></select>
                 </td>
             </tr>
-            <tr id="password-row-new" style="display: none;">
+            <tr id="password-row-new" style="display:"none"};">
                 <td>Password:</td>
                 <td><input type="password" id="iface-key-new"></td>
             </tr>
@@ -928,13 +1042,17 @@ async function openAddModal(device) {
         <button class="modal-close-btn" onclick="closeEditModal()">Close</button>
     `;
 
+
     modalContent.innerHTML = modalHtml;
+    updateChannelBand(device, "new")
     updateAddHtmode(device, defaultHtmode, hwModesData);
-    updateCipherOptions("new", "ap");
+    const modeValue = document.getElementById("iface-mode-new").value;
+    updateCipherOptions("new", modeValue, device);
     togglePasswordField("new");
     overlay.classList.add('show');
     modal.classList.add('show');
 }
+
 
 function updateAddHtmode(device, defaultHtmode, hwModesData = null) {
     const hwmodeSelect = document.getElementById(`device-hwmode-${device}`);
@@ -1022,23 +1140,68 @@ function saveNewInterface(device) {
     showLoading();
     const getValue = (id) => document.getElementById(id)?.value.trim() || "";
 
+    let rawChannel = getValue(`device-channel-${device}`);
+    let finalChannel = "auto";
+    let band = 1;
+
+
+    let txpower = getValue(`device-txpower-${device}`);
+    if (txpower === "MAX") {
+        txpower = null; 
+    }
+
+    let match = rawChannel.match(/^(\d+)\s\((\d+)\sMHz\)$/);
+    if (match) {
+        finalChannel = match[1];  
+        let currentChannelMHz = parseInt(match[2]);  
+
+        if (currentChannelMHz >= 2412 && currentChannelMHz <= 2484) {
+            band = 1;
+        } else if (currentChannelMHz >= 5180 && currentChannelMHz <= 5885) {
+            band = 2;
+        } else if (currentChannelMHz >= 5955 && currentChannelMHz <= 7115) {
+            band = 3;
+        }
+    } else if (rawChannel.includes("5GHz")) {
+        band = 2;
+    } else if (rawChannel.includes("6GHz")) {
+        band = 3;
+    }
+
+    let encryption = getValue(`iface-encryption-new`);
+    let cipher = getValue(`iface-cipher-new`);
+
+    if (["psk", "psk2", "sae", "sae-mixed"].includes(encryption) && cipher && cipher !== "auto") {
+        encryption = `${encryption}+${cipher}`;
+    }
+
     let newConfig = {
         device,
         create_new: true, 
-        channel: getValue(`device-channel-${device}`),
-        txpower: getValue(`device-txpower-${device}`),
+        channel: finalChannel,
+        band: band,  
+        txpower: txpower,
         country: getValue(`device-country-${device}`),
         hwmode: getValue(`device-hwmode-${device}`), 
         htmode: getValue(`device-htmode-${device}`), 
         iface: {
             ssid: getValue("iface-ssid-new"), 
             mode: getValue("iface-mode-new"), 
-            encryption: getValue("iface-encryption-new"),
+            encryption: encryption,
         }
     };
 
-    if (newConfig.iface.encryption !== "none") {
-        newConfig.iface.key = getValue("iface-key-new");
+    if (encryption.startsWith("sae")) {
+        newConfig.iface.sae = "1";
+    } else {
+        delete newConfig.iface.sae;
+    }
+
+    if (encryption !== "none") {
+        let key = getValue(`iface-key-new`);
+        if (key) {
+            newConfig.iface.key = key;
+        }
     }
 
     console.log("Final new interface JSON:", JSON.stringify(newConfig, null, 2));
@@ -1054,10 +1217,7 @@ function saveNewInterface(device) {
 
         if (data.includes("Configuration saved successfully")) {
             console.log("WiFi reload in progress... Waiting for completion...");
-            alert("New interface added successfully! Waiting for WiFi reload...");
-
             await new Promise(resolve => setTimeout(resolve, 8000));
-
             console.log("WiFi reload complete. Closing modal...");
             closeEditModal();
             getConfig();
@@ -1074,10 +1234,8 @@ function saveNewInterface(device) {
         saveButton.disabled = false;
         saveButton.textContent = "Save";
         closeButton.disabled = false; 
-        
     });
 }
-
 //scan
 async function startScan(device) {
     try {
@@ -1274,14 +1432,22 @@ function closeScanModal() {
     document.getElementById('scanModal').classList.remove('show');
 }
 
-function showLoading() {
+function showLoading(message = "Loading...") {
     let overlay = document.getElementById("loading-overlay");
+    let loadingText = document.getElementById("loading-text");
+
     if (!overlay) {
         console.error("showLoading: loading-overlay not found!");
         return;
     }
+
+    if (loadingText) {
+        loadingText.textContent = message; 
+    }
+
     overlay.classList.add("show");
 }
+
 
 function hideLoading() {
     let overlay = document.getElementById("loading-overlay");
@@ -1329,3 +1495,163 @@ function updateStationsTable(stationsData) {
         tableBody.innerHTML = newRowsHtml;
     });
 }
+
+function openMloModal() {
+    document.getElementById("mloModal").classList.add("show");
+    document.getElementById("mloOverlay").classList.add("show");
+}
+
+function closeMloModal() {
+    document.getElementById("mloModal").classList.remove("show");
+    document.getElementById("mloOverlay").classList.remove("show");
+}
+
+function toggleMloOptions() {
+    const enabled = document.getElementById("mlo-enabled").checked;
+    const mloSettings = document.querySelectorAll("#mlo-ssid, #mlo-password, #mlo-2G, #mlo-5G, #mlo-6G");
+
+    mloSettings.forEach(input => {
+        input.disabled = !enabled; 
+    });
+
+    const mloTable = document.querySelector("#mlo-table");
+    if (mloTable) {
+        mloTable.style.display = enabled ? "table" : "none"; 
+    }
+}
+
+
+document.getElementById("mlo-enabled").addEventListener("change", toggleMloOptions);
+document.getElementById("mlo-disabled").addEventListener("change", toggleMloOptions);
+toggleMloOptions();
+
+function setupMLO() {
+    showLoading();
+    document.getElementById("loading-text").textContent = "Applying MLO settings...";
+
+    const isEnabled = document.getElementById("mlo-enabled").checked;
+    if (!isEnabled) {
+        alert("Disabling MLO will reboot the device.");
+        document.getElementById("loading-text").textContent = "Device is rebooting... Please wait.";
+
+        fetch('/cgi-bin/mlo_setup.sh', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ disable_mlo: true })
+        })
+        .then(() => {
+            console.log("MLO Disabled, device is rebooting...");
+            setTimeout(() => {
+                checkDeviceReboot();
+            }, 7000);
+            closeMloModal();
+        })
+        .catch(error => {
+            console.error("Error disabling MLO:", error);
+            alert("Failed to disable MLO.");
+            hideLoading();
+            closeMloModal();
+        })
+        return;
+    }
+
+    const ssidInput = document.getElementById("mlo-ssid");
+    const passwordInput = document.getElementById("mlo-password");
+    const ssid = ssidInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!ssid) {
+        alert("SSID is required.");
+        ssidInput.focus();
+        hideLoading();
+        return;
+    }
+
+    if (!password || password.length < 8) {
+        alert("Password must be at least 8 characters.");
+        passwordInput.focus();
+        hideLoading();
+        return;
+    }
+
+    const selectedBands = [];
+    if (document.getElementById("mlo-2G").checked) selectedBands.push("2G");
+    if (document.getElementById("mlo-5G").checked) selectedBands.push("5G");
+    if (document.getElementById("mlo-6G").checked) selectedBands.push("6G");
+
+    if (selectedBands.length < 2) {
+        alert("Please select at least two bands.");
+        hideLoading();
+        return;
+    }
+
+    const mloConfig = {
+        ssid: ssid,
+        password: password,
+        combo: selectedBands.join("")
+    };
+
+    fetch('/cgi-bin/mlo_setup.sh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(mloConfig)
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log("MLO Setup Response:", data);
+        closeMloModal();
+        getConfig();
+    })
+    .catch(error => {
+        console.error("Error applying MLO setup:", error);
+        alert("Failed to apply MLO setup.");
+    })
+    .finally(() => {
+        hideLoading();
+    });
+}
+
+
+function updateMloState(status, bands) {
+    document.getElementById("mlo-enabled").checked = status === 1;
+    document.getElementById("mlo-disabled").checked = status === 0;
+
+    document.getElementById("mlo-2G").checked = bands.includes("2G");
+    document.getElementById("mlo-5G").checked = bands.includes("5G");
+    document.getElementById("mlo-6G").checked = bands.includes("6G");
+
+    toggleMloOptions();
+
+    document.querySelectorAll('.scan-btn, .add-btn, .edit-btn, .delete-btn').forEach(btn => {
+        btn.disabled = status === 1;
+    });
+}
+
+function checkDeviceReboot(attempts = 0) {
+    fetch('/cgi-bin/get_wifi_config.sh', { method: 'GET', cache: 'no-store' })
+    .then(response => {
+        if (!response.ok) throw new Error("Device not ready");
+        return response.json();
+    })
+    .then(data => {
+        console.log("Device rebooted successfully!");
+        hideLoading();
+        getConfig(); 
+    })
+    .catch(() => {
+        if (attempts < 30) {
+            console.log(`Device not ready, retrying... (${attempts + 1})`);
+            setTimeout(() => checkDeviceReboot(attempts + 1), 3000);
+        } else {
+            alert("Device took too long to reboot. Try refreshing manually.");
+        }
+    });
+}
+
+function toggleInfoTooltip() {
+    const tooltip = document.getElementById("info-tooltip");
+    tooltip.classList.toggle("show");
+}
+
+
+
