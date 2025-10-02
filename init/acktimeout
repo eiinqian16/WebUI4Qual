@@ -1,0 +1,26 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+
+start() {
+    if [ ! -f /etc/config/acktimeout ]; then
+        cat <<EOF > /etc/config/acktimeout
+config acktimeout 'wifi0'
+    option value '115'
+
+config acktimeout 'wifi1'
+    option value '115'
+
+config acktimeout 'wifi2'
+    option value '115'
+EOF
+    fi
+
+    for wifi in wifi0 wifi1 wifi2; do
+        if [ -d "/sys/class/net/$wifi" ]; then 
+            local timeout_value=$(uci get acktimeout.$wifi.value 2>/dev/null || echo 64)
+            cfg80211tool "$wifi" acktimeout "$timeout_value"
+        fi
+    done
+}
+
