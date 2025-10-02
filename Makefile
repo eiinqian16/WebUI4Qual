@@ -44,6 +44,9 @@ define Package/webUI/install
 	chmod +x $(1)/etc/init.d/acktimeout
 	chmod +x $(1)/etc/init.d/mld_phyname
 
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
+	$(CP) $(PKG_BUILD_DIR)/98-default-uhttpd $(1)/etc/uci-defaults
+
 	$(INSTALL_DIR) $(1)/www/webUI/
 	$(CP) $(PKG_BUILD_DIR)/css $(1)/www/webUI/
 	$(CP) $(PKG_BUILD_DIR)/js $(1)/www/webUI/
