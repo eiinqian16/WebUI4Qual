@@ -23,8 +23,8 @@ define Build/Prepare
 	mkdir -p $(PKG_BUILD_DIR)
 	$(TAR) -C $(PKG_BUILD_DIR) -xzf $(DL_DIR)/$(PKG_SOURCE)
 	mv $(PKG_BUILD_DIR)/webUI-main/* $(PKG_BUILD_DIR)/
-	# Remove the now-empty webUI-0~main directory
-	rm -rf $(PKG_BUILD_DIR)/webUI-0~main
+	# Remove the now-empty webUI-main directory
+	rm -rf $(PKG_BUILD_DIR)/webUI-main
 endef
 
 define Build/Compile
