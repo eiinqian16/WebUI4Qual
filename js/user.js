@@ -56,7 +56,7 @@ function changeCred() {
     
     //document.getElementById("body").innerHTML = `${body}`;
     
-    fetch("/cgi-bin/changePwd.sh", {
+    fetch("/cgi-bin/change_pwd.sh", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: body

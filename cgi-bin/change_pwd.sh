@@ -10,7 +10,7 @@ nameInput=$(echo "$INPUT" | awk -F'[=&]' '{print $2}')
 oriPwd=$(echo "$INPUT" | awk -F'[=&]' '{print $4}')
 newPwd=$(echo "$INPUT" | awk -F'[=&]' '{print $6}')
 
-dir="/etc/shadowUI"
+dir="/etc/init.d/login"
 
 encryptOriPwd=$(echo -n "$oriPwd" | sha256sum | awk '{print $1}')
 encryptNewPwd=$(echo -n "$newPwd" | sha256sum | awk '{print $1}')
@@ -18,7 +18,7 @@ encryptNewPwd=$(echo -n "$newPwd" | sha256sum | awk '{print $1}')
 status="Wrong credentials"
 
 while IFS=":" read -r uname storedPwd; do
-    if [ "$nameInput" = "$uname" ] && [ "$encryptOriPwd" = "$storedPwd" ]; then
+    if [ "$encryptOriPwd" = "$storedPwd" ]; then
         output="${uname}:${encryptNewPwd}"
         status="Success"
         echo "$output" > "$dir"
