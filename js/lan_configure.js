@@ -141,7 +141,6 @@ function getCurWanIf() {
         .then(data =>{
             console.log("Successfully fetched current WAN data:", data);
             
-            let proto = "";
             let html = "";
             html += `<h1>WAN Configuration</h1>
                     <p class="description">View and configure Internet settings</p>
@@ -155,9 +154,9 @@ function getCurWanIf() {
             }
             if (wan && wan.proto) {
                 if (wan.proto === "dhcp") {
-                    proto = "DHCP client"
+                    wan.proto = "DHCP client"
                 }
-                html += `<p><strong>Connection Type: </strong>${proto || 'N/A'}</p>`
+                html += `<p><strong>Connection Type: </strong>${wan.proto || 'N/A'}</p>`
             }
             if (wan && wan.IP) {
                 html += `<p><strong>IP Address: </strong>${wan.IP || 'N/A'}</p>`
@@ -462,4 +461,5 @@ function hideLoading() {
     }
     overlay.classList.remove("show");
 }
+
 
