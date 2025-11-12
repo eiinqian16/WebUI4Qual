@@ -199,6 +199,9 @@ function fetchWanStatus() {
             let html = "";
             if (wanIf) {
             data.forEach(iface => {
+                if (iface.proto === "dhcp") {
+                    iface.proto = "DHCP client";
+                }
                 if (iface.type === "WAN") {
                 html += `
                 <div class="interface">
@@ -269,3 +272,4 @@ function fetchOthStatus() {
 function refreshStatus() {
     fetchLanStatus();
 }
+
