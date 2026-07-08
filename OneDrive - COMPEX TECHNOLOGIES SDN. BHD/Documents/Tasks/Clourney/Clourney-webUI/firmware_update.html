@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Firmware Update</title>
+  <link rel="stylesheet" href="css/system.css">
+</head>
+<body>
+    <div class="box">
+        <h1>Update Firmware</h1>
+        <p class="description">Update firmware using sysupgrade image.</p>
+        <hr>
+        <input type="file" id="fwFile" accept=".bin">
+        <br>
+        <br>
+        <div id="loading-overlay">
+            <div class="loading-spinner"></div>
+            <div id="loading-text">Compex</div>
+        </div>
+        <button onclick="uploadFirmware()">Upload</button>
+        <div id="popup" class="popup hidden">
+            <div class="popup-content">
+                <h3>Firmware Upload</h3>
+                <p>Please check hash of firmware.</p>
+                <hr>
+                <p><strong>Validation: </strong><span id="status"></span></p>
+                <p><strong>MD5: </strong><span id="md5sum"></span></p>
+                <p><strong>SHA256: </strong><span id="sha256sum"></span></p>
+                <button onclick="confirmUpgrade()">Upgrade</button>
+                <button onclick="closePopup()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <br>
+</body>

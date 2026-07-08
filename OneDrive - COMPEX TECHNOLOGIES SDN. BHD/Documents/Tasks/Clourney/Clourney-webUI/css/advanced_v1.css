@@ -1,0 +1,1102 @@
+.wireless-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.wireless-header h1 {
+    margin: 0;
+}
+
+#mlo-btn {
+    background-color: #149196;
+    color: white;    
+    border: none;        
+    padding: 8px 16px;       
+    font-size: 16px;        
+    font-weight: bold;          
+    border-radius: 5px;         
+    cursor: pointer;            
+    transition: background 0.3s ease;  
+    float: right;
+    margin-left: 20px;
+    margin-top: -5px; 
+}
+
+#mlo-btn:hover {
+    background-color: #14686b; 
+}
+
+
+.wifi-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    table-layout: fixed;
+}
+
+.wifi-table thead {
+    background-color: #ffffff !important; 
+}
+
+.wifi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wifi-table th {
+    border-top: none; 
+    border-right: none; 
+    border-left: none; 
+    border-bottom: 2px solid #ddd; 
+    background-color: inherit; 
+    padding: 10px;
+    text-align: left;
+}
+
+.wifi-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.wifi-table tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.wifi-table td:first-child {
+    width: 80%;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.wifi-table td:last-child {
+    width: 20%;
+    white-space: nowrap; 
+}
+
+.scan-btn, .add-btn {
+    background-color: rgba(255, 255, 255, 0.3); /* 白色半透明背景 */
+    color: #1ab2b8;
+    padding: 5px 10px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    transition: background 0.3s, color 0.3s, opacity 0.3s;
+    margin-right: 5px;
+    font-weight: bold;
+    font-size: 1vw;
+}
+
+.scan-btn:hover, .add-btn:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+    color: #36bbd9;
+}
+
+.edit-btn, .delete-btn {
+    width: 4vw; 
+    height: 2vw;
+    padding: 5px 10px;
+    font-size: 0.8vw;
+    font-weight: bold;
+    color: #ffffff; 
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s, opacity 0.3s;
+}
+
+.edit-btn {
+    background-color: #1aa34c; 
+}
+
+.edit-btn:hover {
+    background-color: #174E28;
+    opacity: 0.85;
+}
+
+.delete-btn {
+    background-color: #8B0000;
+}
+
+.delete-btn:hover {
+    background-color: #6B0000; 
+    opacity: 0.85;
+}
+
+
+.modal-overlay {
+    visibility: hidden;
+    opacity: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    transition: opacity 0.3s ease, visibility 0s;
+}
+
+.modal-overlay.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.modal {
+    visibility: hidden;
+    opacity: 0;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    width: 50%;
+    max-width: 600px;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.3s ease, visibility 0s;
+}
+
+.modal.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    font-size: 1.5em;
+    color: #333;
+}
+
+.modal-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.modal-content table, 
+.modal-content th, 
+.modal-content td {
+    border: 1px solid #ddd;
+}
+
+.modal-content th,
+.modal-content td {
+    padding: 10px;
+    text-align: left;
+}
+
+.modal-content th {
+    background-color: #f4f4f9;
+    font-weight: bold;
+}
+
+.modal-content button {
+    background: #1aa34c;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.modal-content button:hover {
+    background: #218838;
+}
+
+.modal-content .modal-close-btn {
+    background: #c22121 !important;
+    color: white;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-top: 10px;
+    border-radius: 5px;
+    transition: background 0.3s;
+    font-weight: bold;
+}
+
+.modal-content .modal-close-btn:hover {
+    background: #db2727 !important;
+}
+.scan-overlay {
+    visibility: hidden;
+    opacity: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9997;
+    transition: opacity 0.3s ease, visibility 0s;
+}
+
+.scan-overlay.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+#scanModal {
+    max-width: 90%;
+    width: 900px;
+    max-height: 80vh;
+    overflow: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9998;
+}
+
+#scan-modal-content {
+    max-width: 100%;
+    overflow-x: auto; 
+}
+
+#scan-modal-content table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+#scan-modal-content th, #scan-modal-content td {
+    padding: 8px 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+    white-space: normal;
+    word-break: break-word; 
+}
+
+#scan-modal-content th {
+    background-color: #f4f4f4;
+}
+
+#scan-modal-content thead {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 2;
+}
+
+.join-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.join-btn:hover {
+    background-color: #218838;
+}
+
+#password-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    display: none;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0s;
+}
+
+#password-modal.show {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+}
+
+#loading-overlay {
+    visibility: hidden;
+    opacity: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    transition: opacity 0.3s ease, visibility 0s;
+    flex-direction: column;
+}
+
+#loading-overlay.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 6px solid rgba(255, 255, 255, 0.3);
+    border-top: 6px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+#loading-text {
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.wifi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-direction: column;
+    flex: 0 0 80%;
+}
+
+.wifi-header-content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+}
+
+.wifi-header h3 {
+    font-size: 1.2vw;
+    margin-bottom: 5px;
+}
+
+.wifi-info {
+    font-size: 0.7vw;
+    color: #178748;
+    margin-top: 2px;
+}
+
+
+.main-wifi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.header-buttons {
+    flex: 0 0 20%; 
+    display: flex;
+    gap: 10px;
+}
+
+.station-box table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    table-layout: fixed;
+}
+
+.station-box th, .station-box td {
+    padding: 10px;
+    border: 1px solid #ddd; 
+    text-align: center;
+    border: 0px solid #ddd;
+    border-bottom: 1px solid #ddd; 
+    padding: 10px;
+    text-align: left;
+}
+
+.station-box th {
+    color: #000000;
+    border-top: none; 
+    border-right: none; 
+    border-left: none; 
+    border-bottom: 2px solid #ddd; 
+    background-color: inherit; 
+    padding: 10px;
+    text-align: left;
+}
+
+.ssid-mode-bssid-column {
+    padding-left: 10px;
+}
+
+.ssid-mode-bssid-wrapper {
+    display: flex;
+    align-items: center; 
+    width: 100%;
+    gap: 6px;
+}
+
+.ssid {
+    font-size: 1.1vw;
+    white-space: nowrap;
+}
+
+.mode-bssid {
+    display: flex;
+    flex-direction: column;
+}
+
+.mode {
+    font-size: 0.7vw;
+    color: #777;
+}
+
+.bssid {
+    font-size: 0.7vw;
+    color: #777;
+}
+
+button:disabled {
+    background-color: #FFFFFF !important;
+    color: #FFFFFF !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+}
+
+
+input[type="checkbox"] {
+    appearance: none; 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid green; 
+    border-radius: 4px; 
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+
+    vertical-align: middle;
+    accent-color: green; 
+    margin-right: 0px; 
+}
+
+input[type="checkbox"]:checked {
+    background-color: green;
+    border-color: green;
+}
+
+input[type="checkbox"]:checked::after {
+    content: "✔";
+    font-size: 14px;
+    color: white;
+    position: absolute;
+    left: 3px;
+    top: -1px;
+    font-weight: bold;
+}
+
+.mlo-bands {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; 
+}
+
+.modal-content .modal-reset-btn {
+    background: white;
+    color: #149196;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s, color 0.3s;
+    position: absolute;
+    right: 20px;
+    bottom: 15px;
+}
+
+.modal-content .modal-reset-btn:hover {
+    background: white;
+    color: #0e686b;
+}
+
+#acktimeout-page #wifiListAck {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.ack-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.ack-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.ack-label {
+    font-weight: bold;
+    color: #333;
+}
+
+.ack-input {
+    width: 80px;
+    padding: 5px;
+    text-align: right;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.ack-unit {
+    margin-left: 5px;
+    color: #666;
+}
+
+.ack-btn-container {
+    text-align: left;
+    margin-top: 15px;
+}
+
+.ack-button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    color: white;
+    background-color: #28a745;
+    border-radius: 0.5rem;
+    transition: background-color 0.15s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: none;
+    cursor: pointer;
+}
+
+.ack-button:hover {
+    background-color: #218838;
+    color: white;
+}
+
+.info-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #007bff;
+    border-radius: 50%; 
+    cursor: pointer;
+    margin-left: 10px;
+    transition: all 0.3s ease-in-out;
+}
+
+.info-icon:hover {
+    background-color: #0056b3;
+    transform: scale(1.1); 
+}
+
+.info-tooltip {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    max-width: 250px;
+    font-size: 14px;
+    z-index: 1000;
+    margin-top: 5px;
+}
+
+.info-tooltip.show {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.page-card {
+    background-color: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+    max-width: 900px;
+    width: 95%;
+    margin: 2rem auto;
+}
+        
+.page-header h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.page-header p {
+    font-size: 0.875rem;
+    color: #6b7280;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+/* --- Toggle Switch (Master Control) --- */
+.toggle-switch {
+    width: 44px;
+    height: 24px;
+    background-color: #d1d5db;
+    border-radius: 9999px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.toggle-switch.active {
+    background-color: #3b82f6;
+}
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+.toggle-switch.active::after {
+    transform: translateX(20px);
+}
+
+/* --- General Layout and Typography --- */
+.setting-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+.setting-row label {
+    color: #374151;
+    font-weight: 500;
+    min-width: 10rem;
+}
+.current-time-display {
+    color: #111827;
+    font-family: monospace;
+}
+.note {
+    padding-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+.note .highlight {
+    font-weight: 600;
+    color: #ef4444;
+}
+
+/* --- Schedule List and Button --- */
+.schedule-list-header {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #374151;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+.schedule-placeholder {
+    padding: 0.75rem;
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #4b5563;
+}
+.btn-add {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    color: white;
+    background-color: #28a745;
+    border-radius: 0.5rem;
+    transition: background-color 0.15s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: none;
+    cursor: pointer;
+}
+.btn-add:hover {
+    background-color: #218838;
+    color: white;
+}
+
+/* --- General Modal Styles (Backdrop) --- */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100; /* High z-index for all modals */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s;
+}
+.modal-backdrop.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* --- Confirmation Dialog Content (The specific requested pop-up) --- */
+.confirmation-dialog {
+    background-color: white;
+    border-radius: 0.5rem;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    padding: 1.5rem;
+    text-align: center;
+}
+.confirmation-dialog h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #1f2937;
+}
+.confirmation-dialog p {
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin-bottom: 1.5rem;
+}
+.confirmation-dialog-footer {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+.btn-confirm-cancel {
+    padding: 0.5rem 1.5rem;
+    border: 1px solid #d1d5db;
+    background-color: white;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    color: #4b5563;
+}
+.btn-confirm-ok {
+    padding: 0.5rem 1.5rem;
+    border: none;
+    background-color: #3b82f6;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    color: white;
+    font-weight: 500;
+}
+
+/* --- Add Schedule Modal Content --- */
+.schedule-modal-content {
+    width: 100%;
+    max-width: 512px;
+    background-color: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    transform: scale(0.95);
+    transition: transform 0.3s;
+}
+.schedule-modal-content .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem;
+    border-bottom: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+}
+.schedule-modal-content .modal-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+.schedule-modal-content .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 1.25rem;
+    border-top: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+    gap: 0.75rem;
+}
+        
+/* Modal Form Elements */
+.form-row {
+    display: flex;
+    align-items: flex-start;
+}
+.form-label {
+    color: #4b5563;
+    width: 10rem;
+    padding-top: 0.25rem;
+}
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.time-picker-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+select, .text-input {
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    width: 4rem;
+    box-sizing: border-box;
+}
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+    color: #374151;
+    font-weight: 500;
+}
+.checkbox-container label {
+    margin-left: 0.5rem;
+    width: auto;
+    color: #374151;
+    font-weight: 500;
+}
+.checkbox-input {
+    height: 1rem;
+    width: 1rem;
+    border-radius: 0.25rem;
+    border: 1px solid #d1d5db;
+    appearance: none;
+    background-color: white;
+    cursor: pointer;
+    position: relative;
+}
+.checkbox-input:checked {
+    background-color: #2563eb;
+    border-color: #2563eb;
+}
+.checkbox-input:checked::after {
+    content: '\2713';
+    position: absolute;
+    top: -2px;
+    left: 1px;
+    font-size: 0.75rem;
+    color: white;
+}
+        
+/* --- Day Toggles --- */
+.day-toggles-container {
+    display: flex;
+    gap: 0.5rem;
+}
+.day-toggle {
+    transition: all 0.15s ease-in-out;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    font-size: 0.75rem; /* Slightly smaller for better fit */
+    font-weight: 500;
+    border-radius: 9999px;
+    border: 1px solid;
+}
+.day-toggle.selected {
+    background-color: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+}
+.day-toggle:not(.selected) {
+    background-color: #e5e7eb;
+    color: #4b5563;
+    border-color: #d1d5db;
+}
+
+/* --- Modal Buttons --- */
+.btn-cancel-modal {
+    padding: 0.5rem 1.5rem;
+    color: #3b82f6;
+    border: 1px solid #d1d5db;
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transition: background-color 0.15s;
+    cursor: pointer;
+}
+.btn-cancel-modal:hover {
+    background-color: #f3f4f6;
+}
+.btn-save-modal {
+    padding: 0.5rem 1.5rem;
+    color: white;
+    background-color: #3b82f6;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.15s;
+    border: none;
+    cursor: pointer;
+}
+.btn-save-modal:hover {
+    background-color: #2563eb;
+}
+
+
+/* Responsive Adjustments */
+@media (max-width: 640px) {
+    .page-card {
+        margin: 0.5rem;
+        padding: 1rem;
+    }
+    .form-row, .setting-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    .form-label, .setting-row label {
+        width: 100%;
+        margin-bottom: 0.25rem;
+    }
+    .day-toggles-container {
+        flex-wrap: wrap;
+    }
+    .time-picker-group {
+        flex-wrap: nowrap; /* Keep time pickers in line if possible */
+        width: 100%;
+        justify-content: space-between;
+    }
+    select {
+        width: 4rem;
+    }
+    .schedule-modal-content {
+        margin: 0 0.5rem;
+    }
+}
+
+.description {
+    color: rgb(110, 110, 110);
+    font-size: 12px;
+    font-family: sans-serif;
+    margin-bottom: 15px;
+}
+
+.deny-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 4px;
+}
+
+.deny-table th {
+    text-align: left;
+    padding: 12px 8px;
+    background-color: #fafafa;
+    border-bottom: 2px solid #eee;
+    font-size: 14px;
+}
+
+.deny-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Green icon for the Unblock action */
+.green-icon {
+    width: 20px;
+    height: 20px;
+    /* This filter creates a clean green color from a black/red icon */
+    filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between; /* Pushes items to far left and far right */
+    align-items: center;            /* Vertically centers them on the line */
+    margin-bottom: 5px;             /* Space before the horizontal line */
+}
+
+.table-title {
+    margin: 0;
+    color: #004d40; /* Matches your dark green text */
+    font-size: 24px;
+}
+
+.add-device-btn {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    color: white;
+    background-color: #28a745;
+    border-radius: 0.5rem;
+    transition: background-color 0.15s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: none;
+    cursor: pointer;
+}
+
+.add-device-btn:hover {
+    background-color: #218838;
+    color: white;
+}
+
+button {
+    font-size: 16px; /* Responsive font size */
+    padding: 8px 16px; /* Adjust padding based on viewport */
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}

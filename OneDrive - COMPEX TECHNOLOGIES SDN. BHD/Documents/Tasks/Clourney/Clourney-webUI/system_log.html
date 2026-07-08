@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Restore Config</title>
+  <link rel="stylesheet" href="css/system.css">
+</head>
+<body>
+    <div class="box">
+        <h1>System Log</h1>
+        <p class="description">View recorded system activities</p>
+        <hr>
+        <div id="date"></div>
+        <input type="text" id="search" placeholder="Search logs...">
+        <button onclick="searchLog()">Search</button> 
+        <button onclick="refreshLog()" style="float: right;">Refresh</button>
+        <span id="loading-spinner" class="loading-spinner hidden"></span>
+        <br> 
+        <br>
+        <span id="resultCount"></span>
+        <span id="nextButton"></span>
+        <span id="prevButton"></span>
+        <br>
+        <br>
+        <div>
+          <pre id="logBox" readonly></pre>
+        </div>
+    </div>
+    <div class="box">
+      <h1>Download Log</h1>
+      <p class="description">Download full recorded activities to local PC</p>
+      <hr>
+      <button id="dlSyslog" onclick="downloadLog()">Download Log</button>
+    </div>
+</body>

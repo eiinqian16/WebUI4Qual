@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Restore Config</title>
+  <link rel="stylesheet" href="css/system.css">
+</head>
+<body>
+    <div class="box">
+        <h1>Backup Configuration</h1>
+        <p class="description">Backup configuration as compressed folder</p>
+        <hr>
+        <div id="backup">
+            <input type="checkbox" id="dlLocal">
+            <label for="dlLocal">Download to local PC</label>
+            <br>
+            <br>
+            <button onclick="backup_config()">Backup Configuration</button>
+        </div>
+    </div>
+    <br>
+
+    <div class="box">
+        <h1>Restore Configuration</h1>
+        <p class="description">Restore Configuration from file</p>
+        <hr>
+        <div id="restore">    
+            <input type="file" id="backupFile" accept=".tar.gz">
+            <br>
+            <br>
+            <div id="loading-overlay">
+                <div class="loading-spinner"></div>
+                <div id="loading-text">Compex</div>
+            </div>
+            <button onclick="uploadBackup()">Upload</button>
+            <div id="backup-popup" class="popup hidden">
+                <div class="popup-content">
+                    <h3>Backup Upload</h3>
+                    <p>Please check hash of upload.</p>
+                    <hr>
+                    <p><strong>MD5: </strong><span id="md5sum"></span></p>
+                    <p><strong>SHA256: </strong><span id="sha256sum"></span></p>
+                    <button onclick="confirmBackup()">Restore</button>
+                    <button onclick="closePopup()">Cancel</button>
+                </div>
+        </div>
+        <div id="uploadStatus"></div>
+    </div>
+</body>

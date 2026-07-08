@@ -1,0 +1,132 @@
+/* 1️⃣ 白色背景 */
+body {
+    font-family: Arial, sans-serif;
+    background: #FFFFFF;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /*center*/
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0px 15px 35px rgba(54, 28, 29, 0.2);
+    width: 100%;
+    max-width: 400px;
+    transition: all 0.3s ease-in-out;
+    margin-top: 5vh;
+}
+
+.container:hover {
+    box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+.container img {
+    display: block;
+    margin-left: 0;
+    width: 60px;
+    margin-bottom: 15px;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.25);
+    border-radius: 10%; 
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; 
+    will-change: transform; 
+}
+
+.container img:hover {
+    transform: scale(1.1); 
+    box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.3); 
+    backdrop-filter: none !important; /* 关键：防止模糊影响 */
+}
+
+.auth-title {
+    display: block;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #222;
+    text-align: left;
+}
+
+.auth-desc {
+    display: block;
+    font-size: 14px;
+    color: #555;
+    margin-top: 4px; 
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: none; 
+    border-bottom: 2px solid #ddd; 
+    border-radius: 0;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background: transparent;
+}
+
+input:focus {
+    border-bottom: 2px solid #0f691e;
+    outline: none;
+    box-shadow: 0px 4px 8px rgba(252, 248, 126, 0.2); 
+}
+
+button {
+    display: block;
+    width: 40%; 
+    background:#1aa34c; 
+    color: white;
+    border: none;
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold; 
+    border-radius: 8px; 
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0px 5px 15px rgba(3, 3, 2, 0.3); 
+}
+
+button:hover {
+    background: #0f691e;
+    box-shadow: 0px 8px 18px rgba(247, 214, 198, 0.5);
+    transform: translateY(-1px);
+}
+
+button:active {
+    transform: scale(0.98);
+    box-shadow: 0px 4px 10px rgba(13, 122, 11, 0.3);
+}
+
+.chkbox {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 14px;
+    margin-top: -5px;
+}
+
+.loader {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1.2s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

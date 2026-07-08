@@ -1,0 +1,5 @@
+#!/bin/sh
+if [ "$ACTION" = "add" ] && echo "$INTERFACE" | grep -qE '^wifi[0-9]+$'; then
+    logger "Reapplying acktimeout for $INTERFACE"
+    /etc/init.d/acktimeout start
+fi

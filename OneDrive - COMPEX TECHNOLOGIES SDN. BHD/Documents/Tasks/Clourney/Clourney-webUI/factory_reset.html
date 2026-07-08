@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reset</title>
+  <link rel="stylesheet" href="css/system.css">
+  <script src="js/system.js"></script>
+</head>
+<body>
+
+  <div class="box">
+    <h1>Factory Reset</h1>
+    <p class="description">Click the button below to reset your board to factory settings.</p>
+    <hr>
+    <button onclick="resetBoard()">Reset Board</button>
+    <p id="status" style="color: red; font-weight: bold;"></p>
+  </div>
+
+  <div class="box">
+    <h1>Reboot</h1>
+    <p class="description">Click the button below to reboot your device.</p>
+    <hr>
+    <button onclick="rebootBoard()">Reboot</button>
+    <p id="status" style="color: red; font-weight: bold;"></p>
+  </div>
+
+  <div id="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div id="loading-text">Compex</div>
+</div>
+</body>
+
+</html>

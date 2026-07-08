@@ -1,0 +1,412 @@
+{
+  "502153": {
+    "mcc": "502",
+    "mnc": "153",
+    "carrier": "Unifi",
+    "APNs": {
+      "LTE": { "apn": "unifi", "username": "", "password": "" },
+      "NR5G": { "apn": "unifi", "username": "", "password": "" },
+      "AUTO": { "apn": "unifi", "username": "", "password": "" }
+    }
+  },
+  "502150": {
+    "mcc": "502",
+    "mnc": "150",
+    "carrier": "Tune Talk",
+    "APNs": {
+      "LTE": { "apn": "tunetalk", "username": "", "password": "" },
+      "NR5G": { "apn": "tunetalk", "username": "", "password": "" },
+      "AUTO": { "apn": "tunetalk", "username": "", "password": "" }
+    }
+  },
+  "50212": {
+    "mcc": "502",
+    "mnc": "12",
+    "carrier": "Maxis",
+    "APNs": {
+      "LTE": { "apn": "max4g", "username": "", "password": "" },
+      "NR5G": { "apn": "max5g", "username": "", "password": "" },
+      "AUTO": { "apn": "max4g", "username": "", "password": "" }
+    }
+  },
+  "50216": {
+    "mcc": "502",
+    "mnc": "16",
+    "carrier": "Digi",
+    "APNs": {
+      "LTE": { "apn": "diginet", "username": "", "password": "" },
+      "NR5G": { "apn": "diginet5", "username": "", "password": "" },
+      "AUTO": { "apn": "diginet", "username": "", "password": "" }
+    }
+  },
+  "50213": {
+    "mcc": "502",
+    "mnc": "13",
+    "carrier": "Celcom",
+    "APNs": {
+      "LTE": { "apn": "celcom4g", "username": "", "password": "" },
+      "NR5G": { "apn": "celcom5g", "username": "", "password": "" },
+      "AUTO": { "apn": "celcom4g", "username": "","password": "" }
+    }
+  },
+  "50219": {
+    "mcc": "502",
+    "mnc": "19",
+    "carrier": "CelcomDigi",
+    "APNs": {
+      "LTE": { "apn": "celcom4g", "username": "", "password": "" },
+      "NR5G": { "apn": "celcom5g", "username": "", "password": "" },
+      "AUTO": { "apn": "celcom4g", "username": "", "password": "" }
+    }
+  },
+  "50218": {
+    "mcc": "502",
+    "mnc": "18",
+    "carrier": "U Mobile",
+    "APNs": {
+      "LTE": { "apn": "unet", "username": "", "password": "" },
+      "NR5G": { "apn": "my5g", "username": "", "password": "" },
+      "AUTO": { "apn": "unet", "username": "", "password": "" }
+    }
+  },
+  "502152": {
+    "mcc": "502",
+    "mnc": "152",
+    "carrier": "Yes",
+    "APNs": {
+      "LTE": { "apn": "yesnet", "username": "", "password": "" },
+      "NR5G": { "apn": "yesnet5", "username": "", "password": "" },
+      "AUTO": { "apn": "yesnet", "username": "", "password": "" }
+    }
+  },
+  "52503": {
+    "mcc": "525",
+    "mnc": "03",
+    "carrier": "M1",
+    "APNs": {
+      "LTE": { "apn": "sunsurf", "username": "", "password": "" },
+      "NR5G": { "apn": "sunsurf", "username": "", "password": "" },
+      "AUTO": { "apn": "sunsurf", "username": "", "password": "" }
+    }
+  },
+  "52501": {
+    "mcc": "525",
+    "mnc": "01",
+    "carrier": "Singtel",
+    "APNs": {
+      "LTE": { "apn": "e-ideas", "username": "65ideas", "password": "65ideas" },
+      "NR5G": { "apn": "e-ideas", "username": "65ideas", "password": "65ideas" },
+      "AUTO": { "apn": "e-ideas", "username": "65ideas", "password": "65ideas" }
+    }
+  },
+  "52505": {
+    "mcc": "525",
+    "mnc": "05",
+    "carrier": "Starhub",
+    "APNs": {
+      "LTE": { "apn": "shinternet", "username": "", "password": "" },
+      "NR5G": { "apn": "shinternet", "username": "", "password": "" },
+      "AUTO": { "apn": "shinternet", "username": "", "password": "" }
+    }
+  },
+  "52510": {
+    "mcc": "525",
+    "mnc": "10",
+    "carrier": "SIMBA",
+    "APNs": {
+      "LTE": { "apn": "TPG", "username": "", "password": "" },
+      "NR5G": { "apn": "TPG", "username": "", "password": "" },
+      "AUTO": { "apn": "TPG", "username": "", "password": "" }
+    }
+  },
+  "52003": {
+    "mcc": "520",
+    "mnc": "03",
+    "carrier": "AIS",
+    "APNs": {
+      "LTE": { "apn": "internet", "username": "", "password": "" },
+      "NR5G": { "apn": "internet", "username": "", "password": "" },
+      "AUTO": { "apn": "internet", "username": "", "password": "" }
+    }
+  },
+  "52005": {
+    "mcc": "520",
+    "mnc": "05",
+    "carrier": "DTAC",
+    "APNs": {
+      "LTE": { "apn": "www.dtac.co.th", "username": "", "password": "" },
+      "NR5G": { "apn": "www.dtac.co.th", "username": "", "password": "" },
+      "AUTO": { "apn": "www.dtac.co.th", "username": "", "password": "" }
+    }
+  },
+  "52047": {
+    "mcc": "520",
+    "mnc": "47",
+    "carrier": "TOT",
+    "APNs": {
+      "LTE": { "apn": "internet", "username": "", "password": "" },
+      "NR5G": { "apn": "internet", "username": "", "password": "" },
+      "AUTO": { "apn": "internet", "username": "", "password": "" }
+    }
+  },
+  "52004": {
+    "mcc": "520",
+    "mnc": "04",
+    "carrier": "True Move",
+    "APNs": {
+      "LTE": { "apn": "internet", "username": "", "password": "" },
+      "NR5G": { "apn": "internet", "username": "", "password": "" },
+      "AUTO": { "apn": "internet", "username": "", "password": "" }
+    }
+  },
+  "52811": {
+    "mcc": "528",
+    "mnc": "11",
+    "carrier": "DST",
+    "APNs": {
+      "LTE": { "apn": "internet", "username": "", "password": "" },
+      "NR5G": { "apn": "internet", "username": "", "password": "" },
+      "AUTO": { "apn": "internet", "username": "", "password": "" }
+    }
+  },
+  "52801": {
+    "mcc": "528",
+    "mnc": "01",
+    "carrier": "Imagine",
+    "APNs": {
+      "LTE": { "apn": "internet.bn", "username": "", "password": "" },
+      "NR5G": { "apn": "internet.bn", "username": "", "password": "" },
+      "AUTO": { "apn": "internet.bn", "username": "", "password": "" }
+    }
+  },
+  "45601": {
+    "mcc": "456",
+    "mnc": "01",
+    "carrier": "Cellcard",
+    "APNs": {
+      "LTE": { "apn": "cellcard", "username": "", "password": "" },
+      "NR5G": { "apn": "cellcard", "username": "", "password": "" },
+      "AUTO": { "apn": "cellcard", "username": "", "password": "" }
+    }
+  },
+  "45611": {
+    "mcc": "456",
+    "mnc": "11",
+    "carrier": "SEATEL",
+    "APNs": {
+      "LTE": { "apn": "seatel", "username": "", "password": "" },
+      "NR5G": { "apn": "seatel", "username": "", "password": "" },
+      "AUTO": { "apn": "seatel", "username": "", "password": "" }
+    }
+  },
+  "45602": {
+    "mcc": "456",
+    "mnc": "02",
+    "carrier": "Smart",
+    "APNs": {
+      "LTE": { "apn": "smart", "username": "", "password": "" },
+      "NR5G": { "apn": "smart", "username": "", "password": "" },
+      "AUTO": { "apn": "smart", "username": "", "password": "" }
+    }
+  },
+  "45605": {
+    "mcc": "456",
+    "mnc": "05",
+    "carrier": "Smart",
+    "APNs": {
+      "LTE": { "apn": "smart", "username": "", "password": "" },
+      "NR5G": { "apn": "smart", "username": "", "password": "" },
+      "AUTO": { "apn": "smart", "username": "", "password": "" }
+    }
+  },
+  "45606": {
+    "mcc": "456",
+    "mnc": "06",
+    "carrier": "Smart",
+    "APNs": {
+      "LTE": { "apn": "smart", "username": "", "password": "" },
+      "NR5G": { "apn": "smart", "username": "", "password": "" },
+      "AUTO": { "apn": "smart", "username": "", "password": "" }
+    }
+  },
+  "45608": {
+    "mcc": "456",
+    "mnc": "08",
+    "carrier": "Metfone",
+    "APNs": {
+      "LTE": { "apn": "metfone", "username": "", "password": "" },
+      "NR5G": { "apn": "metfone", "username": "", "password": "" },
+      "AUTO": { "apn": "metfone", "username": "", "password": "" }
+    }
+  },
+  "51089": {
+    "mcc": "510",
+    "mnc": "89",
+    "carrier": "Tri",
+    "APNs": {
+      "LTE": { "apn": "tri.co.id", "username": "3gprs", "password": "3gprs" },
+      "NR5G": { "apn": "tri.co.id", "username": "3gprs", "password": "3gprs" },
+      "AUTO": { "apn": "tri.co.id", "username": "3gprs", "password": "3gprs" }
+    }
+  },
+  "51001": {
+    "mcc": "510",
+    "mnc": "01",
+    "carrier": "OOredoo",
+    "APNs": {
+      "LTE": { "apn": "ooredoo.com.kw", "username": "", "password": "" },
+      "NR5G": { "apn": "ooredoo.com.kw", "username": "", "password": "" },
+      "AUTO": { "apn": "ooredoo.com.kw", "username": "", "password": "" }
+    }
+  },
+  "46000": {
+    "mcc": "460",
+    "mnc": "00",
+    "carrier": "China Mobile",
+    "APNs": {
+      "LTE": { "apn": "cmnet", "username": "", "password": "" },
+      "NR5G": { "apn": "cmnet", "username": "", "password": "" },
+      "AUTO": { "apn": "cmnet", "username": "", "password": "" }
+    }
+  },
+  "46002": {
+    "mcc": "460",
+    "mnc": "02",
+    "carrier": "China Mobile",
+    "APNs": {
+      "LTE": { "apn": "cmnet", "username": "", "password": "" },
+      "NR5G": { "apn": "cmnet", "username": "", "password": "" },
+      "AUTO": { "apn": "cmnet", "username": "", "password": "" }
+    }
+  },
+  "46004": {
+    "mcc": "460",
+    "mnc": "04",
+    "carrier": "China Mobile",
+    "APNs": {
+      "LTE": { "apn": "cmnet", "username": "", "password": "" },
+      "NR5G": { "apn": "cmnet", "username": "", "password": "" },
+      "AUTO": { "apn": "cmnet", "username": "", "password": "" }
+    }
+  },
+  "46007": {
+    "mcc": "460",
+    "mnc": "07",
+    "carrier": "China Mobile",
+    "APNs": {
+      "LTE": { "apn": "cmnet", "username": "", "password": "" },
+      "NR5G": { "apn": "cmnet", "username": "", "password": "" },
+      "AUTO": { "apn": "cmnet", "username": "", "password": "" }
+    }
+  },
+  "46008": {
+    "mcc": "460",
+    "mnc": "08",
+    "carrier": "China Mobile",
+    "APNs": {
+      "LTE": { "apn": "cmnet", "username": "", "password": "" },
+      "NR5G": { "apn": "cmnet", "username": "", "password": "" },
+      "AUTO": { "apn": "cmnet", "username": "", "password": "" }
+    }
+  },
+  "46013": {
+    "mcc": "460",
+    "mnc": "13",
+    "carrier": "China Mobile",
+    "APNs": {
+      "LTE": { "apn": "cmnet", "username": "", "password": "" },
+      "NR5G": { "apn": "cmnet", "username": "", "password": "" },
+      "AUTO": { "apn": "cmnet", "username": "", "password": "" }
+    }
+  },
+  "46001": {
+    "mcc": "460",
+    "mnc": "01",
+    "carrier": "China Unicom",
+    "APNs": {
+      "LTE": { "apn": "3gnet", "username": "", "password": "" },
+      "NR5G": { "apn": "3gnet", "username": "", "password": "" },
+      "AUTO": { "apn": "3gnet", "username": "", "password": "" }
+    }
+  },
+  "46006": {
+    "mcc": "460",
+    "mnc": "06",
+    "carrier": "China Unicom",
+    "APNs": {
+      "LTE": { "apn": "3gnet", "username": "", "password": "" },
+      "NR5G": { "apn": "3gnet", "username": "", "password": "" },
+      "AUTO": { "apn": "3gnet", "username": "", "password": "" }
+    }
+  },
+  "46009": {
+    "mcc": "460",
+    "mnc": "09",
+    "carrier": "China Unicom",
+    "APNs": {
+      "LTE": { "apn": "3gnet", "username": "", "password": "" },
+      "NR5G": { "apn": "3gnet", "username": "", "password": "" },
+      "AUTO": { "apn": "3gnet", "username": "", "password": "" }
+    }
+  },
+  "46010": {
+    "mcc": "460",
+    "mnc": "10",
+    "carrier": "China Unicom",
+    "APNs": {
+      "LTE": { "apn": "3gnet", "username": "", "password": "" },
+      "NR5G": { "apn": "3gnet", "username": "", "password": "" },
+      "AUTO": { "apn": "3gnet", "username": "", "password": "" }
+    }
+  },
+  "46003": {
+    "mcc": "460",
+    "mnc": "03",
+    "carrier": "China Telecom",
+    "APNs": {
+      "LTE": { "apn": "ctnet", "username": "", "password": "" },
+      "NR5G": { "apn": "ctnet", "username": "", "password": "" },
+      "AUTO": { "apn": "ctnet", "username": "", "password": "" }
+    }
+  },
+  "46005": {
+    "mcc": "460",
+    "mnc": "05",
+    "carrier": "China Telecom",
+    "APNs": {
+      "LTE": { "apn": "ctnet", "username": "", "password": "" },
+      "NR5G": { "apn": "ctnet", "username": "", "password": "" },
+      "AUTO": { "apn": "ctnet", "username": "", "password": "" }
+    }
+  },
+  "46011": {
+    "mcc": "460",
+    "mnc": "11",
+    "carrier": "China Telecom",
+    "APNs": {
+      "LTE": { "apn": "ctnet", "username": "", "password": "" },
+      "NR5G": { "apn": "ctnet", "username": "", "password": "" },
+      "AUTO": { "apn": "ctnet", "username": "", "password": "" }
+    }
+  },
+  "46012": {
+    "mcc": "460",
+    "mnc": "12",
+    "carrier": "China Telecom",
+    "APNs": {
+      "LTE": { "apn": "ctnet", "username": "", "password": "" },
+      "NR5G": { "apn": "ctnet", "username": "", "password": "" },
+      "AUTO": { "apn": "ctnet", "username": "", "password": "" }
+    }
+  },
+  "46015": {
+    "mcc": "460",
+    "mnc": "15",
+    "carrier": "China Broadnet",
+    "APNs": {
+      "LTE": { "apn": "cbnet", "username": "", "password": "" },
+      "NR5G": { "apn": "cbnet", "username": "", "password": "" },
+      "AUTO": { "apn": "cbnet", "username": "", "password": "" }
+    }
+  }
+}

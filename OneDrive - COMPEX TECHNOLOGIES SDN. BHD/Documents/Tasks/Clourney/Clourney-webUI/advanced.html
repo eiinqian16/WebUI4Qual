@@ -1,0 +1,182 @@
+<link rel="stylesheet" href="css/advanced_v1.css">
+<div class="box">
+    <div id="wireless-schedule">
+        <h1>Wireless Schedule</h1>
+        <p class="description">Create schedule to turn off wireless network.</p>
+        <hr>
+        <div style="padding-bottom: 1.5rem; border-bottom: 1px solid #e5e7eb;">
+            <div class="setting-row">
+                <label>Wireless Schedule:</label>
+                <!-- This toggle triggers the confirmation dialog -->
+                <div id="master-toggle" class="toggle-switch" onclick="toggleScheduleWithConfirmation()"></div>
+            </div>
+
+            <div class="setting-row">
+                <label>System Time:</label>
+                <div id="currentTime" class="current-time-display">Loading...</div>
+            </div>
+
+            <div class="note">
+                <p>
+                    <span class="highlight">Note:</span> Please ensure router is connected to Internet and system time shown is correct. Only enabled schedule entries will be saved.
+                </p>
+            </div>
+
+            <div class="config-time">
+                <button onclick="window.redirectToTime(event)">Configure Time</button>
+            </div>
+        </div>
+
+        <!-- Schedule List Section -->
+        <div style="margin-top: 1.5rem;">
+            <h2 class="schedule-list-header">Scheduled Entries</h2>
+            
+            <div id="schedule-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div class="schedule-placeholder">
+                    <span>No schedules configured yet.</span>
+                </div>
+            </div>
+            
+            <button onclick="openAddModal()" class="btn-add">
+                + Add Schedule
+            </button>
+        </div>
+
+    </div>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- 1. Confirmation Dialog (The requested pop-up) -->
+    <!-- ---------------------------------------------------- -->
+    <div id="confirmation-backdrop" class="modal-backdrop">
+        <div id="confirmation-dialog" class="confirmation-dialog bg-white rounded-xl p-6 shadow-2xl w-full max-w-sm text-center">
+            <!-- Ensure IDs match the JS: confirmation-title and confirmation-message -->
+            <h4 id="confirmation-title" class="text-lg font-bold mb-2 text-gray-800">Toggle Wireless Schedule?</h4>
+            <p id="confirmation-message" class="text-sm text-gray-600 mb-4">
+                Confirming will send the full configuration payload to the backend script via a POST request. Continue?
+            </p>
+            <div class="flex justify-center gap-3">
+                <button onclick="confirmToggle(false)" class="px-4 py-2 text-sm font-semibold rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition duration-150">
+                    CANCEL
+                </button>
+                <button onclick="confirmToggle(true)" class="px-4 py-2 text-sm font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition duration-150">
+                    CONFIRM
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- 2. Add Schedule Modal (The form) -->
+    <!-- ---------------------------------------------------- -->
+    <div id="add-schedule-backdrop" class="modal-backdrop">
+        <!-- Modal Container -->
+        <div id="schedule-modal" class="schedule-modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h3 id="modal-title">Add Schedule</h3>
+                <button onclick="closeAddModal()" style="border: none; background: none; cursor: pointer;">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width: 1.5rem; height: 1.5rem; color: #9ca3af;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <input type="hidden" id="edit-id" value="">
+
+                <!-- 2. Band Selection -->
+        <!--        <div class="form-row">
+                    <label class="form-label">Band:</label>
+                    <div class="input-group">
+                        <div class="checkbox-container">
+                            <input type="checkbox" id="band-24" class="checkbox-input" checked>
+                            <label for="band-24">2.4 GHz</label>
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width: 1rem; height: 1rem; margin-left: 0.25rem; color: #3b82f6;" title="Only selected bands will be affected by the schedule."><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c0-3.379 2.476-6 5.5-6s5.5 2.621 5.5 6a4.522 4.522 0 01-1.285 3.195 9 9 0 01-4.996 2.479M20.245 15l-1.405-1.405M17.5 17.5l-1.405-1.405M14.75 12.5h.01M12 18v2m-6.75-6.5l-1.405-1.405M3 15h.01"></path></svg>
+                        </div>
+                        <div class="checkbox-container">
+                            <input type="checkbox" id="band-5" class="checkbox-input" checked>
+                            <label for="band-5">5 GHz</label>
+                        </div>
+                    </div>
+                </div>
+            -->
+                <!-- 3. Wireless Off Time -->
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div class="form-row items-center">
+                        <label class="form-label">Wireless Off Time:</label>
+                        <div class="time-picker-group">
+                            <!-- Options populated by populateTime() -->
+                            <select id="off-hour" class="text-input"></select> 
+                            <span>:</span>
+                            <select id="off-minute" class="text-input">
+                                <option value="00" selected>00</option>
+                                <option value="30">30</option>
+                            </select>
+                            <select id="off-ampm" class="text-input">
+                                <option value="PM" selected>PM</option>
+                            <option value="AM">AM</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Time Picker Row 2 (On Time) -->
+                    <div class="form-row items-center">
+                        <label class="form-label">Wireless On Time:</label>
+                        <div class="time-picker-group">
+                            <!-- Options populated by populateTime() -->
+                            <select id="on-hour" class="text-input"></select>
+                            <span>:</span>
+                            <select id="on-minute" class="text-input">
+                                <option value="00" selected>00</option>
+                                <option value="30">30</option>
+                            </select>
+                            <select id="on-ampm" class="text-input">
+                                <option value="AM" selected>AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                            <span style="color: #9ca3af; font-size: 0.875rem;">(next day)</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 4. Repeat Days -->
+                <div class="form-row" style="align-items: center;">
+                    <label class="form-label">Repeat:</label>
+                    <div id="day-toggles" class="day-toggles-container">
+                        <div id="day-Su" data-day="Su" class="day-toggle selected">Su</div>
+                        <div id="day-M" data-day="M" class="day-toggle selected">M</div>
+                        <div id="day-T" data-day="Tu" class="day-toggle selected">Tu</div>
+                        <div id="day-W" data-day="W" class="day-toggle selected">W</div>
+                        <div id="day-Th" data-day="Th" class="day-toggle selected">Th</div>
+                        <div id="day-F" data-day="F" class="day-toggle selected">F</div>
+                        <div id="day-Sa" data-day="Sa" class="day-toggle selected">Sa</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button onclick="handleCancel()" class="btn-cancel-modal">
+                    CANCEL
+                </button>
+                <button onclick="handleSave()" class="btn-save-modal">
+                    SAVE
+                </button>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<div class="box" id="accessControl">
+    <h1>Access Control</h1>
+    <p class="description">Devices in below list is blocked.</p>
+    <hr>
+    <div class="header-container">
+    <button class="add-device-btn" onclick="openAddDeviceModal()">
+        + Add Device
+    </button>
+    </div>
+    <div id="denyListContainer">
+    </div>
+</div>
