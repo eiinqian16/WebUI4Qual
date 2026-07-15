@@ -1,53 +1,53 @@
 function resetBoard() {
-    const statusText = document.getElementById("status");
-  
+    const statusText = document.getElementById("reset-status") || document.getElementById("status");
+
     let confirmation = confirm(`Saving and applying the changes will ERASE ALL YOUR SETTINGS and RESET TO FACTORY SETTINGS. Continue?`);
 
     if (confirmation) {
         fetch('/cgi-bin/reset.sh', {
-        method: "POST"
+            method: "POST"
         })
-        .then(response => {
-            if (response.ok) {
-                showLoading();
-                statusText.innerText = "Board reset triggered. Rebooting now...\nRefresh the web page when the board is ready...";
-                setTimeout(() => {
-                    checkDeviceReboot();
-                }, 7000);
-            } else {
-                statusText.innerText = "Reset failed. Server responded with error.";
-            }
-        })
-        .catch(error => {
-        statusText.innerText = "Error contacting server: " + error;
-        });
+            .then(response => {
+                if (response.ok) {
+                    showLoading();
+                    statusText.innerText = "Board reset triggered. Rebooting now...\nRefresh the web page when the board is ready...";
+                    setTimeout(() => {
+                        checkDeviceReboot();
+                    }, 7000);
+                } else {
+                    statusText.innerText = "Reset failed. Server responded with error.";
+                }
+            })
+            .catch(error => {
+                statusText.innerText = "Error contacting server: " + error;
+            });
     }
 }
 
 function rebootBoard() {
-    const statusText = document.getElementById("status");
+    const statusText = document.getElementById("reboot-status") || document.getElementById("status");
 
     let confirmation = confirm(`Reboot device? Refresh web page manually when board is ready. Continue?`);
 
     if (confirmation) {
         showLoading();
         fetch('/cgi-bin/reboot.sh', {
-        method: "POST"
+            method: "POST"
         })
-        .then(response => {
-            if (response.ok) {
-                showLoading();
-                statusText.innerText = "Board reboot triggered. Rebooting now...\nRefresh the web page when the board is ready...";
-                setTimeout(() => {
-                    checkDeviceReboot();
-                }, 7000);
-            } else {
-                statusText.innerText = "Reset failed. Server responded with error.";
-            }
-        })
-        .catch(error => {
-        statusText.innerText = "Error contacting server: " + error;
-        });
+            .then(response => {
+                if (response.ok) {
+                    showLoading();
+                    statusText.innerText = "Board reboot triggered. Rebooting now...\nRefresh the web page when the board is ready...";
+                    setTimeout(() => {
+                        checkDeviceReboot();
+                    }, 7000);
+                } else {
+                    statusText.innerText = "Reset failed. Server responded with error.";
+                }
+            })
+            .catch(error => {
+                statusText.innerText = "Error contacting server: " + error;
+            });
     }
 }
 
@@ -61,7 +61,7 @@ function showLoading(message = "Loading...") {
     }
 
     if (loadingText) {
-        loadingText.textContent = message; 
+        loadingText.textContent = message;
     }
 
     overlay.classList.add("show");
@@ -79,22 +79,21 @@ function hideLoading() {
 
 function checkDeviceReboot(attempts = 0) {
     fetch('/cgi-bin/get_wifi_config.sh', { method: 'GET', cache: 'no-store' })
-    .then(response => {
-        if (!response.ok) throw new Error("Device not ready");
-        return response.json();
-    })
-    .then(data => {
-        console.log("Device rebooted successfully!");
-        hideLoading();
-        getConfig(); 
-    })
-    .catch(() => {
-        if (attempts < 30) {
-            console.log(`Device not ready, retrying... (${attempts + 1})`);
-            setTimeout(() => checkDeviceReboot(attempts + 1), 3000);
-        } else {
-            alert("Device took too long to reboot. Try refreshing manually.");
-        }
-    });
+        .then(response => {
+            if (!response.ok) throw new Error("Device not ready");
+            return response.json();
+        })
+        .then(data => {
+            console.log("Device rebooted successfully!");
+            hideLoading();
+            getConfig();
+        })
+        .catch(() => {
+            if (attempts < 30) {
+                console.log(`Device not ready, retrying... (${attempts + 1})`);
+                setTimeout(() => checkDeviceReboot(attempts + 1), 3000);
+            } else {
+                alert("Device took too long to reboot. Try refreshing manually.");
+            }
+        });
 }
-  

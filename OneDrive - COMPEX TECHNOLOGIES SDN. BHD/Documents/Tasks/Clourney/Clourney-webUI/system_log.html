@@ -1,35 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Restore Config</title>
   <link rel="stylesheet" href="css/system.css">
 </head>
+
 <body>
-    <div class="box">
-        <h1>System Log</h1>
-        <p class="description">View recorded system activities</p>
-        <hr>
-        <div id="date"></div>
-        <input type="text" id="search" placeholder="Search logs...">
-        <button onclick="searchLog()">Search</button> 
-        <button onclick="refreshLog()" style="float: right;">Refresh</button>
-        <span id="loading-spinner" class="loading-spinner hidden"></span>
-        <br> 
-        <br>
-        <span id="resultCount"></span>
-        <span id="nextButton"></span>
-        <span id="prevButton"></span>
-        <br>
-        <br>
-        <div>
-          <pre id="logBox" readonly></pre>
-        </div>
+  <div class="box">
+    <h1>System Log</h1>
+    <p class="description">View recorded system activities</p>
+    <hr>
+    <div id="date"></div>
+    <div class="system-log-actions">
+      <input type="text" id="search" placeholder="Search logs...">
+      <button onclick="searchLog()">Search</button>
+      <button class="log-refresh-btn" onclick="refreshLog()">Refresh</button>
     </div>
-    <div class="box">
-      <h1>Download Log</h1>
-      <p class="description">Download full recorded activities to local PC</p>
-      <hr>
-      <button id="dlSyslog" onclick="downloadLog()">Download Log</button>
+    <span id="loading-spinner" class="loading-spinner hidden"></span>
+    <br>
+    <br>
+    <span id="resultCount"></span>
+    <span id="nextButton"></span>
+    <span id="prevButton"></span>
+    <br>
+    <br>
+    <div>
+      <pre id="logBox" readonly></pre>
     </div>
+  </div>
+  <div class="box">
+    <h1>Download Log</h1>
+    <p class="description">Download full recorded activities to local PC</p>
+    <hr>
+    <button id="dlSyslog" onclick="downloadLog()">Download Log</button>
+  </div>
 </body>
+
+</html>

@@ -26,10 +26,10 @@ function configWan() {
     }
 
     body += "&proto=" + encodeURIComponent(proto) +
-            "&dev" + encodeURIComponent(dev) +
-            "&IP" + encodeURIComponent(ip) +
-            "&Netmask" + encodeURIComponent(mask);
-        
+        "&dev" + encodeURIComponent(dev) +
+        "&IP" + encodeURIComponent(ip) +
+        "&Netmask" + encodeURIComponent(mask);
+
     if (proto === "static") {
         if (gateway) {
             if (!validateIP(gateway)) {
@@ -46,7 +46,7 @@ function configWan() {
             body += "&bcast=" + encodeURIComponent(bcast);
         }
     }
-        
+
     if (dns1) {
         body += "&dns1" + encodeURIComponent(dns1);
     }
@@ -54,7 +54,7 @@ function configWan() {
     if (dns2) {
         body += "dns2" + encodeURIComponent(dns2);
     }
-        
+
     let confirmation = confirm(`Saving and applying the changes will restart both network and WiFi interfaces. Continue?`)
 
     if (confirmation) {
@@ -64,23 +64,23 @@ function configWan() {
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: body
         })
-        .then(response => {
-            console.log('HTTP Status:', response.status);
-            if (!response.ok) {
-                throw new Error('Network response was not ok: ' + response.statusText);
-            }
-            return response.text();
-        })
-        .then(data => {
-            alert('done')
-            getCurWanIf();
-            hideLoading();
-        })
-        .catch(error => {
-            console.log("error");
-            alert("error");
-            hideLoading();
-        });
+            .then(response => {
+                console.log('HTTP Status:', response.status);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+                return response.text();
+            })
+            .then(data => {
+                alert('done')
+                getCurWanIf();
+                hideLoading();
+            })
+            .catch(error => {
+                console.log("error");
+                alert("error");
+                hideLoading();
+            });
     }
 }
 
@@ -89,40 +89,38 @@ async function getCurWanIf() {
         const resp = await fetch('/cgi-bin/extract_wired_data.sh');
         const wiredData = await resp.json();
         const wan = wiredData.find(item => item.type === "WAN");
-        
+
         let html = "";
-            html += `<h1>WAN Configuration</h1>
+        html += `<h1>WAN Configuration</h1>
                     <p class="description">View and configure Internet settings</p>
                     <hr>`;
-            const wanIP = document.getElementById("wanIP");
-            //const curNetmask = document.getElementById("curNetmask");
-            //const curDev = document.getElementById("curDev");
-            if (wan && wan.iface) {
-                html += `<p><strong>Device: </strong>${wan.iface || 'N/A'}</p>`
+        const wanIP = document.getElementById("wanIP");
+        if (wan && wan.iface) {
+            html += `<p><strong>Device: </strong><span>${wan.iface || 'N/A'}</span></p>`
+        }
+        if (wan && wan.proto) {
+            if (wan.proto === "dhcp") {
+                wan.proto = "DHCP client";
             }
-            if (wan && wan.proto) {
-                if (wan.proto === "dhcp") {
-                    wan.proto = "DHCP client";
-                }
-                html += `<p><strong>Connection Type: </strong>${wan.proto || 'N/A'}</p>`
-            }
-            if (wan && wan.IP) {
-                html += `<p><strong>IP Address: </strong>${wan.IP || 'N/A'}</p>`
-            }
-            if (wan && wan.netmask) {
-                html += `<p><strong>Subnet Mask: </strong>${wan.netmask || 'N/A'}</p>`
-            } 
-            if (wan && wan.gateway) {
-                html += `<p><strong>Gateway: </strong>${wan.gateway || 'N/A'}</p>`
-            }
-            if (wan && wan.bcast) {
-                html += `<p><strong>Broadcast: </strong>${wan.bcast || 'N/A'}</p>`
-            }
-            if (!wan) {
-                html += `<p><strong>Currently no WAN configured.</strong></p>`
-            }
-           
-            html += `
+            html += `<p><strong>Connection Type: </strong><span>${wan.proto || 'N/A'}</span></p>`
+        }
+        if (wan && wan.IP) {
+            html += `<p><strong>IP Address: </strong><span>${wan.IP || 'N/A'}</span></p>`
+        }
+        if (wan && wan.netmask) {
+            html += `<p><strong>Subnet Mask: </strong><span>${wan.netmask || 'N/A'}</span></p>`
+        }
+        if (wan && wan.gateway) {
+            html += `<p><strong>Gateway: </strong><span>${wan.gateway || 'N/A'}</span></p>`
+        }
+        if (wan && wan.bcast) {
+            html += `<p><strong>Broadcast: </strong><span>${wan.bcast || 'N/A'}</span></p>`
+        }
+        if (!wan) {
+            html += `<p><strong>Currently no WAN configured.</strong></p>`
+        }
+
+        html += `
             <div class="wanForm">
              <label for="proto">Connection Type:</label>
             <select class="proto-select" id="proto" name="proto" onchange="toggleIPConfig()">
@@ -131,12 +129,12 @@ async function getCurWanIf() {
                 <option value="static">Static IP</option>
             </select>
             `
-            html += `
+        html += `
             <form id="noneConfig" style="display: none;">
             </form>
             </div>
             `
-            html += `
+        html += `
             <form id="dhcpConfig" style="display: none;">
                 <label for="dev">Device:</label>
                 <select class="dev-select" id="dev" name="dev">
@@ -146,7 +144,7 @@ async function getCurWanIf() {
             </form>
             </div>
             <br>`
-            html += `
+        html += `
             <form id="wanConfig" style="display: none;">
                 <label for="wanIp">IPv4 address: </label>
                 <input type="text" id="wanIp" name="wanIp" required> <br>
@@ -169,9 +167,9 @@ async function getCurWanIf() {
             </form>
             </div>
             `
-            html += `<button onclick="configWan()">Save</button>`
-            wanIP.innerHTML = html;
-            loadDev();
+        html += `<button onclick="configWan()">Save</button>`
+        wanIP.innerHTML = html;
+        loadDev();
     }
     catch (err) {
         console.error("Failed to load WAN info:", err);
@@ -187,10 +185,10 @@ function loadDev() {
             return response.json();
         })
         .then(data => {
-            console.log("Successfully fetched data:", data); 
+            console.log("Successfully fetched data:", data);
             let dropdown = document.getElementById("dev");
             dropdown.innerHTML = "";
-            
+
             data.forEach(dev => {
                 if (dev.iface.startsWith("eth")) {
                     let option = document.createElement("option");
@@ -249,13 +247,13 @@ function getCurLanIf() {
             //const curDev = document.getElementById("curDev");
             const brLan = data.find(item => item.iface === "br-lan");
             if (brLan && brLan.IP) {
-                html += `<div class="curIp"><p><strong>Current IP Address: </strong>${brLan.IP || 'N/A'}</p>`
+                html += `<div class="curIp"><p><strong>Current IP Address: </strong><span>${brLan.IP || 'N/A'}</span></p>`
             }
             if (brLan && brLan.netmask) {
-                html += `<p><strong>Current Subnet Mask: </strong>${brLan.netmask || 'N/A'}</p>`
+                html += `<p><strong>Current Subnet Mask: </strong><span>${brLan.netmask || 'N/A'}</span></p>`
             }
             if (brLan && brLan.iface) {
-                html += `<p><strong>Device: </strong>${brLan.iface || 'N/A'}</p></div>`
+                html += `<p><strong>Device: </strong><span>${brLan.iface || 'N/A'}</span></p></div>`
             }
             html += `
             <form id="ipConfig">
@@ -271,13 +269,13 @@ function getCurLanIf() {
             </form>
             `
             curIP.innerHTML = html;
-        }); 
+        });
 }
 
 function configIP() {
     let ip = document.getElementById("ip").value;
     let mask = document.getElementById("netmask").value;
-    let gateway=document.getElementById("gateway").value;
+    let gateway = document.getElementById("gateway").value;
 
     if (!ip || !mask) {
         alert("Please ensure IP Address and Subnet Mask fields are entered.");
@@ -289,13 +287,13 @@ function configIP() {
         return false;
     }
 
-    if (!validateSubnetMask(mask)){
+    if (!validateSubnetMask(mask)) {
         alert("Invalid subnet mask! Please enter valid subnet mask.");
         return false;
     }
 
     let body = "IP=" + encodeURIComponent(ip) +
-                "&Netmask=" + encodeURIComponent(mask);
+        "&Netmask=" + encodeURIComponent(mask);
 
     if (gateway && !validateIP(gateway)) {
         alert("Invalid gateway IP address! Please enter a correct IPv4 address.");
@@ -314,13 +312,13 @@ function configIP() {
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: body
         })
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById("result").innerText = "Response: " + data;
-        })
-        .catch(error => {
-            document.getElementById("result").innerText = "Error: " + error;
-        });
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("result").innerText = "Response: " + data;
+            })
+            .catch(error => {
+                document.getElementById("result").innerText = "Error: " + error;
+            });
     }
 }
 
@@ -357,7 +355,7 @@ function showLoading(message = "Loading...") {
     }
 
     if (loadingText) {
-        loadingText.textContent = message; 
+        loadingText.textContent = message;
     }
 
     overlay.classList.add("show");

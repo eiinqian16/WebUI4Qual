@@ -1,18 +1,27 @@
 function getCred() {
-    const credCont = document.getElementById("cred");
+    const credCont = document.getElementById("cred-container");
     html = `
     <div class="usr">
     <h1>Change Password</h1>
     <hr style="width:100%;text-align:left;margin-left:0">
     <form id="cred">
-        <label for="oriPwd"><strong>Old Password:</strong></label>
-        <input type="password" id="oriPwd" name="oriPwd" required style="margin-left:73px;"><br>
+        <div class="form-row">
+            <label for="oriPwd"><strong>Old Password:&nbsp;</strong></label>
+            <input type="password" id="oriPwd" name="oriPwd" required>
+        </div>
+        <br>
 
-        <label for="newPwd"><strong>New Password:</strong></label>
-        <input type="password" id="newPwd" name="newPwd" required style="margin-left:65px;"><br>
+        <div class="form-row">
+            <label for="newPwd"><strong>New Password:&nbsp;</strong></label>
+            <input type="password" id="newPwd" name="newPwd" required>
+        </div>
+        <br>
 
-        <label for="confirmPwd"><strong>Confirm New Password:</strong></label>
-        <input type="password" id="confirmPwd" name="confirmPwd" required><br>
+        <div class="form-row">
+            <label for="confirmPwd"><strong>Confirm New Password:&nbsp;</strong></label>
+            <input type="password" id="confirmPwd" name="confirmPwd" required>
+        </div>
+        <br>
         <div class="chkbox">
             <input id="showPwdChk" type="checkbox" onclick="showPwd()">
             <label for="showPwdChk">Show Password</label>
@@ -32,7 +41,7 @@ function changeCred() {
     let conPwd = document.getElementById("confirmPwd").value;
 
     body = "uname=" + encodeURIComponent(name);
-    
+
     //document.getElementById("output").innerHTML = `oldPassword:${oPwd} newPassword:${nPwd} confirmPassword:${conPwd}`;
 
     if (!oPwd || !nPwd || !conPwd) {
@@ -51,35 +60,35 @@ function changeCred() {
     }
 
     body += "&oriPwd=" + encodeURIComponent(oPwd) +
-            "&newPwd=" + encodeURIComponent(nPwd);
-    
-    
+        "&newPwd=" + encodeURIComponent(nPwd);
+
+
     //document.getElementById("body").innerHTML = `${body}`;
-    
+
     fetch("/cgi-bin/change_pwd.sh", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: body
     })
-    .then(response => response.text())
-    .then(text => {
-        try {
-            let data = JSON.parse(text);
+        .then(response => response.text())
+        .then(text => {
+            try {
+                let data = JSON.parse(text);
 
-            if (data.status === "Success") {
-                alert("Password changed successfully");
-            } else {
-                alert(data.status);
+                if (data.status === "Success") {
+                    alert("Password changed successfully");
+                } else {
+                    alert(data.status);
+                }
+            } catch (error) {
+                console.error("JSON Parse Error:", error);
+                document.getElementById("output").innerText = `Invalid JSON: ${text}`;
             }
-        } catch (error) {
-            console.error("JSON Parse Error:", error);
-            document.getElementById("output").innerText = `Invalid JSON: ${text}`;
-        }
-    })
+        })
         .catch(error => {
             console.error("Error:", error);
             document.getElementById("output").innerText = `Request failed: ${error.message}`;
-        }) 
+        })
 }
 
 function showPwd() {

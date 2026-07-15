@@ -1,8 +1,48 @@
-//const { createContext, createElement } = require("react");
+if (typeof window.lockBodyScroll !== "function") {
+    window._bodyScrollLockCount = 0;
+
+    window.lockBodyScroll = function () {
+        const body = document.body;
+        if (!body) return;
+
+        if (window._bodyScrollLockCount === 0) {
+            const scrollY = window.scrollY || window.pageYOffset || 0;
+            body.dataset.scrollLockY = String(scrollY);
+            body.classList.add("modal-open");
+            body.style.position = "fixed";
+            body.style.top = "-" + scrollY + "px";
+            body.style.left = "0";
+            body.style.right = "0";
+            body.style.width = "100%";
+            body.style.overflow = "hidden";
+        }
+
+        window._bodyScrollLockCount = 1;
+    };
+
+    window.unlockBodyScroll = function () {
+        const body = document.body;
+        if (!body || !window._bodyScrollLockCount) return;
+
+        window._bodyScrollLockCount -= 1;
+        if (window._bodyScrollLockCount > 0) return;
+
+        const scrollY = parseInt(body.dataset.scrollLockY || "0", 10);
+        body.style.position = "";
+        body.style.top = "";
+        body.style.left = "";
+        body.style.right = "";
+        body.style.width = "";
+        body.style.overflow = "";
+        body.classList.remove("modal-open");
+        delete body.dataset.scrollLockY;
+        window.scrollTo(0, scrollY);
+    };
+}
 
 function initAckTimeout() {
     console.log('Initializing ACK Timeout settings...');
-    
+
     fetch("/cgi-bin/get_acktimeout.sh")
         .then(res => res.json())
         .then(data => {
@@ -30,7 +70,7 @@ function initAckTimeout() {
                 input.name = wifi;
                 input.min = "64";
                 input.max = "255";
-                input.value = values.acktimeout ?? "112"; 
+                input.value = values.acktimeout ?? "112";
                 input.className = "ack-input";
 
                 const spanMs = document.createElement("span");
@@ -68,17 +108,17 @@ function initAckTimeout() {
                         formData.append(input.name, input.value);
                     });
 
-                    console.log("Sending Data:", formData.toString()); 
+                    console.log("Sending Data:", formData.toString());
                     fetch("/cgi-bin/set_acktimeout.sh", {
                         method: "POST",
                         headers: { "Content-Type": "application/x-www-form-urlencoded" },
                         body: formData.toString()
                     }).then(response => response.text())
-                      .then(data => {
-                          console.log("Server Response:", data); 
-                          alert("Done！");
-                      })
-                      .catch(error => console.error("Error saving ACK timeout:", error));
+                        .then(data => {
+                            console.log("Server Response:", data);
+                            alert("Done！");
+                        })
+                        .catch(error => console.error("Error saving ACK timeout:", error));
                 };
             } else {
                 console.error("Error: #acktimeoutForm not found");
@@ -96,7 +136,7 @@ let savedSchedules = [];
 let adv_systemTime = null;
 let adv_timezone = null;
 
-async function initClock() {
+async function initAdvClock() {
     try {
         const resp = await fetch('/cgi-bin/get_time.sh');
         const text = await resp.text();
@@ -105,8 +145,8 @@ async function initClock() {
 
         if (data && data.epoch) {
             adv_systemTime = new Date(data.epoch * 1000);
-            updateClock();
-            setInterval(updateClock, 1000);
+            updateAdvClock();
+            setInterval(updateAdvClock, 1000);
         }
         else {
             throw new Error("Invalid data format received");
@@ -118,8 +158,8 @@ async function initClock() {
     }
 }
 
-function updateClock() {
-    if(!adv_systemTime) return;
+function updateAdvClock() {
+    if (!adv_systemTime) return;
     adv_systemTime.setSeconds(adv_systemTime.getSeconds() + 1);
     const options = {
         weekday: 'long',
@@ -165,10 +205,10 @@ function toggleScheduleWithConfirmation() {
 async function confirmToggle(confirmed) {
     hideModal(document.getElementById('confirmation-backdrop'));
 
-    if(confirmed) {
+    if (confirmed) {
         const newState = !isMasterScheduleActive;
         updateMasterToggle(newState);
-        
+
         console.log(`Master Wireless Schedule confirmed and set to: ${newState ? 'Enabled' : 'Disabled'}`);
 
         // Send each schedule entry individually to the backend
@@ -244,13 +284,13 @@ function openAddModal() {
     });
 
     populateTime();
-    if(document.getElementById('off-hour')) document.getElementById('off-hour').value = 11;
-    if(document.getElementById('off-minute')) document.getElementById('off-minute').value = "00";
-    if(document.getElementById('off-ampm')) document.getElementById('off-ampm').value = "PM";
-    if(document.getElementById('on-hour')) document.getElementById('on-hour').value = 7;
-    if(document.getElementById('on-minute')) document.getElementById('on-minute').value = "00";
-    if(document.getElementById('on-ampm')) document.getElementById('on-ampm').value = "AM";
-    
+    if (document.getElementById('off-hour')) document.getElementById('off-hour').value = 11;
+    if (document.getElementById('off-minute')) document.getElementById('off-minute').value = "00";
+    if (document.getElementById('off-ampm')) document.getElementById('off-ampm').value = "PM";
+    if (document.getElementById('on-hour')) document.getElementById('on-hour').value = 7;
+    if (document.getElementById('on-minute')) document.getElementById('on-minute').value = "00";
+    if (document.getElementById('on-ampm')) document.getElementById('on-ampm').value = "AM";
+
     const backdrop = document.getElementById('add-schedule-backdrop');
     if (backdrop) showModal(backdrop);
 }
@@ -261,11 +301,17 @@ function closeAddModal() {
 
 // Unified modal show/hide functions
 function showModal(backdropElement) {
+    if (typeof window.lockBodyScroll === "function") {
+        window.lockBodyScroll();
+    }
     backdropElement.classList.add('show');
 }
 
 function hideModal(backdropElement) {
     backdropElement.classList.remove('show');
+    if (typeof window.unlockBodyScroll === "function") {
+        window.unlockBodyScroll();
+    }
 }
 
 function editConfig(id) {
@@ -283,13 +329,13 @@ function editConfig(id) {
 
     populateTime();
 
-    if(document.getElementById('off-hour')) document.getElementById('off-hour').value = parsedOff.hour;
-    if(document.getElementById('off-minute')) document.getElementById('off-minute').value = parsedOff.minute;
-    if(document.getElementById('off-ampm')) document.getElementById('off-ampm').value = parsedOff.ampm;
+    if (document.getElementById('off-hour')) document.getElementById('off-hour').value = parsedOff.hour;
+    if (document.getElementById('off-minute')) document.getElementById('off-minute').value = parsedOff.minute;
+    if (document.getElementById('off-ampm')) document.getElementById('off-ampm').value = parsedOff.ampm;
 
-    if(document.getElementById('on-hour')) document.getElementById('on-hour').value = parsedOn.hour;
-    if(document.getElementById('on-minute')) document.getElementById('on-minute').value = parsedOn.minute;
-    if(document.getElementById('on-ampm')) document.getElementById('on-ampm').value = parsedOn.ampm;
+    if (document.getElementById('on-hour')) document.getElementById('on-hour').value = parsedOn.hour;
+    if (document.getElementById('on-minute')) document.getElementById('on-minute').value = parsedOn.minute;
+    if (document.getElementById('on-ampm')) document.getElementById('on-ampm').value = parsedOn.ampm;
 
     currentScheduleConfig.repeatDays = [...entry.repeatDays];
 
@@ -309,20 +355,20 @@ function editConfig(id) {
 async function deleteConfig(id) {
     const userConfirmed = confirm("Are you sure you want to delete this schedule entry?");
     if (!userConfirmed) return;
- 
+
     const index = savedSchedules.findIndex(entry => entry.id === id);
     if (index === -1) {
         alertSuccess("Error: Could not find schedule entry to delete.");
         return;
     }
- 
+
     savedSchedules.splice(index, 1);
- 
+
     renderScheduleList();
- 
+
     console.log("Deleted entry ID:", id);
     console.log("Updated savedSchedules:", savedSchedules);
- 
+
     try {
         const resp = await fetch("/cgi-bin/wireless_schedule.sh", {
             method: "POST",
@@ -332,19 +378,19 @@ async function deleteConfig(id) {
                 id: id
             })
         });
- 
+
         if (!resp.ok) {
             throw new Error(`HTTP error! Status: ${resp.status}`);
         }
- 
+
         console.log("Delete sent to backend");
- 
+
         if (savedSchedules.length === 0) {
             updateMasterToggle(false);
         }
- 
+
         alertSuccess("Schedule entry deleted successfully.");
- 
+
     } catch (error) {
         console.error("Delete failed:", error);
         alertSuccess("Failed to delete schedule.");
@@ -514,14 +560,14 @@ async function initAdvanced() {
             console.log("Updated repeat days:", currentScheduleConfig.repeatDays);
         });
     });
-/*
-    // Update time every second
-    if (document.getElementById('currentTime')) {
-        setInterval(loadScheduleTime, 1000);
-        loadScheduleTime();
-    }
-*/
-    initClock();
+    /*
+        // Update time every second
+        if (document.getElementById('currentTime')) {
+            setInterval(loadScheduleTime, 1000);
+            loadScheduleTime();
+        }
+    */
+    initAdvClock();
 
     // Ack timeout initialization
     if (document.getElementById('acktimeout-page')) {
@@ -565,7 +611,7 @@ function generateUUID() {
         d += performance.now();
     }
 
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         const r = (d + Math.random() * 16) % 16 | 0;
         d = Math.floor(d / 16);
         return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
@@ -589,7 +635,7 @@ function parseTime(timeStr) {
 function openDenyList() {
     console.log("Opening deny list");
     const container = document.getElementById('denyListContainer');
-    
+
     fetch('/cgi-bin/gen_deny_list.sh')
         .then(res => res.json())
         .then(data => {
@@ -609,7 +655,7 @@ function openDenyList() {
             if (!data || data.length === 0) {
                 html += `
                     <tr>
-                        <td colspan="4" style="text-align:center; padding: 20px; color: #666;">
+                        <td colspan="5" style="text-align:center; padding: 20px; color: #666;">
                             No devices blocked.
                         </td>
                     </tr>`;
@@ -622,8 +668,9 @@ function openDenyList() {
                             <td>${dev.mac}</td>
                             <td>${dev.ip}</td>
                             <td style="text-align:center;">
-                                <button class="icon-only-btn" onclick="unblockDevice('${dev.mac}','${dev.hostname}', '${dev.ssid}')" title="Unblock">
+                                <button class="icon-only-btn access-action-btn" onclick="unblockDevice('${dev.mac}','${dev.hostname}', '${dev.ssid}')" title="Unblock">
                                    <img src="/logo/bin.png" alt="Unblock" class="green-icon">
+                                   <span class="access-action-text">Unblock</span>
                                 </button>
                             </td>
                         </tr>`;
@@ -639,14 +686,14 @@ function openDenyList() {
         });
 }
 
-window.openAddDeviceModal = function() {
+window.openAddDeviceModal = function () {
     let modal = document.getElementById('addDeviceModal');
-    
+
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'addDeviceModal';
         modal.className = 'modal-overlay';
-        
+
         modal.innerHTML = `
             <div class="modal-box">
                 <div class="modal-header">
@@ -680,17 +727,23 @@ window.openAddDeviceModal = function() {
     }
 
     setTimeout(() => {
+        if (typeof window.lockBodyScroll === "function") {
+            window.lockBodyScroll();
+        }
         modal.classList.add('active');
     }, 10);
 
     fetchAvailableDevices();
 };
 
-window.closeAddDeviceModalBtn = function() {
+window.closeAddDeviceModalBtn = function () {
     const modal = document.getElementById('addDeviceModal');
     if (modal) {
         modal.classList.remove('active');
-        
+        if (typeof window.unlockBodyScroll === "function") {
+            window.unlockBodyScroll();
+        }
+
         setTimeout(() => {
             modal.remove();
         }, 300);
@@ -698,8 +751,8 @@ window.closeAddDeviceModalBtn = function() {
 };
 
 function fetchAvailableDevices() {
-    const blockIcon = "/logo/block.png"; 
-    fetch('/cgi-bin/get_associated_clients.sh') 
+    const blockIcon = "/logo/block.png";
+    fetch('/cgi-bin/get_associated_clients.sh')
         .then(res => res.json())
         .then(data => {
             const tbody = document.getElementById('popupDeviceListBody');
@@ -716,8 +769,9 @@ function fetchAvailableDevices() {
                     <td>${dev.ip}</td>
                     <td>${dev.mac}</td>
                     <td>
-                        <button class="blockBtn" onclick="blockDevice('${dev.mac}', '${name}', '${dev.ssid}')">
+                        <button class="blockBtn access-action-btn" onclick="blockDevice('${dev.mac}', '${name}', '${dev.ssid}')">
                             <img src="${blockIcon}" alt="Block" class="blockBtnIcon">
+                            <span class="access-action-text">Block</span>
                         </button>
                     </td>
                 </tr>`;
@@ -730,14 +784,16 @@ function blockDevice(mac, devName, ap) {
         const url = `/cgi-bin/deny_list.sh?action=add&mac=${encodeURIComponent(mac)}&ssid=${encodeURIComponent(ap)}&policy=deny`;
 
         fetch(url)
-            .then(resp => resp.text()) 
+            .then(resp => resp.text())
             .then(text => {
                 try {
                     const data = JSON.parse(text);
-                    if (data.result === "success") {
+                    if (data.result === "success" || data.status === "Success") {
                         alert(`Success: ${devName} has been blocked.`);
-                        closeAddDeviceModalBtn();
+                        if (typeof closeAddDeviceModalBtn === "function") closeAddDeviceModalBtn();
                         if (typeof openDenyList === 'function') openDenyList();
+                    } else {
+                        alert(data.message || "Failed to block device.");
                     }
                 } catch (e) {
                     console.error("Server returned non-JSON:", text);
@@ -764,15 +820,17 @@ function unblockDevice(mac, devName, ap) {
 
         console.log(`${params.toString()}`);
 
-        fetch (`/cgi-bin/deny_list.sh?${params.toString()}`)
+        fetch(`/cgi-bin/deny_list.sh?${params.toString()}`)
             .then(resp => {
-                if(!resp.ok) throw new Error('Network response was not ok');
+                if (!resp.ok) throw new Error('Network response was not ok');
                 return resp.json();
             })
             .then(data => {
-                if (data.result === "success") {
-                    alert (`Success: ${devName} (${mac}) has been unblocked.`);
+                if (data.result === "success" || data.status === "Success") {
+                    alert(`Success: ${devName} (${mac}) has been unblocked.`);
                     if (typeof openDenyList === 'function') openDenyList();
+                } else {
+                    alert(data.message || "Failed to unblock device.");
                 }
             })
             .catch(error => {
@@ -782,7 +840,7 @@ function unblockDevice(mac, devName, ap) {
     }
 }
 
-window.onload = function() {
+window.onload = function () {
     if (document.getElementById('accessControl')) {
         openDenyList();
     }

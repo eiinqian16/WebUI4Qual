@@ -451,7 +451,7 @@ function showConfigForm() {
     html += `
     <div class="autoToggle">
         <label class="switch">
-            <input type="checkbox" id="autoToggle" checked>
+            <input type="checkbox" id="autoToggle">
             <span class="slider round"></span>
         </label>
         <span class="toggle-label">Auto configure</span>
@@ -463,7 +463,7 @@ function showConfigForm() {
         <form id="lteConfig">
             <br><br>
             <label for="lteApn">Telco Provider: </label>
-            <select class="lteApn-select" id="lteApn" name="lteApn" style="width: 150px;" onchange="toggleAdvancedConfig()">
+            <select class="lteApn-select" id="lteApn" name="lteApn" onchange="toggleAdvancedConfig()">
             </select>
             <br><br>
             <div id="advanced" style="display: none;">
@@ -517,14 +517,82 @@ function showConfigForm() {
 
     const checkbox = document.getElementById('autoToggle');
     checkbox.addEventListener('change', function () {
+        // A manual click always reflects deliberate user intent, so stop
+        // the background watcher from overriding the user's choice.
+        systemForcedManual = false;
         toggleAutoConfig();
         if (this.checked) {
             getAutoConfig();
         }
     });
 
-    if (checkbox.checked) {
-        getAutoConfig();
+    // Stop any watcher left over from a previous render of this form.
+    stopAutoAvailabilityWatcher();
+
+    // Decide the initial toggle position based on whether modem_stats is
+    // actually populated yet, rather than always defaulting to "auto".
+    (async () => {
+        const initiallyValid = await checkModemStatsAvailable();
+
+        if (initiallyValid) {
+            checkbox.checked = true;
+            toggleAutoConfig();
+            getAutoConfig();
+        } else {
+            checkbox.checked = false;
+            systemForcedManual = true;
+            toggleAutoConfig();
+            await populateCarrierOp();
+            startAutoAvailabilityWatcher();
+        }
+    })();
+}
+
+// Tracks whether the toggle is currently off because the system forced it
+// (modem_stats unavailable) rather than because the user chose manual mode.
+let systemForcedManual = false;
+let autoAvailabilityInterval = null;
+
+async function checkModemStatsAvailable() {
+    try {
+        const resp = await fetch('/modem_stats', { cache: "no-store" });
+        if (!resp.ok) return false;
+        const data = await resp.json();
+        return hasValidCellularData(data);
+    } catch (err) {
+        console.error("checkModemStatsAvailable error:", err);
+        return false;
+    }
+}
+
+function startAutoAvailabilityWatcher(intervalMs = 5000) {
+    if (autoAvailabilityInterval) return; // already watching
+
+    autoAvailabilityInterval = setInterval(async () => {
+        if (!systemForcedManual) {
+            stopAutoAvailabilityWatcher();
+            return;
+        }
+
+        const nowValid = await checkModemStatsAvailable();
+        if (nowValid) {
+            const autoCheckbox = document.getElementById("autoToggle");
+            stopAutoAvailabilityWatcher();
+
+            if (autoCheckbox && !autoCheckbox.checked) {
+                systemForcedManual = false;
+                autoCheckbox.checked = true;
+                toggleAutoConfig();
+                getAutoConfig();
+            }
+        }
+    }, intervalMs);
+}
+
+function stopAutoAvailabilityWatcher() {
+    if (autoAvailabilityInterval) {
+        clearInterval(autoAvailabilityInterval);
+        autoAvailabilityInterval = null;
     }
 }
 
@@ -594,8 +662,7 @@ async function showBandConfig() {
             bands.forEach(band => {
                 section += `
                     <label class="band-pill">
-                        <input type="checkbox" name="lock_band" value="${band}">
-                        ${prefix}${band} 
+                        <input type="checkbox" name="lock_band" value="${band}">&nbsp;<span class="band-pill-text">${prefix}${band}</span> 
                     </label>`;
             });
             section += `</div>`;
@@ -617,18 +684,10 @@ async function showBandConfig() {
         }
 
         html += `
-            <div style="display: flex; gap: 12px; margin-top: 15px; margin-bottom: 15px;">
-                <button class="btn-green" 
-                        style="display: flex; align-items: center; justify-content: center; text-align: center; height: 50px; min-width: 100px; padding: 5px 15px; line-height: 1.2;" 
-                        onclick="applyBandLock()">Apply Band</button>
-                
-                <button class="btn-green" 
-                        style="display: flex; align-items: center; justify-content: center; text-align: center; height: 50px; min-width: 100px; padding: 5px 15px; line-height: 1.2;" 
-                        onclick="selectAllBands(true)">Select All</button>
-                
-                <button class="btn-green" 
-                        style="display: flex; align-items: center; justify-content: center; text-align: center; height: 50px; min-width: 100px; padding: 5px 15px; line-height: 1.2;" 
-                        onclick="selectAllBands(false)">Clear All</button>
+            <div class="band-action-container">
+                <button class="btn-green band-primary-action" onclick="applyBandLock()">Apply Band</button>
+                <button class="btn-green band-secondary-action" onclick="selectAllBands(true)">Select All</button>
+                <button class="btn-green band-secondary-action" onclick="selectAllBands(false)">Clear All</button>
             </div>
         `;
 
@@ -815,6 +874,20 @@ async function getAutoConfig() {
 
         if (!hasValidCellularData(data)) {
             console.warn("getAutoConfig: cellular data still unavailable after retries.");
+
+            // Fall back to manual configuration since modem_stats isn't populated
+            const autoCheckbox = document.getElementById("autoToggle");
+            if (autoCheckbox && autoCheckbox.checked) {
+                autoCheckbox.checked = false;
+                toggleAutoConfig();
+            }
+
+            systemForcedManual = true;
+            startAutoAvailabilityWatcher();
+
+            await populateCarrierOp();
+
+            return;
         }
 
         if (data.operator && data.operator !== "No operator detected") {
@@ -1099,85 +1172,111 @@ async function loadCarrierByMCC(maxRetries = 5) {
     }
 }
 
-async function populateCarrierOp() {
-    const statsResp = await fetch('/modem_stats', { cache: "no-store" });
-    const stats = await statsResp.json();
-
-    let currentCarrier = "";
-    if (stats.operator && stats.operator !== "No operator detected") {
-        currentCarrier = await getCarrier(stats.operator);
-    }
-
-    const carriers = await loadCarrierByMCC();
-    const select = document.getElementById("lteApn");
+function showOthersOnly(select) {
     select.innerHTML = "";
 
-    if (!carriers.length) {
-        const noOpt = document.createElement("option");
-        noOpt.value = "";
-        noOpt.text = "-- No operators found --";
-        noOpt.disabled = true;
-        select.add(noOpt);
+    const noOpt = document.createElement("option");
+    noOpt.value = "";
+    noOpt.text = "-- No operators found --";
+    noOpt.disabled = true;
+    select.add(noOpt);
 
-        const othersOpt = document.createElement("option");
-        othersOpt.value = "others";
-        othersOpt.text = "Others (Manual)";
-        select.add(othersOpt);
+    const othersOpt = document.createElement("option");
+    othersOpt.value = "others";
+    othersOpt.text = "Others (Manual)";
+    select.add(othersOpt);
 
-        select.value = "others";
-        toggleAdvancedConfig();
-    } else {
-        let matched = false;
-        carriers.forEach(carrier => {
-            const opt = document.createElement("option");
-            opt.value = carrier;
-            opt.text = carrier;
-            if (currentCarrier && carrier === currentCarrier) {
-                opt.selected = true;
-                matched = true;
+    select.value = "others";
+    toggleAdvancedConfig();
+}
+
+async function populateCarrierOp() {
+    const select = document.getElementById("lteApn");
+
+    // Show something immediately instead of leaving the dropdown blank
+    // while loadCarrierByMCC() retries in the background.
+    select.innerHTML = "";
+    const loadingOpt = document.createElement("option");
+    loadingOpt.value = "";
+    loadingOpt.text = "Detecting operators ...";
+    loadingOpt.disabled = true;
+    select.add(loadingOpt);
+
+    try {
+        const statsResp = await fetch('/modem_stats', { cache: "no-store" });
+        if (!statsResp.ok) throw new Error(`modem_stats returned ${statsResp.status}`);
+        const stats = await statsResp.json();
+
+        let currentCarrier = "";
+        if (stats.operator && stats.operator !== "No operator detected") {
+            try {
+                currentCarrier = await getCarrier(stats.operator);
+            } catch (e) {
+                console.warn("populateCarrierOp: could not resolve carrier for operator", stats.operator, e);
             }
-            select.add(opt);
-        });
+        }
 
-        const othersOpt = document.createElement("option");
-        othersOpt.value = "others";
-        othersOpt.text = "Others (Manual)";
-        if (!matched) othersOpt.selected = true;
-        select.add(othersOpt);
+        const carriers = await loadCarrierByMCC();
 
-        toggleAdvancedConfig();
-    }
-
-    // Pre-select band
-    if (stats.band) {
-        const bandSelect = document.getElementById("lteBand");
-        if (bandSelect) {
-            for (const opt of bandSelect.options) {
-                if (
-                    opt.value === stats.band ||
-                    opt.value === `B${stats.band}` ||
-                    opt.value.replace(/[^0-9]/g, "") === stats.band
-                ) {
+        if (!carriers.length) {
+            showOthersOnly(select);
+        } else {
+            select.innerHTML = "";
+            let matched = false;
+            carriers.forEach(carrier => {
+                const opt = document.createElement("option");
+                opt.value = carrier;
+                opt.text = carrier;
+                if (currentCarrier && carrier === currentCarrier) {
                     opt.selected = true;
-                    bandSelect.dispatchEvent(new Event("change"));
-                    break;
+                    matched = true;
+                }
+                select.add(opt);
+            });
+
+            const othersOpt = document.createElement("option");
+            othersOpt.value = "others";
+            othersOpt.text = "Others (Manual)";
+            if (!matched) othersOpt.selected = true;
+            select.add(othersOpt);
+
+            toggleAdvancedConfig();
+        }
+
+        // Pre-select band
+        if (stats.band) {
+            const bandSelect = document.getElementById("lteBand");
+            if (bandSelect) {
+                for (const opt of bandSelect.options) {
+                    if (
+                        opt.value === stats.band ||
+                        opt.value === `B${stats.band}` ||
+                        opt.value.replace(/[^0-9]/g, "") === stats.band
+                    ) {
+                        opt.selected = true;
+                        bandSelect.dispatchEvent(new Event("change"));
+                        break;
+                    }
                 }
             }
         }
-    }
 
-    // Pre-select SIM slot
-    if (stats.curSlot) {
-        const simSelect = document.getElementById("simSlot");
-        if (simSelect) {
-            for (const opt of simSelect.options) {
-                if (opt.value === String(stats.curSlot)) {
-                    opt.selected = true;
-                    simSelect.dispatchEvent(new Event("change"));
-                    break;
+        // Pre-select SIM slot
+        if (stats.curSlot) {
+            const simSelect = document.getElementById("simSlot");
+            if (simSelect) {
+                for (const opt of simSelect.options) {
+                    if (opt.value === String(stats.curSlot)) {
+                        opt.selected = true;
+                        simSelect.dispatchEvent(new Event("change"));
+                        break;
+                    }
                 }
             }
         }
+    } catch (err) {
+        console.error("populateCarrierOp failed, defaulting to manual entry:", err);
+        showOthersOnly(select);
     }
 }
 

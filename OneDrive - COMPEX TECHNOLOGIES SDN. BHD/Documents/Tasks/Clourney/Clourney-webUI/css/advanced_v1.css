@@ -10,21 +10,21 @@
 
 #mlo-btn {
     background-color: #149196;
-    color: white;    
-    border: none;        
-    padding: 8px 16px;       
-    font-size: 16px;        
-    font-weight: bold;          
-    border-radius: 5px;         
-    cursor: pointer;            
-    transition: background 0.3s ease;  
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
     float: right;
     margin-left: 20px;
-    margin-top: -5px; 
+    margin-top: -5px;
 }
 
 #mlo-btn:hover {
-    background-color: #14686b; 
+    background-color: #14686b;
 }
 
 
@@ -40,7 +40,7 @@
 }
 
 .wifi-table thead {
-    background-color: #ffffff !important; 
+    background-color: #ffffff !important;
 }
 
 .wifi-header {
@@ -50,11 +50,11 @@
 }
 
 .wifi-table th {
-    border-top: none; 
-    border-right: none; 
-    border-left: none; 
-    border-bottom: 2px solid #ddd; 
-    background-color: inherit; 
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    border-bottom: 2px solid #ddd;
+    background-color: inherit;
     padding: 10px;
     text-align: left;
 }
@@ -79,11 +79,13 @@
 
 .wifi-table td:last-child {
     width: 20%;
-    white-space: nowrap; 
+    white-space: nowrap;
 }
 
-.scan-btn, .add-btn {
-    background-color: rgba(255, 255, 255, 0.3); /* 白色半透明背景 */
+.scan-btn,
+.add-btn {
+    background-color: rgba(255, 255, 255, 0.3);
+    /* 白色半透明背景 */
     color: #1ab2b8;
     padding: 5px 10px;
     cursor: pointer;
@@ -95,26 +97,28 @@
     font-size: 1vw;
 }
 
-.scan-btn:hover, .add-btn:hover {
+.scan-btn:hover,
+.add-btn:hover {
     background-color: rgba(255, 255, 255, 0.5);
     color: #36bbd9;
 }
 
-.edit-btn, .delete-btn {
-    width: 4vw; 
-    height: 2vw;
-    padding: 5px 10px;
-    font-size: 0.8vw;
+.edit-btn,
+.delete-btn {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.15s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     font-weight: bold;
-    color: #ffffff; 
+    color: #ffffff;
     border: none;
-    border-radius: 4px;
     cursor: pointer;
-    transition: background 0.3s, opacity 0.3s;
 }
 
 .edit-btn {
-    background-color: #1aa34c; 
+    background-color: #1aa34c;
 }
 
 .edit-btn:hover {
@@ -123,11 +127,11 @@
 }
 
 .delete-btn {
-    background-color: #8B0000;
+    background-color: #1b8adb;
 }
 
 .delete-btn:hover {
-    background-color: #6B0000; 
+    background-color: #102e45;
     opacity: 0.85;
 }
 
@@ -148,6 +152,90 @@
 .modal-overlay.show {
     visibility: visible;
     opacity: 1;
+}
+
+.modal-overlay.active {
+    visibility: visible;
+    opacity: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.modal-box {
+    width: min(760px, 100%);
+    max-height: calc(100vh - 32px);
+    overflow: hidden;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-box .modal-header,
+.modal-box .modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-box .modal-footer {
+    border-top: 1px solid #eee;
+    border-bottom: 0;
+    justify-content: flex-end;
+}
+
+.modal-box .modal-body {
+    padding: 16px 18px;
+    overflow: hidden;
+}
+
+.close-x {
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    color: #666;
+}
+
+.popup-scroll-area {
+    max-height: min(60vh, 460px);
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.popup-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.popup-table th,
+.popup-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+    font-size: 14px;
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: #fff;
+}
+
+.icon-only-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: auto;
+    min-width: 36px;
+}
+
+.access-action-text {
+    display: none;
 }
 
 .modal {
@@ -188,8 +276,8 @@
     overflow: hidden;
 }
 
-.modal-content table, 
-.modal-content th, 
+.modal-content table,
+.modal-content th,
 .modal-content td {
     border: 1px solid #ddd;
 }
@@ -222,7 +310,7 @@
 }
 
 .modal-content .modal-close-btn {
-    background: #c22121 !important;
+    background: #1b8adb !important;
     color: white;
     padding: 10px 20px;
     cursor: pointer;
@@ -233,8 +321,9 @@
 }
 
 .modal-content .modal-close-btn:hover {
-    background: #db2727 !important;
+    background: #102e45 !important;
 }
+
 .scan-overlay {
     visibility: hidden;
     opacity: 0;
@@ -271,7 +360,7 @@
 
 #scan-modal-content {
     max-width: 100%;
-    overflow-x: auto; 
+    overflow-x: auto;
 }
 
 #scan-modal-content table {
@@ -280,12 +369,13 @@
     table-layout: fixed;
 }
 
-#scan-modal-content th, #scan-modal-content td {
+#scan-modal-content th,
+#scan-modal-content td {
     padding: 8px 12px;
     text-align: left;
     border: 1px solid #ddd;
     white-space: normal;
-    word-break: break-word; 
+    word-break: break-word;
 }
 
 #scan-modal-content th {
@@ -376,8 +466,13 @@
 
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .wifi-header {
@@ -415,7 +510,7 @@
 }
 
 .header-buttons {
-    flex: 0 0 20%; 
+    flex: 0 0 20%;
     display: flex;
     gap: 10px;
 }
@@ -431,23 +526,24 @@
     table-layout: fixed;
 }
 
-.station-box th, .station-box td {
+.station-box th,
+.station-box td {
     padding: 10px;
-    border: 1px solid #ddd; 
+    border: 1px solid #ddd;
     text-align: center;
     border: 0px solid #ddd;
-    border-bottom: 1px solid #ddd; 
+    border-bottom: 1px solid #ddd;
     padding: 10px;
     text-align: left;
 }
 
 .station-box th {
     color: #000000;
-    border-top: none; 
-    border-right: none; 
-    border-left: none; 
-    border-bottom: 2px solid #ddd; 
-    background-color: inherit; 
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    border-bottom: 2px solid #ddd;
+    background-color: inherit;
     padding: 10px;
     text-align: left;
 }
@@ -458,7 +554,7 @@
 
 .ssid-mode-bssid-wrapper {
     display: flex;
-    align-items: center; 
+    align-items: center;
     width: 100%;
     gap: 6px;
 }
@@ -492,20 +588,20 @@ button:disabled {
 
 
 input[type="checkbox"] {
-    appearance: none; 
+    appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
     width: 18px;
     height: 18px;
-    border: 2px solid green; 
-    border-radius: 4px; 
+    border: 2px solid green;
+    border-radius: 4px;
     display: inline-block;
     position: relative;
     cursor: pointer;
 
     vertical-align: middle;
-    accent-color: green; 
-    margin-right: 0px; 
+    accent-color: green;
+    margin-right: 0px;
 }
 
 input[type="checkbox"]:checked {
@@ -526,7 +622,7 @@ input[type="checkbox"]:checked::after {
 .mlo-bands {
     display: flex;
     flex-direction: column;
-    gap: 5px; 
+    gap: 5px;
 }
 
 .modal-content .modal-reset-btn {
@@ -617,7 +713,7 @@ input[type="checkbox"]:checked::after {
     font-weight: bold;
     color: #fff;
     background-color: #007bff;
-    border-radius: 50%; 
+    border-radius: 50%;
     cursor: pointer;
     margin-left: 10px;
     transition: all 0.3s ease-in-out;
@@ -625,7 +721,7 @@ input[type="checkbox"]:checked::after {
 
 .info-icon:hover {
     background-color: #0056b3;
-    transform: scale(1.1); 
+    transform: scale(1.1);
 }
 
 .info-tooltip {
@@ -649,8 +745,15 @@ input[type="checkbox"]:checked::after {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-5px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .page-card {
@@ -662,7 +765,7 @@ input[type="checkbox"]:checked::after {
     width: 95%;
     margin: 2rem auto;
 }
-        
+
 .page-header h1 {
     font-size: 1.25rem;
     font-weight: 600;
@@ -687,9 +790,11 @@ input[type="checkbox"]:checked::after {
     cursor: pointer;
     transition: background-color 0.3s;
 }
+
 .toggle-switch.active {
     background-color: #3b82f6;
 }
+
 .toggle-switch::after {
     content: '';
     position: absolute;
@@ -701,6 +806,7 @@ input[type="checkbox"]:checked::after {
     border-radius: 50%;
     transition: transform 0.3s;
 }
+
 .toggle-switch.active::after {
     transform: translateX(20px);
 }
@@ -712,20 +818,24 @@ input[type="checkbox"]:checked::after {
     margin-bottom: 1rem;
     gap: 1rem;
 }
+
 .setting-row label {
     color: #374151;
     font-weight: 500;
     min-width: 10rem;
 }
+
 .current-time-display {
     color: #111827;
     font-family: monospace;
 }
+
 .note {
     padding-top: 0.5rem;
     font-size: 0.875rem;
     color: #6b7280;
 }
+
 .note .highlight {
     font-weight: 600;
     color: #ef4444;
@@ -739,6 +849,7 @@ input[type="checkbox"]:checked::after {
     margin-top: 1.5rem;
     margin-bottom: 0.75rem;
 }
+
 .schedule-placeholder {
     padding: 0.75rem;
     background-color: #f9fafb;
@@ -749,6 +860,7 @@ input[type="checkbox"]:checked::after {
     align-items: center;
     color: #4b5563;
 }
+
 .btn-add {
     margin-top: 1rem;
     padding: 0.5rem 1rem;
@@ -761,6 +873,7 @@ input[type="checkbox"]:checked::after {
     border: none;
     cursor: pointer;
 }
+
 .btn-add:hover {
     background-color: #218838;
     color: white;
@@ -777,11 +890,13 @@ input[type="checkbox"]:checked::after {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 100; /* High z-index for all modals */
+    z-index: 100;
+    /* High z-index for all modals */
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s;
 }
+
 .modal-backdrop.show {
     opacity: 1;
     visibility: visible;
@@ -797,22 +912,26 @@ input[type="checkbox"]:checked::after {
     padding: 1.5rem;
     text-align: center;
 }
+
 .confirmation-dialog h4 {
     font-size: 1.125rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
     color: #1f2937;
 }
+
 .confirmation-dialog p {
     font-size: 0.875rem;
     color: #4b5563;
     margin-bottom: 1.5rem;
 }
+
 .confirmation-dialog-footer {
     display: flex;
     justify-content: center;
     gap: 1rem;
 }
+
 .btn-confirm-cancel {
     padding: 0.5rem 1.5rem;
     border: 1px solid #d1d5db;
@@ -821,6 +940,7 @@ input[type="checkbox"]:checked::after {
     cursor: pointer;
     color: #4b5563;
 }
+
 .btn-confirm-ok {
     padding: 0.5rem 1.5rem;
     border: none;
@@ -842,6 +962,7 @@ input[type="checkbox"]:checked::after {
     transform: scale(0.95);
     transition: transform 0.3s;
 }
+
 .schedule-modal-content .modal-header {
     display: flex;
     align-items: center;
@@ -850,12 +971,14 @@ input[type="checkbox"]:checked::after {
     border-bottom: 1px solid #e5e7eb;
     background-color: #f9fafb;
 }
+
 .schedule-modal-content .modal-body {
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
 }
+
 .schedule-modal-content .modal-footer {
     display: flex;
     justify-content: flex-end;
@@ -864,28 +987,33 @@ input[type="checkbox"]:checked::after {
     background-color: #f9fafb;
     gap: 0.75rem;
 }
-        
+
 /* Modal Form Elements */
 .form-row {
     display: flex;
     align-items: flex-start;
 }
+
 .form-label {
     color: #4b5563;
     width: 10rem;
     padding-top: 0.25rem;
 }
+
 .input-group {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
+
 .time-picker-group {
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
-select, .text-input {
+
+select,
+.text-input {
     border: 1px solid #d1d5db;
     border-radius: 0.5rem;
     padding: 0.5rem;
@@ -893,6 +1021,7 @@ select, .text-input {
     width: 4rem;
     box-sizing: border-box;
 }
+
 .checkbox-container {
     display: flex;
     align-items: center;
@@ -900,12 +1029,14 @@ select, .text-input {
     color: #374151;
     font-weight: 500;
 }
+
 .checkbox-container label {
     margin-left: 0.5rem;
     width: auto;
     color: #374151;
     font-weight: 500;
 }
+
 .checkbox-input {
     height: 1rem;
     width: 1rem;
@@ -916,10 +1047,12 @@ select, .text-input {
     cursor: pointer;
     position: relative;
 }
+
 .checkbox-input:checked {
     background-color: #2563eb;
     border-color: #2563eb;
 }
+
 .checkbox-input:checked::after {
     content: '\2713';
     position: absolute;
@@ -928,12 +1061,13 @@ select, .text-input {
     font-size: 0.75rem;
     color: white;
 }
-        
+
 /* --- Day Toggles --- */
 .day-toggles-container {
     display: flex;
     gap: 0.5rem;
 }
+
 .day-toggle {
     transition: all 0.15s ease-in-out;
     cursor: pointer;
@@ -943,17 +1077,20 @@ select, .text-input {
     justify-content: center;
     width: 36px;
     height: 36px;
-    font-size: 0.75rem; /* Slightly smaller for better fit */
+    font-size: 0.75rem;
+    /* Slightly smaller for better fit */
     font-weight: 500;
     border-radius: 9999px;
     border: 1px solid;
 }
+
 .day-toggle.selected {
     background-color: #3b82f6;
     color: white;
     border-color: #3b82f6;
     box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
 }
+
 .day-toggle:not(.selected) {
     background-color: #e5e7eb;
     color: #4b5563;
@@ -971,9 +1108,11 @@ select, .text-input {
     transition: background-color 0.15s;
     cursor: pointer;
 }
+
 .btn-cancel-modal:hover {
     background-color: #f3f4f6;
 }
+
 .btn-save-modal {
     padding: 0.5rem 1.5rem;
     color: white;
@@ -984,39 +1123,112 @@ select, .text-input {
     border: none;
     cursor: pointer;
 }
+
 .btn-save-modal:hover {
     background-color: #2563eb;
 }
 
 
 /* Responsive Adjustments */
-@media (max-width: 640px) {
+@media (max-width: 1000px) {
     .page-card {
         margin: 0.5rem;
         padding: 1rem;
     }
-    .form-row, .setting-row {
+
+    .modal-backdrop {
+        align-items: center;
+        padding: 12px;
+        overflow-y: auto;
+        box-sizing: border-box;
+    }
+
+    .form-row,
+    .setting-row {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.25rem;
     }
-    .form-label, .setting-row label {
+
+    .form-label,
+    .setting-row label {
         width: 100%;
         margin-bottom: 0.25rem;
     }
+
     .day-toggles-container {
         flex-wrap: wrap;
+        gap: 8px;
     }
+
     .time-picker-group {
-        flex-wrap: nowrap; /* Keep time pickers in line if possible */
+        flex-wrap: wrap;
         width: 100%;
-        justify-content: space-between;
+        justify-content: flex-start;
+        gap: 8px;
     }
+
     select {
         width: 4rem;
     }
+
     .schedule-modal-content {
-        margin: 0 0.5rem;
+        width: calc(100vw - 24px);
+        max-width: calc(100vw - 24px);
+        max-height: calc(100dvh - 24px);
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .schedule-modal-content .modal-header,
+    .schedule-modal-content .modal-body,
+    .schedule-modal-content .modal-footer {
+        padding: 12px;
+    }
+
+    .schedule-modal-content .modal-body {
+        overflow-y: auto;
+        min-height: 0;
+    }
+
+    .schedule-modal-content .modal-header button {
+        width: auto;
+        height: auto;
+        margin-top: 0;
+        padding: 0;
+        flex: 0 0 auto;
+    }
+
+    .schedule-modal-content .time-picker-group .text-input {
+        flex: 1 1 72px;
+        width: auto;
+        min-width: 72px;
+    }
+
+    .schedule-modal-content .time-picker-group span:last-child {
+        width: 100%;
+    }
+
+    .day-toggle {
+        width: 40px;
+        height: 40px;
+    }
+
+    .schedule-modal-content .modal-footer {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .schedule-modal-content .modal-footer .btn-cancel-modal,
+    .schedule-modal-content .modal-footer .btn-save-modal {
+        width: 100%;
+        margin-top: 0;
+    }
+
+    button {
+        width: 100%;
+        margin-top: 10px;
     }
 }
 
@@ -1049,6 +1261,16 @@ select, .text-input {
     border-bottom: 1px solid #f0f0f0;
     font-size: 14px;
     color: #333;
+    word-break: break-word;
+}
+
+.deny-list-btn {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.15s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 /* Green icon for the Unblock action */
@@ -1061,14 +1283,16 @@ select, .text-input {
 
 .header-container {
     display: flex;
-    justify-content: space-between; /* Pushes items to far left and far right */
-    align-items: center;            /* Vertically centers them on the line */
-    margin-bottom: 5px;             /* Space before the horizontal line */
+    justify-content: space-between;
+    /* Pushes items to far left and far right */
+    margin-bottom: 5px;
+    /* Space before the horizontal line */
 }
 
 .table-title {
     margin: 0;
-    color: #004d40; /* Matches your dark green text */
+    color: #004d40;
+    /* Matches your dark green text */
     font-size: 24px;
 }
 
@@ -1091,12 +1315,182 @@ select, .text-input {
 }
 
 button {
-    font-size: 16px; /* Responsive font size */
-    padding: 8px 16px; /* Adjust padding based on viewport */
-    background-color: #e74c3c;
+    font-size: 16px;
+    /* Responsive font size */
+    padding: 8px 16px;
+    /* Adjust padding based on viewport */
+    background-color: #102e45;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     transition: background 0.3s ease;
+}
+
+@media (max-width: 1000px) {
+    #accessControl .header-container {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    #accessControl .add-device-btn {
+        width: 100%;
+        margin-top: 8px;
+    }
+
+    .deny-table,
+    .deny-table tbody,
+    .deny-table tr,
+    .deny-table td,
+    .popup-table,
+    .popup-table tbody,
+    .popup-table tr,
+    .popup-table td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .deny-table,
+    .popup-table {
+        border: 0;
+        background: transparent;
+    }
+
+    .deny-table thead,
+    .popup-table thead {
+        display: none;
+    }
+
+    .deny-table tr,
+    .popup-table tr {
+        margin-bottom: 12px;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        background: #fff;
+        overflow: hidden;
+    }
+
+    .deny-table td,
+    .popup-table td {
+        border: 0;
+        border-bottom: 1px solid #eee;
+        padding: 10px 12px;
+        text-align: left !important;
+    }
+
+    .deny-table td:last-child,
+    .popup-table td:last-child {
+        border-bottom: 0;
+    }
+
+    .deny-table td::before,
+    .popup-table td::before {
+        display: block;
+        margin-bottom: 4px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .deny-table td:nth-child(1)::before,
+    .popup-table td:nth-child(1)::before {
+        content: "Access Point";
+    }
+
+    .deny-table td:nth-child(2)::before,
+    .popup-table td:nth-child(2)::before {
+        content: "Device Name";
+    }
+
+    .deny-table td:nth-child(3)::before {
+        content: "MAC Address";
+    }
+
+    .deny-table td:nth-child(4)::before {
+        content: "IP Address";
+    }
+
+    .deny-table td:nth-child(5)::before,
+    .popup-table td:nth-child(5)::before {
+        content: "Modify";
+    }
+
+    .popup-table td:nth-child(3)::before {
+        content: "IP";
+    }
+
+    .popup-table td:nth-child(4)::before {
+        content: "MAC Address";
+    }
+
+    .deny-table td[colspan]::before,
+    .popup-table td[colspan]::before {
+        content: "";
+        display: none;
+    }
+
+    .modal-overlay.active {
+        align-items: flex-start;
+        padding: 12px;
+    }
+
+    .modal-box {
+        max-height: calc(100dvh - 24px);
+        border-radius: 8px;
+    }
+
+    .modal-box .modal-header,
+    .modal-box .modal-footer,
+    .modal-box .modal-body {
+        padding: 12px;
+    }
+
+    .popup-scroll-area {
+        max-height: calc(100dvh - 170px);
+    }
+
+    .access-action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: auto;
+        min-width: 84px;
+        padding: 8px 12px;
+        background: #1b8adb;
+        color: #f5f5f5;
+        border: 1px solid #cfcfcf;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+
+    .access-action-btn img {
+        display: none;
+    }
+
+    .access-action-text {
+        display: inline;
+    }
+}
+
+.config-time button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.15s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.config-time button:hover {
+    background-color: #1b8adb;
+}
+
+.eco-save-btn button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.15s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }

@@ -1,9 +1,9 @@
 function getLoginCred() {
     const loginCont = document.getElementById("login");
     let html = `
-    <form id="login">
+    <form id="loginForm">
         <div class="container">
-            <a href="https://compex.com.sg/" target="_blank">
+            <a href="https://www.airioncomm.com/" target="_blank">
                 <img src="/logo/logo.png" alt="Logo">
             </a>
 
@@ -29,10 +29,10 @@ function getLoginCred() {
     `;
     loginCont.innerHTML = html;
 
-    document.getElementById("login").addEventListener("keypress", function (event) {
+    document.getElementById("loginForm").addEventListener("keypress", function (event) {
         if (event.key === "Enter") {
-            event.preventDefault(); 
-            validateCred(); 
+            event.preventDefault();
+            validateCred();
         }
     });
 }
@@ -55,33 +55,33 @@ function validateCred() {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `name=${encodeURIComponent(name)}&pwd=${encodeURIComponent(pwd)}`
     })
-    .then(response => response.json()) 
-    .then(data => {
-        console.log("Login Response:", data);
+        .then(response => response.json())
+        .then(data => {
+            console.log("Login Response:", data);
 
-        setTimeout(() => {
-            if (data.status === "Success") {
-                sessionStorage.setItem("sessionID", data.session_id);
-                console.log("Stored sessionID:", sessionStorage.getItem("sessionID")); 
-                window.location.href = "index.html#overview";
-            } else {
-                alert(data.status);
-                //document.getElementById("output").innerText = data.status;
-            }
-            
-            loginBtn.innerHTML = "Login";
-            loginBtn.disabled = false;
-        }, 2000);
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        document.getElementById("output").innerText = `Request failed: ${error.message}`;
-        
-        setTimeout(() => {
-            loginBtn.innerHTML = "Login";
-            loginBtn.disabled = false;
-        }, 2000);
-    });
+            setTimeout(() => {
+                if (data.status === "Success") {
+                    sessionStorage.setItem("sessionID", data.session_id);
+                    console.log("Stored sessionID:", sessionStorage.getItem("sessionID"));
+                    window.location.href = "index.html#overview";
+                } else {
+                    alert(data.status);
+                    //document.getElementById("output").innerText = data.status;
+                }
+
+                loginBtn.innerHTML = "Login";
+                loginBtn.disabled = false;
+            }, 2000);
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            document.getElementById("output").innerText = `Request failed: ${error.message}`;
+
+            setTimeout(() => {
+                loginBtn.innerHTML = "Login";
+                loginBtn.disabled = false;
+            }, 2000);
+        });
 }
 
 function showPwd() {

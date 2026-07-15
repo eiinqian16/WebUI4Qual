@@ -6,24 +6,24 @@ function configDhcp() {
     let checkbox = document.getElementById("dhcpToggle");
     let body = "";
 
-    if(checkbox.checked) {
-        body += "isEnabled=" + encodeURIComponent(isEnabled); 
+    if (checkbox.checked) {
+        body += "isEnabled=" + encodeURIComponent(isEnabled);
 
-        if(!validateIP(startIp)) {
+        if (!validateIP(startIp)) {
             alert("Invalid IP address! Please enter a correct IPv4 address.");
             return false;
         }
         body += "&startIp=" + encodeURIComponent(startIp);
-        
-        if(!validateIP(endIp)) {
+
+        if (!validateIP(endIp)) {
             alert("Invalid IP address! Please enter a correct IPv4 address.");
             return false;
         }
         body += "&endIp=" + encodeURIComponent(endIp);
-            
+
         body += "&leasetime=" + encodeURIComponent(leasetime);
 
-    //document.getElementById("bodyOutput").innerText = `<p>checked loop: ${body}`;
+        //document.getElementById("bodyOutput").innerText = `<p>checked loop: ${body}`;
     } else {
         isEnabled = "disable";
         body += "isEnabled=" + encodeURIComponent(isEnabled);
@@ -38,15 +38,15 @@ function configDhcp() {
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: body
         })
-        .then(response => response.text())
-        .then(data => {
-            location.reload();
-           // document.getElementById("wanResult").innerText = "Response: " + data;
-        })
-        .catch(error => {
-           // document.getElementById("wanResult").innerText = "Error: " + error;
-        });
-    } 
+            .then(response => response.text())
+            .then(data => {
+                location.reload();
+                // document.getElementById("wanResult").innerText = "Response: " + data;
+            })
+            .catch(error => {
+                // document.getElementById("wanResult").innerText = "Error: " + error;
+            });
+    }
 }
 
 function validateIP(ip) {
@@ -74,14 +74,15 @@ function fetchCurDhcpConfig() {
             const curDhcp = document.getElementById("curDhcp");
             if (data.isEnabled == "Enabled") {
                 html += `
-                <div class="container"
-                <p id="isEnabled"><strong>DHCP server:</strong> ${data.isEnabled || 'N/A'}</p>
-                <p><strong>Current lease pool:</strong> ${data.startIp || 'N/A'} - ${data.endIp || 'N/A'}</p>
-                <p><strong>Current lease time:</strong> ${data.leasetime || 'N/A'} hours</p>
+                <div class="container">
+                <p id="isEnabled"><strong>DHCP server:</strong><span>${data.isEnabled || 'N/A'}</span></p>
+                <p><strong>Current lease pool:</strong><span>${data.startIp || 'N/A'} - ${data.endIp || 'N/A'}</span></p>
+                <p><strong>Current lease time:</strong><span>${data.leasetime || 'N/A'} hours</span></p>
+                </div>
                 `
             } else if (data.isEnabled == "Disabled") {
                 html += `
-                <p><strong>DHCP server:</strong> ${data.isEnabled || 'N/A'}</p>
+                <p><strong>DHCP server:</strong><span>${data.isEnabled || 'N/A'}</span></p>
                 `
             }
 
@@ -118,7 +119,7 @@ function fetchCurDhcpConfig() {
             const dhcpCheckbox = document.getElementById('dhcpToggle');
             toggleDhcpConfig();
 
-            dhcpCheckbox.addEventListener('change', function() {
+            dhcpCheckbox.addEventListener('change', function () {
                 toggleDhcpConfig();
 
                 if (!this.checked) {
@@ -143,7 +144,7 @@ function toggleDhcpConfig() {
     const checkbox = document.getElementById("dhcpToggle");
     const configWrapper = document.getElementById("dhcpConfigWrapper");
     const label = document.getElementById("toggle-label");
-    
+
     if (checkbox.checked) {
         configWrapper.style.display = "block";
         label.innerHTML = "<strong>DHCP Server Enabled</strong>";
@@ -158,29 +159,29 @@ function disableDhcp() {
     showLoading("Disabling DHCP Server ...");
 
     fetch('/cgi-bin/disable_dhcp.sh')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Server returned 502 or 404");
-        }
-        return response.text();
-    })
-    .then(data =>{
-        if (data.trim() === "SUCCESS") {
-            alert("DHCP has been disabled. The page will reload.");
-            setTimeout(() => {
-                location.reload();
-            }, 2000);
-        }
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        alert("Error disabling DHCP: " + error.message);
-        document.getElementById('dhcpToggle').checked = true;
-        toggleDhcpConfig();
-    })
-    .finally(() => {
-        hideLoading();
-    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Server returned 502 or 404");
+            }
+            return response.text();
+        })
+        .then(data => {
+            if (data.trim() === "SUCCESS") {
+                alert("DHCP has been disabled. The page will reload.");
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Error disabling DHCP: " + error.message);
+            document.getElementById('dhcpToggle').checked = true;
+            toggleDhcpConfig();
+        })
+        .finally(() => {
+            hideLoading();
+        })
 }
 
 function fetchDchpClient() {
@@ -214,7 +215,7 @@ function fetchDchpClient() {
                     <th>Lease Expiration Date</th>
                 </tr>
             `;
-            data.forEach(client => { 
+            data.forEach(client => {
                 const hostname = client.hostname && typeof client.hostname === "string" && client.hostname.includes('*')
                     ? 'Unknown'
                     : client.hostname || 'Unknown';
@@ -249,7 +250,7 @@ function showLoading(message) {
     }
 
     if (loadingText) {
-        loadingText.textContent = message; 
+        loadingText.textContent = message;
     }
 
     overlay.classList.add("show");

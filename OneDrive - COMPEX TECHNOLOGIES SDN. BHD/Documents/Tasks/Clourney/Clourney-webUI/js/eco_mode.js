@@ -1,3 +1,45 @@
+if (typeof window.lockBodyScroll !== "function") {
+    window._bodyScrollLockCount = 0;
+
+    window.lockBodyScroll = function () {
+        const body = document.body;
+        if (!body) return;
+
+        if (window._bodyScrollLockCount === 0) {
+            const scrollY = window.scrollY || window.pageYOffset || 0;
+            body.dataset.scrollLockY = String(scrollY);
+            body.classList.add("modal-open");
+            body.style.position = "fixed";
+            body.style.top = "-" + scrollY + "px";
+            body.style.left = "0";
+            body.style.right = "0";
+            body.style.width = "100%";
+            body.style.overflow = "hidden";
+        }
+
+        window._bodyScrollLockCount = 1;
+    };
+
+    window.unlockBodyScroll = function () {
+        const body = document.body;
+        if (!body || !window._bodyScrollLockCount) return;
+
+        window._bodyScrollLockCount -= 1;
+        if (window._bodyScrollLockCount > 0) return;
+
+        const scrollY = parseInt(body.dataset.scrollLockY || "0", 10);
+        body.style.position = "";
+        body.style.top = "";
+        body.style.left = "";
+        body.style.right = "";
+        body.style.width = "";
+        body.style.overflow = "";
+        body.classList.remove("modal-open");
+        delete body.dataset.scrollLockY;
+        window.scrollTo(0, scrollY);
+    };
+}
+
 async function loadPowerMode() {
     const resp = await fetch('/cgi-bin/eco_mode_v2.sh?action=status');
     const data = await resp.json();
@@ -16,17 +58,17 @@ async function setPowerMode() {
 
     const mode = selected.value;
     console.log(mode);
-    
+
     try {
         const resp = await fetch(`/cgi-bin/eco_mode_v2.sh?action=${mode}`);
         if (!resp.ok) throw new Error(`Server responded with ${resp.status}`);
-        
+
         const data = await resp.json();
 
         if (data.status === "OK") {
             alert(`Applied ${data.applied_mode.toUpperCase()} mode successfully!`);
             loadPowerMode();
-        } 
+        }
         else {
             alert(`failed: ${data.error || "Unknown error"}`);
         }
@@ -45,7 +87,7 @@ let savedEcoSchedules = [];
 let eco_systemTime = null;
 let eco_timezone = null;
 
-async function initClock() {
+async function initEcoClock() {
     try {
         const resp = await fetch('/cgi-bin/get_time.sh');
         const text = await resp.text();
@@ -54,8 +96,8 @@ async function initClock() {
 
         if (data && data.epoch) {
             eco_systemTime = new Date(data.epoch * 1000);
-            updateClock();
-            setInterval(updateClock, 1000);
+            updateEcoClock();
+            setInterval(updateEcoClock, 1000);
         }
         else {
             throw new Error("Invalid data format received");
@@ -67,8 +109,8 @@ async function initClock() {
     }
 }
 
-function updateClock() {
-    if(!eco_systemTime) return;
+function updateEcoClock() {
+    if (!eco_systemTime) return;
     eco_systemTime.setSeconds(eco_systemTime.getSeconds() + 1);
     const options = {
         weekday: 'long',
@@ -114,10 +156,10 @@ function toggleEcoScheduleWithConfirmation() {
 async function confirmEcoToggle(confirmed) {
     hideEcoModal(document.getElementById('confirmation-eco-backdrop'));
 
-    if(confirmed) {
+    if (confirmed) {
         const newState = !isEcoMasterScheduleActive;
         updateEcoMasterToggle(newState);
-        
+
         console.log(`Master Wireless Schedule confirmed and set to: ${newState ? 'Enabled' : 'Disabled'}`);
 
         // Send each schedule entry individually to the backend
@@ -193,13 +235,13 @@ function openEcoAddModal() {
     });
 
     populateEcoTime();
-    if(document.getElementById('off-hour-eco')) document.getElementById('off-hour-eco').value = 11;
-    if(document.getElementById('off-minute-eco')) document.getElementById('off-minute-eco').value = "00";
-    if(document.getElementById('off-ampm-eco')) document.getElementById('off-ampm-eco').value = "PM";
-    if(document.getElementById('on-hour-eco')) document.getElementById('on-hour-eco').value = 7;
-    if(document.getElementById('on-minute-eco')) document.getElementById('on-minute-eco').value = "00";
-    if(document.getElementById('on-ampm-eco')) document.getElementById('on-ampm-eco').value = "AM";
-    
+    if (document.getElementById('off-hour-eco')) document.getElementById('off-hour-eco').value = 11;
+    if (document.getElementById('off-minute-eco')) document.getElementById('off-minute-eco').value = "00";
+    if (document.getElementById('off-ampm-eco')) document.getElementById('off-ampm-eco').value = "PM";
+    if (document.getElementById('on-hour-eco')) document.getElementById('on-hour-eco').value = 7;
+    if (document.getElementById('on-minute-eco')) document.getElementById('on-minute-eco').value = "00";
+    if (document.getElementById('on-ampm-eco')) document.getElementById('on-ampm-eco').value = "AM";
+
     const backdrop = document.getElementById('add-eco-schedule-backdrop');
     if (backdrop) showEcoModal(backdrop);
 }
@@ -209,6 +251,9 @@ function closeEcoAddModal() {
 }
 
 function showEcoModal(backdropElement) {
+    if (typeof window.lockBodyScroll === "function") {
+        window.lockBodyScroll();
+    }
     backdropElement.classList.add('show');
     const content = backdropElement.querySelector('.schedule-eco-modal-content');
     if (content) {
@@ -220,6 +265,9 @@ function hideEcoModal(backdropElement) {
     const content = backdropElement.querySelector('.schedule-eco-modal-content');
     if (content) {
         content.style.transform = 'scale(0.95)';
+    }
+    if (typeof window.unlockBodyScroll === "function") {
+        window.unlockBodyScroll();
     }
     setTimeout(() => {
         backdropElement.classList.remove('show');
@@ -242,7 +290,7 @@ function editEcoConfig(id) {
     document.getElementById('on-hour-eco').value = entry.onHour;
     document.getElementById('on-minute-eco').value = entry.onMinute;
     document.getElementById('on-ampm-eco').value = entry.onAP;
-    
+
     document.querySelectorAll('#day-eco-toggles .day-eco-toggle').forEach(el => {
         el.classList.remove('selected');
     });
@@ -264,7 +312,7 @@ async function deleteEcoConfig(id) {
         const resp = await fetch("/cgi-bin/eco_schedule.sh", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: "delete", id: id})
+            body: JSON.stringify({ action: "delete", id: id })
         });
 
         if (!resp.ok) {
@@ -431,7 +479,7 @@ function handleEcoSave() {
         offTime: offTimeStr,
         onTime: onTimeStr,
         // Fixed: removed extra array wrapping
-        repeatDays: [...currentEcoScheduleConfig.repeatDays].sort((a, b) => 
+        repeatDays: [...currentEcoScheduleConfig.repeatDays].sort((a, b) =>
             ['Su', 'M', 'Tu', 'W', 'Th', 'F', 'Sa'].indexOf(a) - ['Su', 'M', 'Tu', 'W', 'Th', 'F', 'Sa'].indexOf(b)
         )
     };
@@ -459,17 +507,17 @@ function handleEcoSave() {
 
 async function initEcoAdvanced() {
     console.log('Initializing advanced.js');
-    
+
     updateEcoMasterToggle(isEcoMasterScheduleActive);
 
     //loadEcoScheduleTime();
-    
+
     /*
     setInterval(() => {
         loadEcoScheduleTime();
     }, 1000);
     */
-    initClock();
+    initEcoClock();
     console.log('Time interval started');
 
     const dayToggleContainer = document.getElementById('day-eco-toggles');
@@ -513,7 +561,7 @@ function generateEcoUUID() {
         d += performance.now();
     }
 
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         const r = (d + Math.random() * 16) % 16 | 0;
         d = Math.floor(d / 16);
         return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);

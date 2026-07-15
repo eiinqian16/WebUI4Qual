@@ -6,8 +6,12 @@ function showTimeConfig() {
         <h1>System Time</h1>
         <p class="description">Configure system time of router</p>
         <hr>
-        <div>System Time: <span id="current-time"></span></div>
-        <div>Timezone:
+        <div class="time-row">
+            <span class="time-label">System Time:</span>
+            <span class="time-value" id="current-time"></span>
+        </div>
+        <div class="time-row">
+            <label class="time-label" for="timezone-select">Timezone:</label>
             <select id="timezone-select">
                 <option value="">--- Loading timezones... ---</option>
             </select>
@@ -17,11 +21,11 @@ function showTimeConfig() {
     `;
 
     document.getElementById('time-container').innerHTML = html;
-    initClock();
+    initSysClock();
     loadTimeZones();
 }
 
-async function initClock() {
+async function initSysClock() {
     try {
         const resp = await fetch('/cgi-bin/get_time.sh');
         const text = await resp.text();
@@ -30,8 +34,8 @@ async function initClock() {
 
         if (data && data.epoch) {
             sys_serverTime = new Date(data.epoch * 1000);
-            updateClock();
-            setInterval(updateClock, 1000);
+            updateSysClock();
+            setInterval(updateSysClock, 1000);
         }
         else {
             throw new Error("Invalid data format received");
@@ -43,8 +47,8 @@ async function initClock() {
     }
 }
 
-function updateClock() {
-    if(!sys_serverTime) return;
+function updateSysClock() {
+    if (!sys_serverTime) return;
     sys_serverTime.setSeconds(sys_serverTime.getSeconds() + 1);
     const options = {
         weekday: 'long',
@@ -75,7 +79,7 @@ async function loadTimeZones() {
         const groups = {};
         timezoneData.forEach(tz => {
             const region = tz.zone_name.split('/')[0];
-            if(!groups[region]) groups[region] = [];
+            if (!groups[region]) groups[region] = [];
             groups[region].push(tz);
         });
 
@@ -108,7 +112,7 @@ async function saveAndApply() {
     const selectTz = select.value;
     const selectedZoneName = select.options[select.selectedIndex]?.dataset.zoneName;
 
-    if(!selectTz) {
+    if (!selectTz) {
         alert("Please select a timezone");
         return;
     }
@@ -128,7 +132,7 @@ async function saveAndApply() {
         if (result.success) {
             localStorage.setItem('selected_timezone', selectTz);
             setTimeout(async () => {
-                await initClock();
+                await initSysClock();
             }, 2000);
             alert(`Timezone updated to ${selectedZoneName}`);
         }

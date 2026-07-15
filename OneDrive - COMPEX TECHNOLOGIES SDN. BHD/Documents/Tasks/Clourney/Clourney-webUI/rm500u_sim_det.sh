@@ -72,6 +72,11 @@ wait_for_sim_ready() {
             return 0
         fi
 
+        if echo "$resp" | grep -qi "+CME ERROR: 10"; then
+            echo "ERROR: SIM slot $slot is empty (+CME ERROR: 10)" >&2
+            return 1
+        fi
+
         sleep 2
         elapsed=$((elapsed + 2))
         echo "Waiting... ($elapsed/$max_wait seconds)"
@@ -148,6 +153,8 @@ check_and_switch_sim() {
     else
         echo "No SIM found in Slot $other_slot"
     fi
+
+    at_cmd "AT+QNETDEVCTL=3,1,1" > /dev/null 2>&1
 }
 
 # Main

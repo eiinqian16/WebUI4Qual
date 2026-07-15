@@ -1,10 +1,11 @@
 body {
     font-family: Arial, sans-serif;
     background-color: #eeeeee;
-    color:rgb(0, 0, 0);
+    color: rgb(0, 0, 0);
     display: flex;
     justify-content: center;
-    align-items: flex-start; /*center*/
+    align-items: flex-start;
+    /*center*/
     height: 100vh;
     margin: 0;
 }
@@ -17,55 +18,109 @@ h1 {
     border-radius: 25px;
     padding: 20px;
     background: rgb(255, 253, 253);
-    text-align: left;  
+    text-align: left;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin-top: 20px;
-    margin-left:300px;
+    margin-left: 300px;
     max-width: 600px;
 }
 
-.usr #cred label {
-    width: 100px;
-    margin-right: 10px;
-    text-align: left;
-    margin-bottom: 10px;
-}
+@media (max-width: 1000px) {
+    #time-container .time-row {
+        display: block;
+        margin: 0;
+        padding: 9px 0;
+        border-bottom: 1px solid #eeeeee;
+    }
 
-.usr input[type="password"] { 
-    flex: 1; 
-    width:200px;
-    height: 25px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    padding-left: 5px;
-    margin-bottom: 10px;
-    align-self: center;
-}
+    #time-container .time-label,
+    #time-container .time-value {
+        display: block;
+        width: 100%;
+        line-height: 1.35;
+    }
 
-.usr input[type="text"] { 
-    flex: 1; 
-    width:150px;
-    height: 20px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    padding-left: 5px;
-    margin-bottom: 10px;
-}
+    #time-container .time-label {
+        margin-bottom: 4px;
+        font-weight: bold;
+        color: #111827;
+    }
 
-.usr input[type="checkbox"] {
-    margin-right:8px;
-    margin-bottom:10px;
+    #time-container .time-value {
+        overflow-wrap: anywhere;
+    }
+
+    #timezone-select {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+
+    br {
+        display: none;
+    }
+
+    #date p {
+        font-size: 15px;
+    }
 }
 
 button {
-    width: 120px; 
-    height: 36px;
-    font-size: 14px;
-    font-weight: bold;
-    color: #ffffff; 
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.15s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    width: 120px;
+    height: auto;
+    color: #ffffff;
     border: none;
-    border-radius: 4px;
     cursor: pointer;
-    transition: background 0.3s, opacity 0.3s;
     background-color: #1aa34c;
+}
+
+@media (max-width: 1000px) {
+    body {
+        margin: 0 !important;
+        display: block !important;
+        height: auto !important;
+        width: auto;
+    }
+
+    .usr {
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 16px;
+        border-radius: 12px;
+        box-sizing: border-box;
+    }
+
+    .usr .form-row {
+        display: block;
+    }
+
+    .usr #cred .form-row label {
+        display: block;
+        width: 100%;
+        margin-bottom: 6px;
+    }
+
+    .usr input[type="password"],
+    .usr input[type="text"] {
+        width: 100%;
+        min-height: 36px;
+    }
+
+    button {
+        width: 100%;
+        height: 40px;
+    }
+
+    br {
+        display: none;
+    }
 }

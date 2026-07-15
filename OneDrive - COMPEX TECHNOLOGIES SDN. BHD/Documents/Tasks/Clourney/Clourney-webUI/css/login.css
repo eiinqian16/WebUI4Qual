@@ -4,7 +4,8 @@ body {
     background: #FFFFFF;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /*center*/
+    align-items: flex-start;
+    /*center*/
     height: 100vh;
     margin: 0;
 }
@@ -28,19 +29,18 @@ body {
 
 .container img {
     display: block;
-    margin-left: 0;
-    width: 60px;
+    margin-left: -5px;
+    width: 120px;
     margin-bottom: 15px;
-    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.25);
-    border-radius: 10%; 
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; 
-    will-change: transform; 
+    border-radius: 10%;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    will-change: transform;
 }
 
 .container img:hover {
-    transform: scale(1.1); 
-    box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.3); 
-    backdrop-filter: none !important; /* 关键：防止模糊影响 */
+    transform: scale(1.1);
+    backdrop-filter: none !important;
+    /* 关键：防止模糊影响 */
 }
 
 .auth-title {
@@ -56,7 +56,7 @@ body {
     display: block;
     font-size: 14px;
     color: #555;
-    margin-top: 4px; 
+    margin-top: 4px;
     margin-bottom: 12px;
     text-align: left;
 }
@@ -65,8 +65,8 @@ input {
     width: 100%;
     padding: 12px;
     margin: 10px 0;
-    border: none; 
-    border-bottom: 2px solid #ddd; 
+    border: none;
+    border-bottom: 2px solid #ddd;
     border-radius: 0;
     box-sizing: border-box;
     transition: border-color 0.3s, box-shadow 0.3s;
@@ -76,23 +76,23 @@ input {
 input:focus {
     border-bottom: 2px solid #0f691e;
     outline: none;
-    box-shadow: 0px 4px 8px rgba(252, 248, 126, 0.2); 
+    box-shadow: 0px 4px 8px rgba(252, 248, 126, 0.2);
 }
 
 button {
     display: block;
-    width: 40%; 
-    background:#1aa34c; 
+    width: 40%;
+    background: #1aa34c;
     color: white;
     border: none;
     padding: 12px;
     margin-top: 10px;
     font-size: 16px;
-    font-weight: bold; 
-    border-radius: 8px; 
+    font-weight: bold;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
-    box-shadow: 0px 5px 15px rgba(3, 3, 2, 0.3); 
+    box-shadow: 0px 5px 15px rgba(3, 3, 2, 0.3);
 }
 
 button:hover {
@@ -127,6 +127,107 @@ button:active {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 1000px),
+(max-device-width: 768px) {
+    html {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+        -webkit-text-size-adjust: 100%;
+        touch-action: manipulation;
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    body {
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        width: 100%;
+        max-width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        padding: 16px 0;
+        overflow-x: hidden;
+    }
+
+    #login {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 16px;
+        display: flex;
+        justify-content: center;
+        margin: 0;
+    }
+
+    #loginForm {
+        width: 100%;
+        max-width: 400px;
+        margin: 0;
+    }
+
+    #output {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 16px;
+        overflow-wrap: break-word;
+    }
+
+    .container {
+        width: 100%;
+        max-width: none;
+        box-sizing: border-box;
+        margin-top: 5vh;
+        padding: 1.5rem 1.125rem;
+        border-radius: 0.625rem;
+        box-shadow: 0px 10px 24px rgba(54, 28, 29, 0.18);
+    }
+
+    .container:hover {
+        transform: none;
+    }
+
+    .container img {
+        width: 3.5rem;
+        margin-bottom: 1.125rem;
+    }
+
+    .auth-title {
+        font-size: 1.25rem;
+        line-height: 1.3;
+    }
+
+    .auth-desc {
+        font-size: 0.875rem;
+        line-height: 1.45;
+        margin-bottom: 1rem;
+    }
+
+    input {
+        width: 100%;
+        max-width: 100%;
+        min-height: 3rem;
+        padding: 0.75rem 0.25rem;
+        margin: 0.5rem 0;
+        font-size: 1rem;
+    }
+
+    button {
+        width: 100%;
+        min-height: 3rem;
+        margin-top: 1.125rem;
+    }
 }

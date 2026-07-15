@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Restore Config</title>
-  <link rel="stylesheet" href="css/system.css">
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Restore Config</title>
+    <link rel="stylesheet" href="css/system.css">
 </head>
+
 <body>
     <div class="box">
         <h1>Backup Configuration</h1>
@@ -24,7 +28,7 @@
         <h1>Restore Configuration</h1>
         <p class="description">Restore Configuration from file</p>
         <hr>
-        <div id="restore">    
+        <div id="restore">
             <input type="file" id="backupFile" accept=".tar.gz">
             <br>
             <br>
@@ -43,7 +47,10 @@
                     <button onclick="confirmBackup()">Restore</button>
                     <button onclick="closePopup()">Cancel</button>
                 </div>
+            </div>
+            <div id="uploadStatus"></div>
         </div>
-        <div id="uploadStatus"></div>
     </div>
 </body>
+
+</html>

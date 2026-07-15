@@ -147,9 +147,11 @@ if [ -n "$DET_SCRIPT" ] && [ -x "$DET_SCRIPT" ]; then
     $DET_SCRIPT > /tmp/sim_det.log 2>&1
 fi
 
-sleep 60
-
-/usr/bin/prodinfo.sh > /tmp/prod_info.log 2>&1
+if [ "$MODEL" != "RM500U-"* ]; then
+    sleep 60
+else
+    sleep 5
+fi
 
 if check_internet; then
         logger "rc.local" "Detected $MODEL"
@@ -197,3 +199,5 @@ if [ -n "$stats_script" ] && [ -x "$stats_script" ]; then
         fi
     done
 fi
+
+/usr/bin/prodinfo.sh > /tmp/prod_info.log 2>&1
