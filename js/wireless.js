@@ -1,91 +1,38 @@
-if (typeof window.lockBodyScroll !== "function") {
-    window._bodyScrollLockCount = 0;
-
-    window.lockBodyScroll = function () {
-        const body = document.body;
-        if (!body) return;
-
-        if (window._bodyScrollLockCount === 0) {
-            const scrollY = window.scrollY || window.pageYOffset || 0;
-            body.dataset.scrollLockY = String(scrollY);
-            body.classList.add("modal-open");
-            body.style.position = "fixed";
-            body.style.top = "-" + scrollY + "px";
-            body.style.left = "0";
-            body.style.right = "0";
-            body.style.width = "100%";
-            body.style.overflow = "hidden";
-        }
-
-        window._bodyScrollLockCount = 1;
-    };
-
-    window.unlockBodyScroll = function () {
-        const body = document.body;
-        if (!body || !window._bodyScrollLockCount) return;
-
-        window._bodyScrollLockCount -= 1;
-        if (window._bodyScrollLockCount > 0) return;
-
-        const scrollY = parseInt(body.dataset.scrollLockY || "0", 10);
-        body.style.position = "";
-        body.style.top = "";
-        body.style.left = "";
-        body.style.right = "";
-        body.style.width = "";
-        body.style.overflow = "";
-        body.classList.remove("modal-open");
-        delete body.dataset.scrollLockY;
-        window.scrollTo(0, scrollY);
-    };
-}
-
-async function getConfig(updateOnly = false) {
-    try {
-        let configUrl = '/cgi-bin/get_wifi_config.sh';
-        try {
-            const modeResp = await fetch('/cgi-bin/get_ezmesh_mode.sh');
-            const modeData = await modeResp.json();
-            if (modeData.role === "controller" || modeData.role === "agent") {
-                configUrl = '/cgi-bin/get_ezmesh_config.sh';
-            }
-        } catch (e) {
-            console.warn("Failed to check EZMesh mode, defaulting to standard config:", e);
-        }
-
-        const response = await fetch(configUrl);
-        console.log('HTTP Status:', response.status);
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok: ' + response.statusText);
-        }
-
-        const data = await response.json();
-        console.log('Fetched data:', data);
-
+async function getConfig(updateOnly = false) {                                                                                                  
+    try {                                                                                                        
+        const response = await fetch('/cgi-bin/get_wifi_config.sh');                                                 
+        console.log('HTTP Status:', response.status);                                                          
+                                                                                                                                   
+        if (!response.ok) {                                                                                               
+            throw new Error('Network response was not ok: ' + response.statusText);                                           
+        }                                                                                                        
+                                                                                                                     
+        const data = await response.json();                                                                    
+        console.log('Fetched data:', data);                                                                                        
+                                                                                                                          
         if (!updateOnly) {
             deviceConfig = {};
 
             window.mloStatus = data.mlo_status ? parseInt(data.mlo_status, 10) : 0;
             window.mloBands = data.mlo_bands || "";
 
-            Object.keys(data).forEach(device => {
-                if (device !== "mlo_status" && device !== "mlo_bands") {
-                    deviceConfig[device] = {
-                        ...data[device],
-                        interfaces: Array.isArray(data[device].interfaces) ? data[device].interfaces : []
-                    };
-                }
-            });
-
-            updateMloState(window.mloStatus, window.mloBands);
-            renderWifiList();
+            Object.keys(data).forEach(device => {     
+                if (device !== "mlo_status" && device !== "mlo_bands") {                                                              
+                    deviceConfig[device] = {                                                                                 
+                        ...data[device],                                                                               
+                        interfaces: Array.isArray(data[device].interfaces) ? data[device].interfaces : []                                  
+                    };   
+                }                                                                                                          
+            });           
+            
+            updateMloState(window.mloStatus, window.mloBands);                                                                                                  
+            renderWifiList(); 
         } else {
-            console.log("Updating only bitrate, channel, BSSID...");
+            console.log("Updating only bitrate, channel, BSSID..."); 
 
             Object.keys(data).forEach(device => {
                 if (device === "mlo_status") {
-                    window.mloStatus = parseInt(data.mlo_status, 10) || 0;
+                    window.mloStatus = parseInt(data.mlo_status, 10);
                 } else if (device === "mlo_bands") {
                     window.mloBands = data.mlo_bands || "";
                 } else if (deviceConfig[device]) {
@@ -100,41 +47,20 @@ async function getConfig(updateOnly = false) {
             });
 
             updateWifiInfoUI();
-            syncWirelessActionButtons();
         }
-    } catch (err) {
-        console.error('Error fetching configuration:', err);
-    }
+    } catch (err) {                                                                                            
+        console.error('Error fetching configuration:', err);                                                                       
+    }                                                                                                                     
 }
 
-function syncWirelessActionButtons() {
-    const actionsDisabled = window.mloStatus === 1;
-    document.querySelectorAll('.scan-btn, .add-btn, .edit-btn, .delete-btn').forEach(btn => {
-        btn.disabled = actionsDisabled;
-    });
-}
 
-function buildWifiInfoText(wifi) {
-    const infoParts = [];
-
-    if (wifi.current_channel) {
-        infoParts.push(t('wireless.current_channel', { channel: wifi.current_channel }));
-    }
-
-    if (wifi.bitrate) {
-        infoParts.push(t('wireless.bitrate', { bitrate: wifi.bitrate }));
-    }
-
-    return infoParts.join(' | ');
-}
-
-function renderWifiList() {
+function renderWifiList() {                                                                                          
     const wifiListContainer = document.getElementById('wifi-list');
-    wifiListContainer.innerHTML = '';
+    wifiListContainer.innerHTML = ''; 
 
-    Object.values(deviceConfig).forEach(wifi => {
+    Object.values(deviceConfig).forEach(wifi => {   
         const table = document.createElement('table');
-        table.classList.add('wifi-table');
+        table.classList.add('wifi-table'); 
 
         const thead = document.createElement('thead');
         thead.innerHTML = `
@@ -142,16 +68,17 @@ function renderWifiList() {
                 <td>
                     <div class="main-wifi-header">
                         <div class="wifi-header">
-                            <h3>${t('wireless.device_heading', { device: wifi.device, bands: wifi.supported_bands || t('common.unknown') })}</h3>
+                            <h3>WiFi Device (${wifi.device}) - Bands: ${wifi.supported_bands || 'Unknown'}</h3>
                             <div class="wifi-header-content">
                                 <p class="wifi-info" data-device="${wifi.device}">
-                                    ${buildWifiInfoText(wifi)}
+                                    ${wifi.current_channel ? `Current Channel: ${wifi.current_channel}` : ""}
+                                    ${wifi.bitrate ? `| Bitrate: ${wifi.bitrate}` : ""}
                                 </p>
                             </div>
                         </div>
                         <div class="header-buttons">
-                            <button class="scan-btn" data-device="${wifi.device}">${t('common.scan')}</button>
-                            <button class="add-btn" data-device="${wifi.device}">${t('common.add')}</button>
+                            <button class="scan-btn" data-device="${wifi.device}">Scan</button>
+                            <button class="add-btn" data-device="${wifi.device}">Add</button>
                         </div>
                     </div>
                 </td>
@@ -167,16 +94,16 @@ function renderWifiList() {
                     <div class="ssid-mode-bssid-wrapper">
                         <span class="ssid">${iface.ssid}</span>
                         <div class="mode-bssid">
-                            <span class="mode">${iface.mode === "ap" ? t('wireless.mode_master') : t('wireless.mode_client')}</span>
-                            <span class="bssid" data-iface="${iface.iface}">${iface.bssid || t('common.unknown')}</span>
+                            <span class="mode">Mode : ${iface.mode === "ap" ? "Master" : "Client"}</span>
+                            <span class="bssid" data-iface="${iface.iface}">BSSID : ${iface.bssid || "Unknown"}</span>
                         </div>
                     </div>
                 </td>
 
 
                 <td class="actions">
-                    <button class="edit-btn" data-device="${wifi.device}" data-iface="${iface.iface}">${t('common.edit')}</button>
-                    <button class="delete-btn" data-iface="${iface.iface}">${t('common.delete')}</button>
+                    <button class="edit-btn" data-device="${wifi.device}" data-iface="${iface.iface}">Edit</button>
+                    <button class="delete-btn" data-iface="${iface.iface}">Delete</button>
                 </td>
             `;
 
@@ -188,347 +115,273 @@ function renderWifiList() {
     });
 
 
-    document.querySelectorAll('.scan-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const device = this.getAttribute('data-device');
-            startScan(device);
-        });
+    document.querySelectorAll('.scan-btn').forEach(btn => {                                                               
+        btn.addEventListener('click', function() {                                                                            
+            const device = this.getAttribute('data-device');                                                     
+            startScan(device);                                                                                       
+        });                                                                                                    
     });
 
-    document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const device = this.getAttribute('data-device');
-            const iface = this.getAttribute('data-iface');
-            openEditModal_v2(device, iface);
-        });
+    document.querySelectorAll('.edit-btn').forEach(btn => {                                                                   
+        btn.addEventListener('click', function() {                                                               
+            const device = this.getAttribute('data-device');                                                         
+            const iface = this.getAttribute('data-iface');                                                     
+            openEditModal(device, iface);                                                                                          
+        });                                                                                                               
     });
 
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const iface = this.getAttribute('data-iface');
-            deleteIface(iface);
-        });
+    document.querySelectorAll('.delete-btn').forEach(btn => {                                                        
+        btn.addEventListener('click', function() {                                                                     
+            const iface = this.getAttribute('data-iface');                                                                         
+            deleteIface(iface);                                                                                           
+        });                                                                                                                   
     });
 
-    document.querySelectorAll('.add-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const device = this.getAttribute('data-device');
-            openAddModal(device);
-        });
+    document.querySelectorAll('.add-btn').forEach(btn => {                                                                    
+        btn.addEventListener('click', function() {                                                               
+            const device = this.getAttribute('data-device');                                                        
+            openAddModal(device);                                                                              
+        });                                                                                                                        
     });
 
-    syncWirelessActionButtons();
-}
-
+    if (window.mloStatus === 1) {
+        document.querySelectorAll('.scan-btn, .add-btn, .edit-btn, .delete-btn').forEach(btn => {
+            btn.disabled = true;
+        });
+    } else {
+        document.querySelectorAll('.scan-btn, .add-btn, .edit-btn, .delete-btn').forEach(btn => {
+            btn.disabled = false;
+        });
+    }
+}                             
+    
 function updateWifiInfoUI() {
     Object.values(deviceConfig).forEach(wifi => {
         const info = document.querySelector(`.wifi-info[data-device="${wifi.device}"]`);
         if (info) {
-            info.textContent = buildWifiInfoText(wifi);
+            info.innerHTML = `
+                ${wifi.current_channel ? `Current Channel: ${wifi.current_channel}` : ""}
+                ${wifi.bitrate ? `| Bitrate: ${wifi.bitrate}` : ""}
+            `;
         }
         wifi.interfaces.forEach(iface => {
             const bssidElement = document.querySelector(`.bssid[data-iface="${iface.iface}"]`);
             if (bssidElement) {
-                bssidElement.textContent = t('wireless.bssid_label', { bssid: iface.bssid || t('common.unknown') });
+                bssidElement.textContent = `BSSID : ${iface.bssid || "Unknown"}`;
             }
         });
     });
 }
 
-async function openEditModal_v2(device, iface) {
-    const modalContent = document.getElementById('edit-modal-content');
-    const modal = document.getElementById('editModal');
-    const overlay = document.getElementById('modalOverlay');
-    console.log(device);
+         
+async function openEditModal(device, iface) {                                                                        
+    const modalContent = document.getElementById('edit-modal-content');                                        
+    const modal = document.getElementById('editModal');                                                                            
+    const overlay = document.getElementById('modalOverlay');                                                              
+                                                                                                                              
+    const wifi = deviceConfig[device];                                                                      
+    if (!wifi) {                                                                                                                                                              
+        return;                                                                                                                    
+    }                                                                                                                     
+                                                                                                                              
+    const ifaceConfig = wifi.interfaces.find(i => i.iface === iface);                                            
+    if (!ifaceConfig) {                                                                                                                                                     
+        return;                                                                                                                    
+    }                                                                                                                     
+                                                                                                                              
+    let txpowerValue = wifi.txpower || "MAX";                                                                    
+                                                                                                                     
+    const txpowerOptions = [5, 8, 11, 14, 17, 20, 23, "MAX"].map(value =>                                              
+        `<option value="${value}" ${txpowerValue == value ? "selected" : ""}>${value}</option>`                                    
+    ).join('');                                                                                                           
+            
+                                                                                                                              
+let channelOptionsHtml = "";
 
-    const wifi = deviceConfig[device];
-    if (!wifi) {
-        return;
-    }
+if (wifi.channel_options) {
+    console.log("🔹 wifi.channel_options:", wifi.channel_options); 
 
-    const ifaceConfig = wifi.interfaces.find(i => i.iface === iface);
-    if (!ifaceConfig) {
-        return;
-    }
+    Object.keys(wifi.channel_options).forEach(band => {
+        console.log("🔹 Processing band:", band); 
 
-    let txpowerValue = wifi.txpower || "MAX";
+        channelOptionsHtml += `<optgroup label="--- ${band} ---"></optgroup>`;
 
-    const txpowerOptions = [5, 8, 11, 14, 17, 20, 23, "MAX"].map(value => {
-        const isSelected = (txpowerValue == value) || (!txpowerValue && value === "MAX");
-        return `<option value="${value}" ${isSelected ? "selected" : ""}>${value}</option>`
-    }).join('');
+        wifi.channel_options[band].forEach(chan => {
+            let chanNumber = chan.split(" ")[0]; 
+            let selected = (chan === wifi.channel) ? "selected" : ""; 
 
+            console.log("🔹 Processing channel:", chan, "chanNumber:", chanNumber);
 
-    let channelOptionsHtml = "";
-
-    if (wifi.channel_options) {
-        console.log("🔹 wifi.channel_options:", wifi.channel_options);
-
-        Object.keys(wifi.channel_options).forEach(band => {
-            console.log("🔹 Processing band:", band);
-
-            channelOptionsHtml += `<optgroup label="--- ${band} ---"></optgroup>`;
-
-            wifi.channel_options[band].forEach(chan => {
-                let chanNumber = chan.split(" ")[0];
-                let selected = (chan === wifi.channel) ? "selected" : "";
-
-                console.log("🔹 Processing channel:", chan, "chanNumber:", chanNumber);
-
-                if (chanNumber === "auto") {
-                    console.log("🔹 Found 'auto' channel: ", chan);
+            if (chanNumber === "auto") {
+                console.log("🔹 Found 'auto' channel: ", chan); 
 
 
-                    if (wifi.current_band === "5GHz" && band === "5GHz" && chan.includes("auto (5GHz)")) {
-                        selected = "selected";
-                        console.log("🔹 Selected 'auto (5GHz)' for 5GHz band.");
-                    } else if (wifi.current_band === "6GHz" && band === "6GHz" && chan.includes("auto (6GHz)")) {
-                        selected = "selected";
-                        console.log("🔹 Selected 'auto (6GHz)' for 6GHz band.");
-                    } else if (wifi.current_band === "2.4GHz" && band === "2.4GHz" && chan.includes("auto (2.4GHz)")) {
-                        selected = "selected";
-                        console.log("🔹 Selected 'auto (2.4GHz)' for 2.4GHz band.");
-                    }
+                if (wifi.current_band === "5GHz" && band === "5GHz" && chan.includes("auto (5GHz)")) {
+                    selected = "selected";
+                    console.log("🔹 Selected 'auto (5GHz)' for 5GHz band.");
+                } else if (wifi.current_band === "6GHz" && band === "6GHz" && chan.includes("auto (6GHz)")) {
+                    selected = "selected";
+                    console.log("🔹 Selected 'auto (6GHz)' for 6GHz band.");
+                } else if (wifi.current_band === "2.4GHz" && band === "2.4GHz" && chan.includes("auto (2.4GHz)")) {
+                    selected = "selected"; 
+                    console.log("🔹 Selected 'auto (2.4GHz)' for 2.4GHz band.");
                 }
+            }
 
-                let optionValue = chan;
-                if (chanNumber === "auto") {
-                    if (wifi.current_band === "5GHz" && band === "5GHz") {
-                        optionValue = "auto (5GHz)";
-                        console.log("🔹 Setting optionValue to 'auto (5GHz)' for 5GHz band.");
-                    } else if (wifi.current_band === "6GHz" && band === "6GHz") {
-                        optionValue = "auto (6GHz)";
-                        console.log("🔹 Setting optionValue to 'auto (6GHz)' for 6GHz band.");
-                    } else if (wifi.current_band === "2.4GHz" && band === "2.4GHz") {
-                        optionValue = "auto (2.4GHz)";
-                        console.log("🔹 Setting optionValue to 'auto (2.4GHz)' for 2.4GHz band.");
-                    }
+            let optionValue = chan; 
+            if (chanNumber === "auto") {
+                if (wifi.current_band === "5GHz" && band === "5GHz") {
+                    optionValue = "auto (5GHz)";
+                    console.log("🔹 Setting optionValue to 'auto (5GHz)' for 5GHz band.");
+                } else if (wifi.current_band === "6GHz" && band === "6GHz") {
+                    optionValue = "auto (6GHz)";
+                    console.log("🔹 Setting optionValue to 'auto (6GHz)' for 6GHz band.");
+                } else if (wifi.current_band === "2.4GHz" && band === "2.4GHz") {
+                    optionValue = "auto (2.4GHz)";
+                    console.log("🔹 Setting optionValue to 'auto (2.4GHz)' for 2.4GHz band.");
                 }
+            }
 
-                console.log("🔹 Option value:", optionValue, "selected:", selected); // 打印选项的值和是否选中
+            console.log("🔹 Option value:", optionValue, "selected:", selected); // 打印选项的值和是否选中
 
-                // 生成选项HTML
-                channelOptionsHtml += `<option value="${optionValue}" ${selected}>${chan}</option>`;
-            });
+            // 生成选项HTML
+            channelOptionsHtml += `<option value="${optionValue}" ${selected}>${chan}</option>`;
         });
-    }
+    });
+}
 
-    let hwmodeValue = wifi.hwmode || "11bea";
-    let htmodeValue = wifi.htmode || "EHT320";
 
-    let hwModesResponse = await fetch(`/cgi-bin/get_hw_modes.sh?device=${device}`);
-    let hwModesData = await hwModesResponse.json();
-    let hwmodeOptionsArray = hwModesData.hw_modes;
-    console.log(hwmodeOptionsArray);
 
-    //let hwmodeOptions = Object.keys(hwModesData.hw_modes)            
-    let hwmodeOptions = hwmodeOptionsArray
-        .map(hw => `<option value="${hw}" ${hw === hwmodeValue ? "selected" : ""}>${hw.toUpperCase()}</option>`)
-        .join('');
 
-    const modeValue = ifaceConfig.mode || "ap";
+                                                                                                                        
 
-    let encryptionValue = ifaceConfig.encryption || "none";
-    console.log("ifaceConfig.encryption:", ifaceConfig.encryption);
-    let cipherOptions = "";
+    let hwmodeValue = wifi.hwmode || "11bea";                                                       
+    let htmodeValue = wifi.htmode || "EHT320";                                                        
+                                                                                                                                                                      
+                                                                                  
+    let hwModesResponse = await fetch(`/cgi-bin/get_hw_modes.sh?device=${device}`);                              
+    let hwModesData = await hwModesResponse.json();                                                                  
 
-    let modalHtml = `                                                                                                                                                                                                                                    
-        <h4>${t('wireless.wifi_configuration')}</h4>                                                                                     
+    let hwmodeOptions = Object.keys(hwModesData.hw_modes)                                                                     
+        .map(hw => `<option value="${hw}" ${hw === hwmodeValue ? "selected" : ""}>${hw.toUpperCase()}</option>`) 
+        .join('');                                                                                                   
+
+    const modeValue = ifaceConfig.mode || "ap"; 
+    
+	let encryptionValue = ifaceConfig.encryption || "none";   
+	console.log("ifaceConfig.encryption:",ifaceConfig.encryption);
+    let cipherOptions ="";
+
+    let modalHtml = `                                                                                                              
+        <h4>Device Configuration: ${device}</h4>                                                                                   
         <table>                                                                                                               
-            <tr><td>${t('common.ssid_colon')}</td><td><input type="text" id="iface-ssid-${iface}" value="${ifaceConfig.ssid || ''}"></td></tr>    
+            <tr><td>Type:</td><td><input type="text" id="device-type-${device}" value="${wifi.type || ''}" disabled></td></tr>
+            <tr>                                                                                                              
+                <td>Channel:</td>                                                                                             
+		<td>                                                                                                               
+		    <select id="device-channel-${device}" onchange="updateChannelBand('${device}', '${iface}')">                                                                
+			${channelOptionsHtml}                                                                                 
+		    </select>                                                                                    
+		</td>                                                                                               
+            </tr>                                                                                                             
+            <tr>                                                                                                                   
+                <td>TX Power:</td>                                                                                        
+                <td>                                                                                                          
+                    <select id="device-txpower-${device}">                                                       
+                        ${txpowerOptions}                                                                            
+                    </select>                                                                                          
+                </td>                                                                                                              
+            </tr>                                                                                                         
+            <tr>                                                                                                              
+                <td>Country:</td>                                                                                
+                <td>                                                                                                 
+                    <input type="text" id="device-country-${device}" value="${wifi.country || ''}"             
+                        oninput="validateCountryCode('${device}')">                                                                
+                    <span id="country-error-${device}" style="color: red; font-size: 0.9em;"></span>                      
+                </td>                                                                                                         
+            </tr>                                                                                                
+            <tr>                                                                                                     
+                <td>HW Mode:</td>                                                                              
+                <td>                                                                                                               
+                    <select id="device-hwmode-${device}" onchange="updateHtmode('${device}')">                            
+                        ${hwmodeOptions}                                                                                      
+                    </select>                                                                                                      
+                </td>                                                                                                     
+            </tr>                                                                                              
+            <tr id="htmode-row-${device}">                                                                                         
+                <td>HT Mode:</td>                                                                                         
+                <td>                                                                                                          
+                    <select id="device-htmode-${device}"></select>                                                                 
+                </td>                                                                                                     
+            </tr>                                                                                                      
+            <tr>                                                                                                                   
+                <td>Disabled:</td>                                                                                        
+                <td>                                                                                                          
+                    <select id="device-disabled-${device}">                                                                        
+                        <option value="0" ${wifi.disabled == "0" ? "selected" : ""}>Enabled</option>                      
+                        <option value="1" ${wifi.disabled == "1" ? "selected" : ""}>Disabled</option>               
+                    </select>                                                                                                 
+                </td>                                                                                                         
+            </tr>                                                                                                             
+        </table>                                                                                                                   
+                                                                                                                              
+        <h4>Interface Configuration</h4>                                                                                     
+        <table>                                                                                                               
+            <tr><td>Network:</td><td><input type="text" id="iface-network-${iface}" value="${ifaceConfig.network || ''}"></td></tr>
+            <tr><td>SSID:</td><td><input type="text" id="iface-ssid-${iface}" value="${ifaceConfig.ssid || ''}"></td></tr>    
+     
+            <tr>                                                                                                                   
+                <td>Mode:</td>                                                                                                     
+                <td>                                                                                                               
+                    <select id="iface-mode-${iface}" 
+                            onchange="updateCipherOptions('${iface}', this.value,'${device}'); togglePasswordField('${iface}');">
+                        <option value="ap" ${ifaceConfig.mode === "ap" ? "selected" : ""}>Access Point (AP)</option>               
+                        <option value="sta" ${ifaceConfig.mode === "sta" ? "selected" : ""}>Station (STA)</option>                 
+                    </select>                                                                                                      
+                </td>                                                                                                              
+            </tr>
                                                                                                                 
             <tr>                                                                                                                   
-                <td>${t('common.encryption_colon')}</td>
-                <td>
+                <td>Encryption:</td>                                                                                               
+                <td>                                                                                                               
                     <select id="iface-encryption-${iface}" onchange="updateCipherOptions('${iface}', document.getElementById('iface-mode-${iface}').value,'${device}'); togglePasswordField('${iface}');">
                     </select>                                                                                               
                 </td>                                                                                                              
             </tr>  
             <tr id="cipher-row-${iface}" style="display: none;">
-                <td>${t('wireless.cipher_mode_colon')}</td>
+                <td>Cipher Mode:</td>
                 <td>
                     <select id="iface-cipher-${iface}"></select>
                 </td>
             </tr>
             <tr id="password-row-${iface}" style="display: ${encryptionValue === "none" ? "none" : "table-row"};">
-                <td>${t('common.password_colon')}</td>
+                <td>Password:</td>
                 <td>
-                    <input type="password" id="iface-key-${iface}"
-                           value="${ifaceConfig.sae_password || ifaceConfig.key || ''}"
-                           ${encryptionValue === "sae" ? `placeholder='${t('wireless.sae_password_placeholder')}'` : ""}>
+                    <input type="password" id="iface-key-${iface}" 
+                           value="${ifaceConfig.sae_password || ifaceConfig.key || ''}" 
+                           ${encryptionValue === "sae" ? "placeholder='SAE Password'" : ""}>
                 </td>
             </tr>
-            <tr>                                                                                                                   
-                <td>${t('common.disabled_colon')}</td>
-                <td>
-                    <select id="device-disabled-${device}">
-                        <option value="0" ${wifi.disabled == "0" ? "selected" : ""}>${t('common.enabled')}</option>
-                        <option value="1" ${wifi.disabled == "1" ? "selected" : ""}>${t('common.disabled')}</option>
-                    </select>                                                                                                 
-                </td>                                                                                                         
-            </tr>                                                                                         
+                                                                                                     
         </table>                                                                                                                   
-
-        <br>
-		<div class="WifiAdvToggle">
-                <label class="switch">
-                    <input type="checkbox" id="WifiAdvToggle">
-                    <span class="slider round"></span>
-                </label>
-                <span class="toggle-label" id="toggle-label"><strong>${t('wireless.advanced_configurations')}</strong></span>
-        </div>
-		
-		<div id="wifiAdv" display="none">
-			<h4>${t('wireless.advanced_configuration_device', { device: device })}</h4>                                                                                   
-			<table>                                                                                                               
-				<tr>                                                                                                              
-					<td>${t('common.channel_colon')}</td>
-			<td>
-				<select id="device-channel-${device}" onchange="updateChannelBand('${device}', '${iface}')">
-				${channelOptionsHtml}
-				</select>
-			</td>
-				</tr>
-				<tr>
-					<td>${t('wireless.tx_power_colon')}</td>
-					<td>
-						<select id="device-txpower-${device}">
-							${txpowerOptions}
-						</select>
-					</td>
-				</tr>
-				<tr>
-					<td>${t('common.country_colon')}</td>
-					<td>
-						<select id="device-country-${device}">
-                            <option value="">${t('common.loading_countries')}</option>
-                        </select>
-						<span id="country-error-${device}" style="color: red; font-size: 0.9em;"></span>
-					</td>
-				</tr>
-				<tr>
-					<td>${t('wireless.hw_mode_colon')}</td>
-					<td>
-						<select id="device-hwmode-${device}" onchange="updateHtmode('${device}')">
-							${hwmodeOptions}
-						</select>
-					</td>
-				</tr>
-				<tr id="htmode-row-${device}">
-					<td>${t('wireless.ht_mode_colon')}</td>
-					<td>
-						<select id="device-htmode-${device}"></select>
-					</td>
-				</tr>
-                <tr>
-					<td>${t('common.mode_colon')}</td>
-					<td>
-						<select id="iface-mode-${iface}"
-								onchange="updateCipherOptions('${iface}', this.value,'${device}'); togglePasswordField('${iface}');">
-							<option value="ap" ${ifaceConfig.mode === "ap" ? "selected" : ""}>${t('wireless.mode_ap')}</option>
-							<option value="sta" ${ifaceConfig.mode === "sta" ? "selected" : ""}>${t('wireless.mode_sta')}</option>
-						</select>
-					</td>
-				</tr>                                                                                                                                                                                                                                                                                                                                                                                                                
-			</table>                                                                                                                
-		</div>
-		
-        <button class="modal-reset-btn" onclick="resetConfig('${device}', '${iface}')">${t('common.reset')}</button>
-        <div class="modal-action-row">
-		    <button class="modal-save-btn" onclick="saveConfig('${device}', '${iface}')">${t('common.save')}</button>
-            <button class="modal-close-btn" onclick="closeEditModal()">${t('common.close')}</button>
-        </div>
-    `;
-
-
-    modalContent.innerHTML = modalHtml;
-    let detected = await detectCountry();
-    let currentCountry = detected || wifi.country || "US";
-
-    populateCountry(device, currentCountry);
-
-    const wifiAdvCheckbox = document.getElementById('WifiAdvToggle');
-    toggleWifiAdv();
-
-    wifiAdvCheckbox.addEventListener('change', function () {
-        toggleWifiAdv();
-    });
-
+        
+        <button class="modal-save-btn" onclick="saveConfig('${device}', '${iface}')">Save</button>                                                        
+        <button class="modal-close-btn" onclick="closeEditModal()">Close</button>   
+        <button class="modal-reset-btn" onclick="resetConfig('${device}', '${iface}')">Reset</button>                                               
+    `;                                                                                                                             
+                  
+                  
+    modalContent.innerHTML = modalHtml; 
+    
     updateChannelBand(device, iface)
-    updateHtmode(device, htmodeValue);
-    document.getElementById(`iface-encryption-${iface}`).value = encryptionValue;
-    updateCipherOptions(iface, modeValue, device);
+    updateHtmode(device, htmodeValue); 
+    document.getElementById(`iface-encryption-${iface}`).value=encryptionValue;        
+    updateCipherOptions(iface, modeValue, device); 
     //document.getElementById(`iface-encryption-${iface}`).value=encryptionValue;                                                                     
-    togglePasswordField(iface);
-    modal.classList.remove('add-interface-state');
-    if (typeof window.lockBodyScroll === "function") {
-        window.lockBodyScroll();
-    }
-    overlay.classList.add('show');
-    modal.classList.add('show');
-}
-
-function toggleWifiAdv() {
-    const checkbox = document.getElementById("WifiAdvToggle");
-    const config = document.getElementById("wifiAdv");
-
-    if (checkbox.checked) {
-        config.style.display = "block";
-    }
-    else {
-        config.style.display = "none";
-    }
-}
-
-async function populateCountry(device, currentCountryCode) {
-    const dropdown = document.getElementById(`device-country-${device}`);
-    if (!dropdown) return;
-
-    const activeCode = (currentCountryCode || 'US').toUpperCase();
-
-    try {
-        const resp = await fetch('./db/country-db.json');
-        const countries = await resp.json();
-
-        dropdown.innerHTML = '';
-        const sortedKeys = Object.keys(countries).sort((a, b) =>
-            countries[a].localeCompare(countries[b])
-        );
-
-        sortedKeys.forEach(code => {
-            let option = document.createElement('option');
-            option.value = code;
-            option.text = `${countries[code]} (${code})`;
-
-            if (code === activeCode) {
-                option.selected = true;
-            }
-
-            dropdown.add(option);
-        });
-    }
-    catch {
-        console.error("Error loading country-db.json:", error);
-    }
-}
-
-async function detectCountry() {
-    try {
-        const resp = await fetch('https://ipapi.co/country/', {
-            mode: 'cors',
-            headers: { 'Accept': 'text/plain' }
-        });
-
-        if (resp.ok) {
-            const country = await resp.text();
-            console.log("Detected Country:", country); // Check your F12 console!
-            return country.trim().toUpperCase();
-        }
-    } catch (err) {
-        console.warn("GeoIP lookup failed (Check internet connection):", err);
-    }
-    return null;
-}
+    togglePasswordField(iface);                                                                                                    
+    overlay.classList.add('show');                                                                                                 
+    modal.classList.add('show');                                                                                                   
+}          
 
 function updateCipherOptions(iface, mode, device, band = null) {
     let encryptionSelect = document.getElementById(`iface-encryption-${iface}`);
@@ -546,28 +399,28 @@ function updateCipherOptions(iface, mode, device, band = null) {
 
     if (!mode) {
         const modeSelect = document.getElementById(`iface-mode-${iface}`);
-        mode = modeSelect ? modeSelect.value : "ap";
+        mode = modeSelect ? modeSelect.value : "ap"; 
     }
 
     const selectedChannel = document.getElementById(`device-channel-${device}`).value;
-    console.log("selectedChannel:", selectedChannel);
+    console.log("selectedChannel:",selectedChannel);
     let currentBand = "Unknown";
     let freq = null;
 
-    if (selectedChannel.includes("MHz")) {
-        const match = selectedChannel.match(/\((\d+)\s*MHz\)/);
-        if (match) {
-            freq = parseInt(match[1], 10);
-        }
-    } else if (selectedChannel.includes("auto")) {
-        if (selectedChannel.includes("6GHz")) {
-            currentBand = "6GHz";
-        } else if (selectedChannel.includes("5GHz")) {
-            currentBand = "5GHz";
-        } else if (selectedChannel.includes("2.4GHz")) {
-            currentBand = "2.4GHz";
-        }
-    }
+	if (selectedChannel.includes("MHz")) {
+	    const match = selectedChannel.match(/\((\d+)\s*MHz\)/);
+	    if (match) {
+		freq = parseInt(match[1], 10);
+	    }
+	} else if (selectedChannel.includes("auto")) { 
+	    if (selectedChannel.includes("6GHz")) {
+		currentBand = "6GHz";
+	    } else if (selectedChannel.includes("5GHz")) {
+		currentBand = "5GHz";
+	    } else if (selectedChannel.includes("2.4GHz")) {
+		currentBand = "2.4GHz";
+	    }
+	}
 
     if (freq) {
         console.log("Frequency:", freq);
@@ -585,10 +438,10 @@ function updateCipherOptions(iface, mode, device, band = null) {
     let encryptionOptions = "";
     if (currentBand === "6GHz") {
         encryptionOptions = `<option value="sae" selected>WPA3-SAE (Forced for 6GHz)</option>`;
-        selectedEnc = "sae";
-        encryptionSelect.disabled = true;
+        selectedEnc = "sae"; 
+        encryptionSelect.disabled = true; 
     } else {
-        encryptionSelect.disabled = false;
+        encryptionSelect.disabled = false; 
         encryptionOptions = `
             <option value="none" ${selectedEnc === "none" ? "selected" : ""}>None</option>
             <option value="psk" ${selectedEnc === "psk" ? "selected" : ""}>WPA-PSK (WPA1)</option>
@@ -652,7 +505,7 @@ function updateChannelBand(device, iface) {
 
     let band;
     if (channel.includes("5GHz")) {
-        band = "5GHz";
+        band = "5GHz"; 
     } else if (channel.includes("6GHz")) {
         band = "6GHz";
     } else if (channel.includes("2.4GHz")) {
@@ -664,9 +517,9 @@ function updateChannelBand(device, iface) {
         if (freq >= 2412 && freq <= 2484) {
             band = "2.4GHz";
         } else if (freq >= 5170 && freq <= 5895) {
-            band = "5GHz";
+            band = "5GHz"; 
         } else if (freq >= 5925) {
-            band = "6GHz";
+            band = "6GHz"; 
         } else {
             band = "Unknown";
         }
@@ -678,46 +531,63 @@ function updateChannelBand(device, iface) {
     togglePasswordField(iface);
 }
 
-function updateHtmode(device, htmodeValue) {
-    console.log(`updateHtmode() called for device: ${device}, htmodeValue: ${htmodeValue}`);
-    const hwmodeSelect = document.getElementById(`device-hwmode-${device}`);
-    const htmodeSelect = document.getElementById(`device-htmode-${device}`);
-    const htmodeRow = document.getElementById(`htmode-row-${device}`);
-
-    if (!hwmodeSelect || !htmodeSelect || !htmodeRow) return;
-
-    const selectedHwmode = hwmodeSelect.value.trim(); // e.g., "11ax"
-
-    fetch(`/cgi-bin/get_hw_modes.sh?device=${device}`)
-        .then(response => response.json())
-        .then(data => {
-            // 1. Get the HT modes specifically for the selected HW mode
-            // We use data.ht_modes because that's where the lists (HT20, HE40, etc.) are stored
-            const availableHtModes = data.ht_modes ? data.ht_modes[selectedHwmode] : [];
-
-            console.log(`Available HT Modes for ${selectedHwmode}:`, availableHtModes);
-
-            // 2. Determine if the row should be hidden
-            // Hide if: mode is legacy (11b/g/a) OR the array is empty
-            const isLegacy = ["11b", "11g", "11a"].includes(selectedHwmode);
-
-            if (isLegacy || !availableHtModes || availableHtModes.length === 0) {
-                console.log(`Hiding HT Mode row for: ${selectedHwmode}`);
-                htmodeRow.style.display = "none";
-                htmodeSelect.innerHTML = "";
-                return;
-            }
-
-            // 3. Show row and populate the dropdown
-            htmodeRow.style.display = "table-row";
-
-            htmodeSelect.innerHTML = availableHtModes
-                .map(ht => `<option value="${ht}" ${ht === htmodeValue ? "selected" : ""}>${ht}</option>`)
-                .join('');
-
-            console.log("HT Mode dropdown updated successfully.");
-        })
-        .catch(error => console.error("Error fetching HT mode options:", error));
+function updateHtmode(device, htmodeValue) {      
+    console.log(`updateHtmode() called for device: ${device}, htmodeValue: ${htmodeValue}`);               
+    const hwmodeSelect = document.getElementById(`device-hwmode-${device}`);                                                       
+    const htmodeSelect = document.getElementById(`device-htmode-${device}`);                                                       
+    const htmodeRow = document.getElementById(`htmode-row-${device}`);                                                             
+                                                                                                                                   
+    if (!hwmodeSelect || !htmodeSelect || !htmodeRow) {                                                                                          
+        console.error("Error: Cannot find HW mode or HT mode select elements.");                                               
+        return;                                                                                                                    
+    }                                                                                                                              
+                                                                                                                                   
+    const hwmode = hwmodeSelect.value.trim();                                                                                      
+    console.log("Current selected hwmode:", hwmode);                                                                          
+                                                                                                                                   
+    fetch(`/cgi-bin/get_hw_modes.sh?device=${device}`)                                                                             
+        .then(response => response.json())                                                                                         
+        .then(data => {                                                                                                            
+            console.log("Fetched HW Modes Data:", data);                                                                      
+                                                                                                                                   
+            if (!data.hw_modes) {                                                                                                  
+                console.error("Error: hw_modes data is missing.");                                                                 
+                return;                                                                                                            
+            }                                                                                                                      
+                                                                                                                                   
+            console.log("Available HW Modes:", Object.keys(data.hw_modes));                                                   
+                                                                                                                                   
+            let matchedHwmode = Object.keys(data.hw_modes).find(key => key.trim().toLowerCase() === hwmode.trim().toLowerCase());                              
+            if (!matchedHwmode) {                                                                                                  
+                console.warn(`Warning: HW Mode '${hwmode}' not found in`, data.hw_modes);                                      
+                htmodeSelect.innerHTML = `<option value="">No HT Modes Available</option>`;                                        
+                htmodeRow.style.display = "none";                                                                                  
+                return;                                                                                                            
+            }                                                                                                                      
+                                                                                                                                   
+            console.log(`Found HW Mode '${matchedHwmode}'`);                                                                       
+                                                                                                                                   
+            const availableHtModes = data.hw_modes[matchedHwmode] || [];                                                           
+            console.log(`HT Modes for ${matchedHwmode}:`, availableHtModes);                                                       
+                                                                                                                                   
+            if (["11b", "11g", "11a"].includes(matchedHwmode)) {                                                                   
+                htmodeRow.style.display = "none";                                                                                  
+                htmodeSelect.innerHTML = "";                                                                                       
+                return;                                                                                                            
+            }                                                                                                                      
+                                                                                                                                   
+            htmodeRow.style.display = "table-row";                                                                                 
+            if (availableHtModes.length > 0) {                                                                                     
+                htmodeSelect.innerHTML = availableHtModes                                                                          
+                    .map(ht => `<option value="${ht}" ${ht === htmodeValue ? "selected" : ""}>${ht}</option>`)                     
+                    .join('');
+            console.log("Final HT Modes HTML:", optionsHTML);
+            } else { 
+                console.warn("No HT Modes Available");                                                                                                              
+                htmodeSelect.innerHTML = `<option value="">No HT Modes Available</option>`;                                        
+            }                                                                                                                      
+        })                                                                                                                         
+        .catch(error => console.error("Error fetching HT mode options:", error));  
 }
 
 function togglePasswordField(iface) {
@@ -730,34 +600,32 @@ function togglePasswordField(iface) {
     }
 
     passwordRow.style.display = (encryptionElement.value === "none" || encryptionElement.value === "owe") ? "none" : "table-row";
-}
-
-async function validateCountryCode(device) {
-    const dropdown = document.getElementById(`device-country-${device}`);
-    const countryError = document.getElementById(`country-error-${device}`);
-
-    const selectCode = dropdown.value;
-
-    try {
-        const resp = await fetch('./db/country-db.json');
-        const countries = await resp.json();
-
-        if (selectCode && countries.hasOwnProperty(selectCode)) {
-            countryError.textContent = "";
-            dropdown.classList.remove("input-error1");
-            console.log(`Validate: ${countries[selectCode]}`);
-            return true;
-        }
-        else {
-            countryError.textContent = t('wireless.select_valid_country');
-            dropdown.classList.add("input-error");
-            return false;
-        }
-    }
-    catch (error) {
-        return selectCode.length === 2;
-    }
-}
+}                                                                                                       
+                                                                                                                                   
+function validateCountryCode(device) {                                                                                             
+    const inputElement = document.getElementById(`device-country-${device}`);                                                      
+    let countryCode = inputElement.value.trim().toUpperCase();                                                                     
+    const countryError = document.getElementById(`country-error-${device}`);                                                       
+                                                                                                                                   
+    const isoCountries = new Set(["US", "CN", "TW", "HK", "JP", "KR", "DE", "GB", "FR", "CA", "IN", "AU", "SG",                    
+        "BR", "MX", "ES", "IT", "NL", "RU", "SE", "CH", "FI", "NO", "DK", "PL", "AT"]);                                            
+                                                                                                                                   
+    if (countryCode === "") {                                                                                                      
+        countryError.textContent = "";                                                                                             
+        inputElement.classList.remove("input-error");                                                                              
+        return true;                                                                                                               
+    }                                                                                                                              
+                                                                                                                                   
+    if (countryCode.length !== 2 || !isoCountries.has(countryCode)) {                                                              
+        countryError.textContent = "Invalid country code"; //must be ISO 3166-1                                                    
+        inputElement.classList.add("input-error");                                                                                 
+        return false;                                                                                                              
+    } else {                                                                                                                       
+        countryError.textContent = "";                                                                                             
+        inputElement.classList.remove("input-error");                                                                              
+        return true;                                                                                                               
+    }                                                                                                                              
+}            
 
 function saveConfig(device, iface) {
 
@@ -776,18 +644,18 @@ function saveConfig(device, iface) {
     let encryption = getSelectedValue(`iface-encryption-${iface}`);
 
     if (encryption !== "none" && password.length < 8) {
-        alert(t('wireless.password_min_length'));
+        alert("Password must be at least 8 characters.");
         //ssidInput.focus();
         hideLoading();
         return;
     }
 
     if (!validateCountryCode(device)) {
-        alert(t('wireless.invalid_country_code'));
+        alert("Invalid country code! Please enter a valid ISO 3166-1 alpha-2 country code.");
         return false;
     }
 
-    showLoading();
+    showLoading(); 
 
     const getValue = (id) => {
         const element = document.getElementById(id);
@@ -809,10 +677,10 @@ function saveConfig(device, iface) {
     if (!rawChannel.startsWith("auto")) {
         let match = rawChannel.match(/^(\d+)\s\((\d+)\sMHz\)$/);
         if (match) {
-            finalChannel = match[1];
-            currentChannelMHz = parseInt(match[2]);
+            finalChannel = match[1];  
+            currentChannelMHz = parseInt(match[2]);  
         } else {
-            finalChannel = rawChannel;
+            finalChannel = rawChannel;  
         }
     } else {
         let bandMatch = rawChannel.match(/\((.*?)\)/);
@@ -851,13 +719,13 @@ function saveConfig(device, iface) {
 
     let txpower = getSelectedValue(`device-txpower-${device}`);
     if (txpower === "MAX") {
-        txpower = null;
+        txpower = null; 
     }
 
     let hwmode = getSelectedValue(`device-hwmode-${device}`);
     let htmode = getSelectedValue(`device-htmode-${device}`);
     if (["11b", "11g", "11a"].includes(hwmode)) {
-        htmode = null;
+        htmode = null; 
     }
 
     //let encryption = getSelectedValue(`iface-encryption-${iface}`);
@@ -868,32 +736,32 @@ function saveConfig(device, iface) {
     }
 
     if (!iface || iface.trim() === "") {
-        alert(t('wireless.no_iface_error'));
+        alert("Error: No iface provided for modification.");
         hideLoading();
         return;
     }
 
     const updatedConfig = {
         device,
-        create_new: false,
+        create_new: false, 
         type: getValue(`device-type-${device}`),
         channel: finalChannel,
-        current_channel: currentChannelMHz,
+        current_channel: currentChannelMHz,  
         txpower: txpower,
         country: getValue(`device-country-${device}`),
         hwmode: hwmode,
         htmode: htmode,
-        band: band,
+        band: band, 
         disabled: getValue(`device-disabled-${device}`) || "0",
         iface: {
-            iface: iface,
+            iface: iface, 
             network: getValue(`iface-network-${iface}`),
             ssid: getValue(`iface-ssid-${iface}`),
             mode: getValue(`iface-mode-${iface}`),
             encryption: encryption
         }
     };
-
+    
     if (encryption.startsWith("sae")) {
         updatedConfig.iface.sae = "1";
     } else {
@@ -914,45 +782,40 @@ function saveConfig(device, iface) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedConfig)
     })
-        .then(response => {
-            console.log('HTTP Status:', response.status);
-            if (!response.ok) {
-                throw new Error('Network response was not ok: ' + response.statusText);
-            }
-            return response.text();
-        })
-        .then(data => {
-            console.log('Save response:', data);
-            closeEditModal();
-            getConfig();
-        })
-        .catch(err => {
-            console.error('Error saving configuration:', err);
-            alert(t('wireless.save_failed'));
-        })
-        .finally(() => {
-            hideLoading();
-            location.reload();
-        });
+    .then(response => {
+        console.log('HTTP Status:', response.status);
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.statusText);
+        }
+        return response.text();
+    })
+    .then(data => {
+        console.log('Save response:', data);
+        closeEditModal();
+        getConfig();
+    })
+    .catch(err => {
+        console.error('Error saving configuration:', err);
+        alert('Failed to save configuration.');
+    })
+    .finally(() => {
+        hideLoading();
+    });
 }
 
 function closeEditModal() {
     document.getElementById('modalOverlay').classList.remove('show');
     document.getElementById('editModal').classList.remove('show');
-    document.getElementById('editModal').classList.remove('add-interface-state');
-    if (typeof window.unlockBodyScroll === "function") {
-        window.unlockBodyScroll();
-    }
 }
 
 function deleteIface(iface) {
-    if (!confirm(t('wireless.confirm_delete_iface', { iface: iface }))) {
+    if (!confirm(`确定要删除 ${iface} 吗？`)) {
         return;
     }
 
     const deleteBtn = document.querySelector(`.delete-btn[data-iface="${iface}"]`);
     if (deleteBtn) {
-        deleteBtn.textContent = t('common.deleting');
+        deleteBtn.textContent = "Deleting...";
         deleteBtn.disabled = true;
     }
 
@@ -964,29 +827,29 @@ function deleteIface(iface) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ iface: iface })
     })
-        .then(response => response.text())
-        .then(data => {
-            console.log("Response from server:", data);
+    .then(response => response.text())
+    .then(data => {
+        console.log("Response from server:", data);
 
-            if (data.includes("Done")) {
-                getConfig();
-            } else {
-                console.log("Delete completed, but 'Done' not detected, WiFi may still be restarting...");
-                return new Promise(resolve => setTimeout(resolve, 1000));
-            }
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            alert(t('wireless.delete_failed'));
-        })
-        .finally(() => {
-            hideLoading();
-            if (deleteBtn) {
-                deleteBtn.textContent = t('common.delete');
-                deleteBtn.disabled = false;
-            }
-            disableButtons(false);
-        });
+        if (data.includes("Done")) { 
+            getConfig();
+        } else {
+            console.log("删除完成，但未检测到 Done，可能 WiFi 还在重启...");
+            return new Promise(resolve => setTimeout(resolve, 1000));
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("删除失败！");
+    })
+    .finally(() => {
+        hideLoading();
+        if (deleteBtn) {
+            deleteBtn.textContent = "Delete";
+            deleteBtn.disabled = false;
+        }
+        disableButtons(false); 
+    });
 }
 
 function resetConfig(device, iface) {
@@ -994,9 +857,9 @@ function resetConfig(device, iface) {
         let el = document.getElementById(id);
         if (el && el.options.length > 0) {
             if (optionIndex === -1) {
-                el.selectedIndex = el.options.length - 1;
+                el.selectedIndex = el.options.length - 1; 
             } else if (optionIndex === -2) {
-                el.selectedIndex = Math.max(0, el.options.length - 2);
+                el.selectedIndex = Math.max(0, el.options.length - 2); 
             } else {
                 el.selectedIndex = Math.max(0, Math.min(optionIndex, el.options.length - 1));
             }
@@ -1008,11 +871,11 @@ function resetConfig(device, iface) {
         if (el) el.value = value;
     }
 
-    resetSelect(`device-channel-${device}`, 0);
+    resetSelect(`device-channel-${device}`, 0);  
     resetSelect(`device-txpower-${device}`, -1);
     resetSelect(`device-hwmode-${device}`, -1);
     resetSelect(`device-htmode-${device}`, -1);
-    resetSelect(`device-disabled-${device}`, 0);
+    resetSelect(`device-disabled-${device}`, 0); 
     resetInput(`device-country-${device}`, "US");
 
     resetInput(`iface-network-${iface}`, "lan");
@@ -1027,7 +890,7 @@ function resetConfig(device, iface) {
 
     console.log(`Reset: Encryption=${encryptionValue}, Mode=${modeValue}, Country=US`);
 
-    updateCipherOptions(iface, modeValue, device);
+    updateCipherOptions(iface, modeValue, device); 
     togglePasswordField(iface);
 }
 
@@ -1055,48 +918,35 @@ async function openAddModal(device) {
         console.error(`Device ${device} not found in deviceConfig.`);
         return;
     }
+    let hwModesData = wifi.hw_modes || {};
 
-    // FIX: Initialize both data structures
-    let hwModesArray = wifi.hw_modes || [];  // This should be the array ["11b", "11g", "11n", "11a", "11ax"]
-    let htModesObject = wifi.ht_modes || {}; // This should be the object with HT mode mappings
-
-    // If we don't have the data, fetch it from the API
-    if (hwModesArray.length === 0 || Object.keys(htModesObject).length === 0) {
+    if (Object.keys(hwModesData).length === 0) {
         try {
             const hwModesResponse = await fetch(`/cgi-bin/get_hw_modes.sh?device=${device}`);
             const hwModesJson = await hwModesResponse.json();
-
-            // FIX: Properly extract both data structures from the response
-            hwModesArray = hwModesJson.hw_modes || [];
-            htModesObject = hwModesJson.ht_modes || {};
-
-            console.log("Fetched HW Modes Array:", hwModesArray);
-            console.log("Fetched HT Modes Object:", htModesObject);
+            hwModesData = hwModesJson.hw_modes || {};
+            console.log("Fetched HW Modes:", hwModesData);
         } catch (error) {
             console.error("Error fetching HW modes:", error);
         }
     }
 
-    // FIX: Use the array for default HW mode selection
-    let defaultHwmode = wifi.hwmode || hwModesArray[0] || "11n";
+    let defaultHwmode = wifi.hwmode || Object.keys(hwModesData)[0] || "11beg";
 
-    // FIX: Use the object for default HT mode selection
     let defaultHtmode = wifi.htmode;
-    if (!defaultHtmode && htModesObject[defaultHwmode] && htModesObject[defaultHwmode].length > 0) {
-        defaultHtmode = htModesObject[defaultHwmode][0];
+    if (!defaultHtmode && hwModesData[defaultHwmode] && hwModesData[defaultHwmode].length > 0) {
+        defaultHtmode = hwModesData[defaultHwmode][0]; 
     }
-    defaultHtmode = defaultHtmode || "HT20";
+    defaultHtmode = defaultHtmode || "EHT40";
 
     console.log(`Default HW Mode: ${defaultHwmode}, Default HT Mode: ${defaultHtmode}`);
 
-    // FIX: Generate HW mode options from the ARRAY
-    let hwmodeOptions = hwModesArray
+    let hwmodeOptions = Object.keys(hwModesData)
         .map(hw => `<option value="${hw}" ${hw === defaultHwmode ? "selected" : ""}>${hw.toUpperCase()}</option>`)
         .join('');
 
-    // FIX: Generate HT mode options from the OBJECT
-    let htmodeOptions = htModesObject[defaultHwmode] && Array.isArray(htModesObject[defaultHwmode])
-        ? htModesObject[defaultHwmode].map(ht => `<option value="${ht}" ${ht === defaultHtmode ? "selected" : ""}>${ht}</option>`).join('')
+    let htmodeOptions = hwModesData[defaultHwmode]
+        ? hwModesData[defaultHwmode].map(ht => `<option value="${ht}" ${ht === defaultHtmode ? "selected" : ""}>${ht}</option>`).join('')
         : `<option value="">No HT Modes Available</option>`;
 
     let channelOptionsHtml = ``;
@@ -1109,19 +959,17 @@ async function openAddModal(device) {
         });
     }
 
-    let txpowerOptions = [5, 8, 11, 14, 17, 20, 23, "MAX"].map(value =>
+    let txpowerOptions = [5, 8, 11, 14, 17, 20, 23, "MAX"].map(value => 
         `<option value="${value}" ${value === "MAX" ? "selected" : ""}>${value}</option>`
     ).join('');
 
-    let cipherOptions = "";
-
+    let cipherOptions ="";
+    
     let modalHtml = `
-        <div class="add-interface-modal">
-        <div class="add-interface-form">
-        <h3>${t('wireless.add_interface_to', { device: device })}</h3>
+        <h3>Add Interface to ${device}</h3>
         <table>
             <tr>
-                <td>${t('common.channel_colon')}</td>
+                <td>Channel:</td>
                 <td>
                     <select id="device-channel-${device}" onchange="updateChannelBand('${device}', 'new')">
                         ${channelOptionsHtml}
@@ -1129,7 +977,7 @@ async function openAddModal(device) {
                 </td>
             </tr>
             <tr>
-                <td>${t('wireless.tx_power_colon')}</td>
+                <td>TX Power:</td>
                 <td>
                     <select id="device-txpower-${device}">
                         ${txpowerOptions}
@@ -1137,22 +985,22 @@ async function openAddModal(device) {
                 </td>
             </tr>
             <tr>
-                <td>${t('common.country_colon')}</td>
+                <td>Country:</td>
                 <td>
                     <input type="text" id="device-country-${device}" value="${wifi.country || ''}" oninput="validateCountryCode('${device}')">
                     <span id="country-error-${device}" style="color: red; font-size: 0.9em;"></span>
                 </td>
             </tr>
             <tr>
-                <td>${t('wireless.hw_mode_colon')}</td>
+                <td>HW Mode:</td>
                 <td>
-                    <select id="device-hwmode-${device}" onchange="updateAddHtmode('${device}', '${defaultHtmode}', ${JSON.stringify(htModesObject).replace(/"/g, '&quot;')})">
+                    <select id="device-hwmode-${device}" onchange="updateAddHtmode('${device}', '${defaultHtmode}', hwModesData)">
                         ${hwmodeOptions}
                     </select>
                 </td>
             </tr>
             <tr id="htmode-row-${device}">
-                <td>${t('wireless.ht_mode_colon')}</td>
+                <td>HT Mode:</td>
                 <td>
                     <select id="device-htmode-${device}">
                         ${htmodeOptions}
@@ -1160,71 +1008,62 @@ async function openAddModal(device) {
                 </td>
             </tr>
             <tr>
-                <td>${t('common.disabled_colon')}</td>
+                <td>Disabled:</td>
                 <td>
                     <select id="device-disabled-${device}">
-                        <option value="0" selected>${t('common.enabled')}</option>
-                        <option value="1">${t('common.disabled')}</option>
+                        <option value="0" selected>Enabled</option>
+                        <option value="1">Disabled</option>
                     </select>
                 </td>
             </tr>
         </table>
 
-        <h3>${t('wireless.new_interface')}</h3>
+        <h3>New Interface</h3>
         <table>
-            <tr><td>${t('common.ssid_colon')}</td><td><input type="text" id="iface-ssid-new" value="myAP" required></td></tr>
+            <tr><td>SSID:</td><td><input type="text" id="iface-ssid-new" value="myAP" required></td></tr>
             <tr>
-                <td>${t('common.mode_colon')}</td>
+                <td>Mode:</td>
                 <td>
                     <select id="iface-mode-new" onchange="updateCipherOptions('new', this.value,'${device}'); togglePasswordField('new');">
-                        <option value="ap" selected>${t('wireless.mode_ap')}</option>
-                        <option value="sta">${t('wireless.mode_sta')}</option>
+                        <option value="ap" selected>Access Point (AP)</option>
+                        <option value="sta">Station (STA)</option>
                     </select>
                 </td>
             </tr>
             <tr>
-                <td>${t('common.encryption_colon')}</td>
-                                <td>
+                <td>Encryption:</td>
+                <td>
                     <select id="iface-encryption-new" onchange="updateCipherOptions('new', document.getElementById('iface-mode-new').value,'${device}'); togglePasswordField('new');">
                     </select>
                 </td>
             </tr>
             <tr id="cipher-row-new" style="display: none;">
-                <td>${t('wireless.cipher_mode_colon')}</td>
+                <td>Cipher Mode:</td>
                 <td>
                     <select id="iface-cipher-new"></select>
                 </td>
             </tr>
-            <tr id="password-row-new" style="display:none;">
-                <td>${t('common.password_colon')}</td>
+            <tr id="password-row-new" style="display:"none"};">
+                <td>Password:</td>
                 <td><input type="password" id="iface-key-new"></td>
             </tr>
-            </div>
         </table>
 
-        <div class="add-interface-actions">
-            <button onclick="saveNewInterface('${device}')">${t('common.save')}</button>
-            <button class="modal-close-btn" onclick="closeEditModal()">${t('common.close')}</button>
-        </div>
-        </div>
+        <button onclick="saveNewInterface('${device}')">Save</button>
+        <button class="modal-close-btn" onclick="closeEditModal()">Close</button>
     `;
 
+
     modalContent.innerHTML = modalHtml;
-    updateChannelBand(device, "new");
-
-    // FIX: Pass the htModesObject to updateAddHtmode
-    updateAddHtmode(device, defaultHtmode, htModesObject);
-
+    updateChannelBand(device, "new")
+    updateAddHtmode(device, defaultHtmode, hwModesData);
     const modeValue = document.getElementById("iface-mode-new").value;
     updateCipherOptions("new", modeValue, device);
     togglePasswordField("new");
-    modal.classList.add('add-interface-state');
-    if (typeof window.lockBodyScroll === "function") {
-        window.lockBodyScroll();
-    }
     overlay.classList.add('show');
     modal.classList.add('show');
 }
+
 
 function updateAddHtmode(device, defaultHtmode, hwModesData = null) {
     const hwmodeSelect = document.getElementById(`device-hwmode-${device}`);
@@ -1259,7 +1098,7 @@ function updateAddHtmode(device, defaultHtmode, hwModesData = null) {
 
     if (!hwModesData || Object.keys(hwModesData).length === 0) {
         console.warn("No HW Modes found, hiding HT Mode select.");
-        htmodeSelect.innerHTML = `<option value="">${t('wireless.no_ht_modes')}</option>`;
+        htmodeSelect.innerHTML = `<option value="">No HT Modes Available</option>`;
         htmodeRow.style.display = "none";
         return;
     }
@@ -1270,11 +1109,10 @@ function updateAddHtmode(device, defaultHtmode, hwModesData = null) {
 
     if (!matchedHwmode) {
         console.warn(`Warning: HW Mode '${hwmode}' not found in`, hwModesData);
-        htmodeSelect.innerHTML = `<option value="">${t('wireless.no_ht_modes')}</option>`;
+        htmodeSelect.innerHTML = `<option value="">No HT Modes Available</option>`;
         htmodeRow.style.display = "none";
         return;
     }
-
 
     console.log(`Found HW Mode '${matchedHwmode}'`);
 
@@ -1282,8 +1120,6 @@ function updateAddHtmode(device, defaultHtmode, hwModesData = null) {
     console.log(`HT Modes for ${matchedHwmode}:`, availableHtModes);
 
     if (["11b", "11g", "11a"].includes(matchedHwmode)) {
-
-
         htmodeRow.style.display = "none";
         htmodeSelect.innerHTML = "";
         return;
@@ -1297,7 +1133,7 @@ function updateAddHtmode(device, defaultHtmode, hwModesData = null) {
         console.log("Final HT Modes HTML:", htmodeSelect.innerHTML);
     } else {
         console.warn("No HT Modes Available");
-        htmodeSelect.innerHTML = `<option value="">${t('wireless.no_ht_modes')}</option>`;
+        htmodeSelect.innerHTML = `<option value="">No HT Modes Available</option>`;
     }
 }
 
@@ -1309,9 +1145,9 @@ function saveNewInterface(device) {
     const closeButton = document.querySelector(".modal-close-btn");
 
     saveButton.disabled = true;
-    saveButton.textContent = t('common.saving');
+    saveButton.textContent = "Saving...";
     closeButton.disabled = true;
-
+    
     showLoading();
     const getValue = (id) => document.getElementById(id)?.value.trim() || "";
 
@@ -1322,13 +1158,13 @@ function saveNewInterface(device) {
 
     let txpower = getValue(`device-txpower-${device}`);
     if (txpower === "MAX") {
-        txpower = null;
+        txpower = null; 
     }
 
     let match = rawChannel.match(/^(\d+)\s\((\d+)\sMHz\)$/);
     if (match) {
-        finalChannel = match[1];
-        let currentChannelMHz = parseInt(match[2]);
+        finalChannel = match[1];  
+        let currentChannelMHz = parseInt(match[2]);  
 
         if (currentChannelMHz >= 2412 && currentChannelMHz <= 2484) {
             band = 1;
@@ -1352,16 +1188,16 @@ function saveNewInterface(device) {
 
     let newConfig = {
         device,
-        create_new: true,
+        create_new: true, 
         channel: finalChannel,
-        band: band,
+        band: band,  
         txpower: txpower,
         country: getValue(`device-country-${device}`),
-        hwmode: getValue(`device-hwmode-${device}`),
-        htmode: getValue(`device-htmode-${device}`),
+        hwmode: getValue(`device-hwmode-${device}`), 
+        htmode: getValue(`device-htmode-${device}`), 
         iface: {
-            ssid: getValue("iface-ssid-new"),
-            mode: getValue("iface-mode-new"),
+            ssid: getValue("iface-ssid-new"), 
+            mode: getValue("iface-mode-new"), 
             encryption: encryption,
         }
     };
@@ -1381,35 +1217,35 @@ function saveNewInterface(device) {
 
     console.log("Final new interface JSON:", JSON.stringify(newConfig, null, 2));
 
-    fetch('/cgi-bin/add_iface.sh', {
+    fetch('/cgi-bin/save_wifi_config.sh', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newConfig)
     })
-        .then(response => response.text())
-        .then(async (data) => {
-            console.log('Save response:', data);
+    .then(response => response.text())
+    .then(async (data) => {
+        console.log('Save response:', data);
 
-            if (data.includes("Configuration saved successfully")) {
-                console.log("WiFi reload in progress... Waiting for completion...");
-                await new Promise(resolve => setTimeout(resolve, 8000));
-                console.log("WiFi reload complete. Closing modal...");
-                closeEditModal();
-                getConfig();
-            } else {
-                alert(t('wireless.save_failed'));
-            }
-        })
-        .catch(err => {
-            console.error('Error saving new interface:', err);
-            alert(t('wireless.save_error'));
-        })
-        .finally(() => {
-            hideLoading();
-            saveButton.disabled = false;
-            saveButton.textContent = t('common.save');
-            closeButton.disabled = false;
-        });
+        if (data.includes("Configuration saved successfully")) {
+            console.log("WiFi reload in progress... Waiting for completion...");
+            await new Promise(resolve => setTimeout(resolve, 8000));
+            console.log("WiFi reload complete. Closing modal...");
+            closeEditModal();
+            getConfig();
+        } else {
+            alert("Failed to save configuration.");
+        }
+    })
+    .catch(err => {
+        console.error('Error saving new interface:', err);
+        alert("Error: Could not save the configuration.");
+    })
+    .finally(() => {
+        hideLoading();
+        saveButton.disabled = false;
+        saveButton.textContent = "Save";
+        closeButton.disabled = false; 
+    });
 }
 //scan
 async function startScan(device) {
@@ -1428,8 +1264,8 @@ async function startScan(device) {
         showScanResult(data);
     } catch (err) {
         console.error('Error during scanning:', err);
-        alert(t('wireless.scan_failed'));
-    } finally {
+        alert('Failed to scan networks.');
+    }finally{
         hideLoading();
     }
 }
@@ -1443,25 +1279,25 @@ function showScanResult(scanData) {
         console.error('Modal elements not found.');
         return;
     }
-    console.log("before Sorted Scan Data:", scanData.results);
+     console.log("before Sorted Scan Data:", scanData.results);
     scanData.results.sort((a, b) => {
-        const signalA = parseInt(a.signal, 10);
-        const signalB = parseInt(b.signal, 10);
-        return signalB - signalA;
+          const signalA = parseInt(a.signal, 10);  
+          const signalB = parseInt(b.signal, 10);  
+          return signalB - signalA;
     });
     console.log("Sorted Scan Data:", scanData.results);
-    let resultHtml = `<h3>${t('wireless.scan_result_for', { device: scanData.device })}</h3><div class="scan-results-list">`;
+    let resultHtml = `<h3>Scan Result for ${scanData.device}</h3>`;
     resultHtml += `
         <table class="scan-table">
             <thead>
                 <tr>
-                    <th>${t('common.signal_dbm')}</th>
-                    <th>${t('common.ssid')}</th>
-                    <th>${t('common.channel')}</th>
-                    <th>${t('wireless.bssid')}</th>
-                    <th>${t('common.mode')}</th>
-                    <th>${t('common.encryption')}</th>
-                    <th>${t('common.join')}</th>
+                    <th>Signal (dBm)</th>
+                    <th>SSID</th>
+                    <th>Channel</th>
+                    <th>BSSID</th>
+                    <th>Mode</th>
+                    <th>Encryption</th>
+                    <th>Join</th>
                 </tr>
             </thead>
             <tbody>
@@ -1469,30 +1305,27 @@ function showScanResult(scanData) {
 
     scanData.results.forEach(result => {
         if (result.ssid) {
-            let encryption = result.encryption ? (result.encryption.includes("Open") ? "none" : result.encryption) : t('common.unknown');
+            let encryption = result.encryption ? (result.encryption.includes("Open") ? "none" : result.encryption) : "Unknown";
             resultHtml += `
                 <tr>
                     <td>${result.signal} dBm</td>
                     <td>${result.ssid}</td>
                     <td>${result.channel || 'N/A'}</td>
                     <td>${result.bssid || 'N/A'}</td>
-                    <td>${result.mode || t('common.unknown')}</td>
+                    <td>${result.mode || 'Unknown'}</td>
                     <td>${encryption}</td>
                     <td>
-                        <button class="join-btn" onclick="joinNetwork('${scanData.device}', '${result.ssid}', '${result.bssid}', '${result.channel}', '${result.encryption}')">${t('common.join')}</button>
+                        <button class="join-btn" onclick="joinNetwork('${scanData.device}', '${result.ssid}', '${result.bssid}', '${result.channel}', '${result.encryption}')">Join</button>
                     </td>
                 </tr>
             `;
         }
     });
 
-    resultHtml += `</tbody></table></div>`;
-    resultHtml += `<div class="scan-modal-footer"><button class="modal-close-btn" onclick="closeScanModal()">${t('common.close')}</button></div>`;
+    resultHtml += `</tbody></table>`;
+    resultHtml += `<button class="modal-close-btn" onclick="closeScanModal()">Close</button>`;
 
     modalContent.innerHTML = resultHtml;
-    if (typeof window.lockBodyScroll === "function") {
-        window.lockBodyScroll();
-    }
     overlay.classList.add('show');
     modal.classList.add('show');
 
@@ -1509,21 +1342,21 @@ function showPasswordModal(ssid, callback) {
 
     let modal = document.createElement("div");
     modal.id = "password-modal";
-    modal.classList.add("modal", "show");
+    modal.classList.add("modal", "show");  
     modal.innerHTML = `
         <div class="modal-content">
-            <h3>${t('wireless.connect_to', { ssid: ssid })}</h3>
-            <label>${t('common.password_colon')}</label>
+            <h3>Connect to ${ssid}</h3>
+            <label>Password:</label>
             <div class="password-wrapper">
                 <input type="password" id="wifi-password"
-                       onmousedown="this.type='text'"
-                       onmouseup="this.type='password'"
+                       onmousedown="this.type='text'" 
+                       onmouseup="this.type='password'" 
                        onmouseleave="this.type='password'"
                        autofocus>
             </div>
             <div class="modal-actions">
-                <button id="join-btn">${t('common.join')}</button>
-                <button id="cancel-btn">${t('common.cancel')}</button>
+                <button id="join-btn">Join</button>
+                <button id="cancel-btn">Cancel</button>
             </div>
         </div>`;
 
@@ -1534,7 +1367,7 @@ function showPasswordModal(ssid, callback) {
 
     document.body.appendChild(modal);
 
-    document.getElementById("join-btn").addEventListener("click", function () {
+    document.getElementById("join-btn").addEventListener("click", function() {
         let password = document.getElementById("wifi-password").value;
         document.body.removeChild(modal);
 
@@ -1545,9 +1378,9 @@ function showPasswordModal(ssid, callback) {
         callback(password);
     });
 
-    document.getElementById("cancel-btn").addEventListener("click", function () {
+    document.getElementById("cancel-btn").addEventListener("click", function() {
         document.body.removeChild(modal);
-
+        
         if (scanOverlay) {
             scanOverlay.style.display = "block";
         }
@@ -1561,7 +1394,7 @@ async function joinNetwork(device, ssid, bssid, channel, encryption) {
     if (encryption !== "Open") {
         showPasswordModal(ssid, async (password) => {
             if (!password) {
-                alert(t('wireless.password_required'));
+                alert("Password is required.");
                 return;
             }
             await sendJoinRequest(device, ssid, bssid, channel, encryption, password);
@@ -1584,7 +1417,7 @@ async function sendJoinRequest(device, ssid, bssid, channel, encryption, passwor
         const text = await response.text();
         console.log("Raw response:", text);
 
-        const match = text.match(/{.*}/s);
+        const match = text.match(/{.*}/s); 
         if (!match) throw new Error("No valid JSON found");
 
         const result = JSON.parse(match[0]);
@@ -1593,12 +1426,12 @@ async function sendJoinRequest(device, ssid, bssid, channel, encryption, passwor
             closeScanModal();
             getConfig();
         } else {
-            alert(t('wireless.join_failed', { ssid: ssid, error: result.error || t('wireless.unknown_error') }));
+            alert(`Failed to join ${ssid}: ${result.error || "Unknown error"}`);
         }
     } catch (err) {
         console.error("Join network error:", err);
-        alert(t('wireless.join_network_error'));
-    } finally {
+        alert("Error joining the network.");
+    }finally{
         hideLoading();
     }
 }
@@ -1620,7 +1453,7 @@ function showLoading(message = "Loading...") {
     }
 
     if (loadingText) {
-        loadingText.textContent = message;
+        loadingText.textContent = message; 
     }
 
     overlay.classList.add("show");
@@ -1638,89 +1471,43 @@ function hideLoading() {
 
 
 function fetchAssociatedStations() {
-    fetch("/cgi-bin/get_associated_clients.sh")
+    fetch("/cgi-bin/get_associated_stations.sh")
         .then(response => response.json())
         .then(data => updateStationsTable(data))
         .catch(error => console.error("Failed to fetch stations:", error));
 }
 
 function updateStationsTable(stationsData) {
-    const table2g = document.getElementById("2gTable");
-    const table5g = document.getElementById("5gTable");
+    const tableBody = document.getElementById("associated-stations");
 
-    if (!table2g || !table5g) {
-        console.error("Error: Table not found!");
+    if (!tableBody) {
+        console.error("Error: Table body not found!");
         return;
     }
 
-    if (!stationsData || stationsData.length === 0) {
-        table2g.innerHTML = `<tr><td colspan="5">${t('wireless.no_clients_connected')}</td></tr>`;
-        table5g.innerHTML = `<tr><td colspan="5">${t('wireless.no_clients_connected')}</td></tr>`;
-        return;
-    }
+    let newRowsHtml = "";
 
-    let html2g = "";
-    let html5g = "";
-
-    stationsData.forEach(station => {
-        const blockIcon = "logo/block.png"
-        const blockBtn = `<button class="blockBtn" onclick="blockDevice('${station.mac}', '${station.hostname}', '${station.ssid}')" title="${t('wireless.block_device_title')}">
-                                <img src="${blockIcon}" alt="${t('wireless.block')}" class="blockBtnIcon">
-                                <span class="blockBtnText">${t('wireless.block')}</span>
-                              </button>
-            `;
-        const row = `
+    stationsData.forEach(device => {
+        device.stations.forEach(station => {
+            newRowsHtml += `
                 <tr>
-                    <td>${station.hostname}</td>
+                    <td>${device.ssid}</td>
+                    <td>${device.mode}</td>
                     <td>${station.mac}</td>
-                    <td>${station.ip}</td>
-                    <td>${station.signal}</td>
-                    <td>${station.rx_bitrate}</td>
-                    <td>${station.tx_bitrate}</td>
-                    <td class="iconCell">${blockBtn}</td>
+                    <td>${station.rssi}</td>
+                    <td>${station.rx_rate}</td>
+                    <td>${station.tx_rate}</td>
                 </tr>
             `;
-
-        if (station.mode === "2g") {
-            html2g += row;
-        } else if (station.mode === "5g") {
-            html5g += row;
-        }
+        });
     });
-    table2g.innerHTML = html2g;
-    table5g.innerHTML = html5g;
-}
 
-function blockDevice(mac, devName, ap) {
-    if (confirm(t('wireless.confirm_add_deny_list', { name: devName }))) {
-        const url = `/cgi-bin/deny_list.sh?action=add&mac=${encodeURIComponent(mac)}&ssid=${encodeURIComponent(ap)}&policy=deny`;
-
-        fetch(url)
-            .then(resp => resp.text())
-            .then(text => {
-                try {
-                    const data = JSON.parse(text);
-                    if (data.status === "success") {
-                        alert(t('wireless.block_success', { name: devName }));
-                        closeAddDeviceModalBtn();
-                        if (typeof openDenyList === 'function') openDenyList();
-                    }
-                } catch (e) {
-                    console.error("Server returned non-JSON:", text);
-                    alert(t('wireless.router_error_invalid_format'));
-                }
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-                alert(t('wireless.communicate_failed'));
-            });
-    }
+    requestAnimationFrame(() => {
+        tableBody.innerHTML = newRowsHtml;
+    });
 }
 
 function openMloModal() {
-    if (typeof window.lockBodyScroll === "function") {
-        window.lockBodyScroll();
-    }
     document.getElementById("mloModal").classList.add("show");
     document.getElementById("mloOverlay").classList.add("show");
 }
@@ -1728,9 +1515,6 @@ function openMloModal() {
 function closeMloModal() {
     document.getElementById("mloModal").classList.remove("show");
     document.getElementById("mloOverlay").classList.remove("show");
-    if (typeof window.unlockBodyScroll === "function") {
-        window.unlockBodyScroll();
-    }
 }
 
 function toggleMloOptions() {
@@ -1738,12 +1522,12 @@ function toggleMloOptions() {
     const mloSettings = document.querySelectorAll("#mlo-ssid, #mlo-password, #mlo-2G, #mlo-5G, #mlo-6G");
 
     mloSettings.forEach(input => {
-        input.disabled = !enabled;
+        input.disabled = !enabled; 
     });
 
     const mloTable = document.querySelector("#mlo-table");
     if (mloTable) {
-        mloTable.style.display = enabled ? "table" : "none";
+        mloTable.style.display = enabled ? "table" : "none"; 
     }
 }
 
@@ -1754,31 +1538,31 @@ toggleMloOptions();
 
 function setupMLO() {
     showLoading();
-    document.getElementById("loading-text").textContent = t('wireless.applying_mlo');
+    document.getElementById("loading-text").textContent = "Applying MLO settings...";
 
     const isEnabled = document.getElementById("mlo-enabled").checked;
     if (!isEnabled) {
-        alert(t('wireless.mlo_disable_confirm'));
-        document.getElementById("loading-text").textContent = t('wireless.device_rebooting');
+        alert("Disabling MLO will reboot the device.");
+        document.getElementById("loading-text").textContent = "Device is rebooting... Please wait.";
 
         fetch('/cgi-bin/mlo_setup.sh', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ disable_mlo: true })
         })
-            .then(() => {
-                console.log("MLO Disabled, device is rebooting...");
-                setTimeout(() => {
-                    checkDeviceReboot();
-                }, 7000);
-                closeMloModal();
-            })
-            .catch(error => {
-                console.error("Error disabling MLO:", error);
-                alert(t('wireless.mlo_disable_failed'));
-                hideLoading();
-                closeMloModal();
-            })
+        .then(() => {
+            console.log("MLO Disabled, device is rebooting...");
+            setTimeout(() => {
+                checkDeviceReboot();
+            }, 7000);
+            closeMloModal();
+        })
+        .catch(error => {
+            console.error("Error disabling MLO:", error);
+            alert("Failed to disable MLO.");
+            hideLoading();
+            closeMloModal();
+        })
         return;
     }
 
@@ -1788,14 +1572,14 @@ function setupMLO() {
     const password = passwordInput.value.trim();
 
     if (!ssid) {
-        alert(t('wireless.ssid_required'));
+        alert("SSID is required.");
         ssidInput.focus();
         hideLoading();
         return;
     }
 
     if (!password || password.length < 8) {
-        alert(t('wireless.password_min_length'));
+        alert("Password must be at least 8 characters.");
         passwordInput.focus();
         hideLoading();
         return;
@@ -1807,7 +1591,7 @@ function setupMLO() {
     if (document.getElementById("mlo-6G").checked) selectedBands.push("6G");
 
     if (selectedBands.length < 2) {
-        alert(t('wireless.select_two_bands'));
+        alert("Please select at least two bands.");
         hideLoading();
         return;
     }
@@ -1823,19 +1607,19 @@ function setupMLO() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(mloConfig)
     })
-        .then(response => response.text())
-        .then(data => {
-            console.log("MLO Setup Response:", data);
-            closeMloModal();
-            getConfig();
-        })
-        .catch(error => {
-            console.error("Error applying MLO setup:", error);
-            alert(t('wireless.mlo_setup_failed'));
-        })
-        .finally(() => {
-            hideLoading();
-        });
+    .then(response => response.text())
+    .then(data => {
+        console.log("MLO Setup Response:", data);
+        closeMloModal();
+        getConfig();
+    })
+    .catch(error => {
+        console.error("Error applying MLO setup:", error);
+        alert("Failed to apply MLO setup.");
+    })
+    .finally(() => {
+        hideLoading();
+    });
 }
 
 
@@ -1849,31 +1633,36 @@ function updateMloState(status, bands) {
 
     toggleMloOptions();
 
-    syncWirelessActionButtons();
+    document.querySelectorAll('.scan-btn, .add-btn, .edit-btn, .delete-btn').forEach(btn => {
+        btn.disabled = status === 1;
+    });
 }
 
 function checkDeviceReboot(attempts = 0) {
     fetch('/cgi-bin/get_wifi_config.sh', { method: 'GET', cache: 'no-store' })
-        .then(response => {
-            if (!response.ok) throw new Error("Device not ready");
-            return response.json();
-        })
-        .then(data => {
-            console.log("Device rebooted successfully!");
-            hideLoading();
-            getConfig();
-        })
-        .catch(() => {
-            if (attempts < 30) {
-                console.log(`Device not ready, retrying... (${attempts + 1})`);
-                setTimeout(() => checkDeviceReboot(attempts + 1), 3000);
-            } else {
-                alert(t('wireless.reboot_timeout'));
-            }
-        });
+    .then(response => {
+        if (!response.ok) throw new Error("Device not ready");
+        return response.json();
+    })
+    .then(data => {
+        console.log("Device rebooted successfully!");
+        hideLoading();
+        getConfig(); 
+    })
+    .catch(() => {
+        if (attempts < 30) {
+            console.log(`Device not ready, retrying... (${attempts + 1})`);
+            setTimeout(() => checkDeviceReboot(attempts + 1), 3000);
+        } else {
+            alert("Device took too long to reboot. Try refreshing manually.");
+        }
+    });
 }
 
 function toggleInfoTooltip() {
     const tooltip = document.getElementById("info-tooltip");
     tooltip.classList.toggle("show");
 }
+
+
+

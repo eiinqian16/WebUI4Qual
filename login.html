@@ -1,24 +1,18 @@
 <!DOCTYPE html>
 
 <html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title> Login</title>
+        <link rel="stylesheet" type="text/css" href="css/login.css">
+    </head>
+    <body>
+        <div id="login"></div>
+        <div id="output"></div>
 
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title> Login</title>
-    <link rel="stylesheet" type="text/css" href="css/login.css">
-    <link rel="stylesheet" type="text/css" href="css/lang_switcher.css">
-    <script src="js/i18n.js"></script>
-</head>
-
-<body>
-    <div id="login"></div>
-    <div id="output"></div>
-
-    <script src="js/login.js"></script>
-    <script>
-        i18n.init().then(getLoginCred);
-    </script>
-</body>
+        <script src="js/login.js"></script>
+        <script>
+            getLoginCred();
+        </script>
+    </body>
 <html>

@@ -1,33 +1,24 @@
 function getCred() {
-    const credCont = document.getElementById("cred-container");
+    const credCont = document.getElementById("cred");
     html = `
     <div class="usr">
-    <h1>${t('user.change_password_title')}</h1>
+    <h1>Change Password</h1>
     <hr style="width:100%;text-align:left;margin-left:0">
     <form id="cred">
-        <div class="form-row">
-            <label for="oriPwd"><strong>${t('user.old_password_label')}&nbsp;</strong></label>
-            <input type="password" id="oriPwd" name="oriPwd" required>
-        </div>
-        <br>
+        <label for="oriPwd"><strong>Old Password:</strong></label>
+        <input type="password" id="oriPwd" name="oriPwd" required style="margin-left:73px;"><br>
 
-        <div class="form-row">
-            <label for="newPwd"><strong>${t('user.new_password_label')}&nbsp;</strong></label>
-            <input type="password" id="newPwd" name="newPwd" required>
-        </div>
-        <br>
+        <label for="newPwd"><strong>New Password:</strong></label>
+        <input type="password" id="newPwd" name="newPwd" required style="margin-left:65px;"><br>
 
-        <div class="form-row">
-            <label for="confirmPwd"><strong>${t('user.confirm_new_password_label')}&nbsp;</strong></label>
-            <input type="password" id="confirmPwd" name="confirmPwd" required>
-        </div>
-        <br>
+        <label for="confirmPwd"><strong>Confirm New Password:</strong></label>
+        <input type="password" id="confirmPwd" name="confirmPwd" required><br>
         <div class="chkbox">
             <input id="showPwdChk" type="checkbox" onclick="showPwd()">
-            <label for="showPwdChk">${t('user.show_password')}</label>
+            <label for="showPwdChk">Show Password</label>
         </div>
         <br>
-        <button type="button" onclick="changeCred()">${t('user.save_changes_button')}</button>
+        <button type="button" onclick="changeCred()">Save Changes</button>
     </form>
     </div>
     `;
@@ -41,54 +32,54 @@ function changeCred() {
     let conPwd = document.getElementById("confirmPwd").value;
 
     body = "uname=" + encodeURIComponent(name);
-
+    
     //document.getElementById("output").innerHTML = `oldPassword:${oPwd} newPassword:${nPwd} confirmPassword:${conPwd}`;
 
     if (!oPwd || !nPwd || !conPwd) {
-        alert(t('user.fill_all_fields'));
+        alert("Please fill in all fields.");
         return false;
     }
 
     if (oPwd === nPwd) {
-        alert(t('user.same_password_error'));
+        alert("Old and new passwords are the same, please re-enter ...");
         return false;
     }
 
     if (nPwd !== conPwd) {
-        alert(t('user.password_mismatch'));
+        alert("New password and confirm password do not match.");
         return false;
     }
 
     body += "&oriPwd=" + encodeURIComponent(oPwd) +
-        "&newPwd=" + encodeURIComponent(nPwd);
-
-
+            "&newPwd=" + encodeURIComponent(nPwd);
+    
+    
     //document.getElementById("body").innerHTML = `${body}`;
-
+    
     fetch("/cgi-bin/change_pwd.sh", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: body
     })
-        .then(response => response.text())
-        .then(text => {
-            try {
-                let data = JSON.parse(text);
+    .then(response => response.text())
+    .then(text => {
+        try {
+            let data = JSON.parse(text);
 
-                if (data.status === "Success") {
-                    alert(t('user.password_changed_success'));
-                } else {
-                    alert(data.status);
-                }
-            } catch (error) {
-                console.error("JSON Parse Error:", error);
-                document.getElementById("output").innerText = t('user.invalid_json', { text: text });
+            if (data.status === "Success") {
+                alert("Password changed successfully");
+            } else {
+                alert(data.status);
             }
-        })
+        } catch (error) {
+            console.error("JSON Parse Error:", error);
+            document.getElementById("output").innerText = `Invalid JSON: ${text}`;
+        }
+    })
         .catch(error => {
             console.error("Error:", error);
-            document.getElementById("output").innerText = t('login.request_failed', { error: error.message });
-        })
+            document.getElementById("output").innerText = `Request failed: ${error.message}`;
+        }) 
 }
 
 function showPwd() {

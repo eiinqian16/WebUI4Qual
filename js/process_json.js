@@ -1,22 +1,3 @@
-function loadTime() {
-    const now = new Date();
-    const options = {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-    };
-
-    const formatted = now.toLocaleString('en-GB', options).replace(',', '');
-    const dateElem = document.getElementById("overview-date");
-    if (dateElem) {
-        dateElem.textContent = formatted;
-    }
-}
-
 function fetchSysStats() {
     fetch('/cgi-bin/extract_system_info.sh')
         .then(response => {
@@ -38,67 +19,66 @@ function fetchSysStats() {
 
             let html = `
                 <div class="status-item">
-                    <span class="status-label">${t('overview.model')}</span>
+                    <span class="status-label">Model</span>
 
                     <span class="status-value"> ${data.model || 'N/A'}</span>
                 </div>
                 <div class="status-item">
-                    <span class="status-label">${t('overview.firmware_version')}</span>
-
-                    <span class="status-value"> ${data.fw_version || 'N/A'}</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-label">${t('overview.host')}</span>
+                    <span class="status-label">Host</span>
 
                     <span class="status-value"> ${data.host || 'N/A'}</span>
                 </div>
                 <div class="status-item">
-                    <span class="status-label">${t('overview.architecture')}</span>
+                    <span class="status-label">Architecture</span>
 
                     <span class="status-value"> ${data.arch || 'N/A'}</span>
                 </div>
                 <div class="status-item">
 
-                    <span class="status-label">${t('overview.target_platform')}</span>
+                    <span class="status-label">Target Platform</span>
                     <span class="status-value"> ${data.target || 'N/A'}</span>
                 </div>
                 <div class="status-item">
 
-                    <span class="status-label">${t('overview.kernel_version')}</span>
+                    <span class="status-label">Kernel Version</span>
                     <span class="status-value"> ${data.kernel || 'N/A'}</span>
                 </div>
                 <div class="status-item">
 
-                    <span class="status-label">${t('overview.date')}</span>
-                    <span class="status-value" id="overview-date"></span>
+                    <span class="status-label">Date</span>
+                    <span class="status-value"> ${data.date || 'N/A'}</span>
                 </div>
                 <br>
-                <h3>${t('overview.memory')}</h3>
+                <h3>Memory</h3>
                 <div class="memory-item">
-                    <span class="memory-label">${t('overview.total_available')}</span>
+                    <span class="memory-label">Total Available</span>
 
                     <progress class="memory-progress" value="${data.memAvail}" max="${data.memTotal}"></progress>
                     <span class="memory-value">${(data.memAvail / 1000).toFixed(2)}MB / ${(data.memTotal / 1000).toFixed(2)}MB (${percentAvailMem}%)</span>
                 </div>
                 <div class="memory-item">
 
-                    <span class="memory-label">${t('overview.used')}</span>
+                    <span class="memory-label">Used</span>
                     <progress class="memory-progress" value="${data.memUsed}" max="${data.memTotal}"></progress>
                     <span class="memory-value">${(data.memUsed / 1000).toFixed(2)}MB / ${(data.memTotal / 1000).toFixed(2)}MB (${percentUsedMem}%)</span>
+                </div>
+
+                <div class="memory-item">
+                    <span class="memory-label">Cached</span>
+                    <progress class="memory-progress" value="${data.cache}" max="${data.memTotal}"></progress>
+                    <span class="memory-value">${(data.cache / 1000).toFixed(2)}MB / ${(data.memTotal / 1000).toFixed(2)}MB (${percentCache}%)</span>
                 </div>
             `;
 
 
             sysInfo.innerHTML = html;
-            loadTime();
         })
         .catch(error => {
             console.error("Fetch Error:", error);
 
-            document.getElementById("errorMessage").innerHTML = `<p style="color: red;">${t('common.error_prefix', { message: error.message })}</p>`;
+            document.getElementById("errorMessage").innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
         });
 }
-setInterval(loadTime, 1000);
 
 function fetchStorageStats() {
     const storeInfo = document.getElementById("storage");
@@ -148,9 +128,10 @@ function fetchStorageStats() {
 
 
             let html = `
-                <h3>${t('overview.storage')}</h3>
-                ${renderStorageItem(t('overview.disk_space'), usedStorage, totStorage, perStorage)}
-                ${renderStorageItem(t('overview.temp_space'), usedTmp, totTmp, perTmp)}
+                <h3>Storage</h3>
+                ${renderStorageItem("Disk Space", usedStorage, totStorage, perStorage)}
+                ${renderStorageItem("Temp Space", usedTmp, totTmp, perTmp)}
+                ${renderStorageItem(`${data.fwBlk} (${data.fwDir})`, fwUsedMem, fwTotMem, perFwMem)}
             `;
 
             storeInfo.innerHTML = html;
@@ -159,7 +140,7 @@ function fetchStorageStats() {
         })
         .catch(error => {
             console.error("Fetch Error:", error);
-            errorMessage.innerHTML = `<p style="color: red;">${t('common.error_prefix', { message: error.message })}</p>`;
+            errorMessage.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
             storeInfo.innerHTML = "";
         });
 }
@@ -179,17 +160,17 @@ function fetchLanStatus() {
                 if (iface.type === "LAN") {
                     const lanstat = document.getElementById("lan");
                     html += `
-                    <div class="interface">
+                    <div class="interface"> 
                         <h3><strong>${iface.iface || 'N/A'}</strong> </h3>
-                        <p><strong>${t('common.mac_address')}:</strong> <span>${iface.MAC || 'N/A'}</span></p>
-                        <p><strong>${t('common.ip_address')}:</strong> <span>${iface.IP || 'N/A'}</span></p>
-                        <p><strong>${t('common.subnet_mask')}:</strong><span> ${iface.netmask || 'N/A'}</span></p>
-                        <p><strong>${t('common.protocol')}:</strong> <span>${iface.proto || 'N/A'}</span></p>
-                        <p><strong>${t('common.interface_type')}:</strong> <span>${iface.type || 'N/A'}</span></p>
-                        <p><strong>${t('common.tx_packets')}:</strong> <span>${iface.txpkt || 'N/A'}</span></p>
-                        <p><strong>${t('common.rx_packets')}:</strong> <span>${iface.rxpkt || 'N/A'}</span></p>
-                        <p><strong>${t('common.tx_bytes')}:</strong> <span>${iface.txbytes || 'N/A'}</span></p>
-                        <p><strong>${t('common.rx_bytes')}:</strong> <span>${iface.rxbytes || 'N/A'}</span></p>
+                        <p><strong>MAC Address:</strong> <span>${iface.MAC || 'N/A'}</span></p>
+                        <p><strong>IP Addr:</strong> <span>${iface.IP || 'N/A'}</span></p>
+                        <p><strong>Subnet Mask:</strong><span> ${iface.netmask || 'N/A'}</span></p>
+                        <p><strong>Protocol:</strong> <span>${iface.proto || 'N/A'}</span></p>
+                        <p><strong>Interface Type:</strong> <span>${iface.type || 'N/A'}</span></p>
+                        <p><strong>TX Packets:</strong> <span>${iface.txpkt || 'N/A'}</span></p>
+                        <p><strong>RX Packets:</strong> <span>${iface.rxpkt || 'N/A'}</span></p>
+                        <p><strong>TX Bytes:</strong> <span>${iface.txbytes || 'N/A'}</span></p>
+                        <p><strong>RX Bytes:</strong> <span>${iface.rxbytes || 'N/A'}</span></p>
                     </div>
                     `;
                     lanstat.innerHTML = html;
@@ -199,7 +180,7 @@ function fetchLanStatus() {
         })
         .catch(error => {
             console.error("Fetch Error:", error);
-            document.getElementById("errorMessage").innerHTML = `<p style="color: red;">${t('common.error_prefix', { message: error.message })}</p>`;
+            document.getElementById("errorMessage").innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
         });
 }
 
@@ -219,34 +200,34 @@ function fetchWanStatus() {
             if (wanIf) {
             data.forEach(iface => {
                 if (iface.proto === "dhcp") {
-                    iface.proto = t('common.dhcp_client');
+                    iface.proto = "DHCP client";
                 }
                 if (iface.type === "WAN") {
                 html += `
                 <div class="interface">
                     <h3><strong>${iface.iface || 'N/A'}</strong></h3>
-                    <p><strong>${t('common.mac_address')}:</strong><span>${iface.MAC || 'N/A'}</span></p>
-                    <p><strong>${t('common.ip_address')}:</strong> <span>${iface.IP || 'N/A'}</span></p>
-                    <p><strong>${t('common.subnet_mask')}:</strong> <span>${iface.netmask || 'N/A'}</span></p>
-                    <p><strong>${t('common.protocol')}:</strong> <span>${iface.proto || 'N/A'}</span></p>
-                    <p><strong>${t('common.interface_type')}:</strong> <span>${iface.type || 'N/A'}</span></p>
-                    <p><strong>${t('common.tx_packets')}:</strong> <span>${iface.txpkt || 'N/A'}</span></p>
-                    <p><strong>${t('common.rx_packets')}:</strong> <span>${iface.rxpkt || 'N/A'}</span></p>
-                    <p><strong>${t('common.tx_bytes')}:</strong> <span>${iface.txbytes || 'N/A'}</span></p>
-                    <p><strong>${t('common.rx_bytes')}:</strong> <span>${iface.rxbytes || 'N/A'}</span></p>
+                    <p><strong>MAC Address:</strong><span>${iface.MAC || 'N/A'}</span></p>
+                    <p><strong>IP Addr:</strong> <span>${iface.IP || 'N/A'}</span></p>
+                    <p><strong>Subnet Mask:</strong> <span>${iface.netmask || 'N/A'}</span></p>
+                    <p><strong>Protocol:</strong> <span>${iface.proto || 'N/A'}</span></p>
+                    <p><strong>Interface Type:</strong> <span>${iface.type || 'N/A'}</span></p>
+                    <p><strong>TX Packets:</strong> <span>${iface.txpkt || 'N/A'}</span></p>
+                    <p><strong>RX Packets:</strong> <span>${iface.rxpkt || 'N/A'}</span></p>
+                    <p><strong>TX Bytes:</strong> <span>${iface.txbytes || 'N/A'}</span></p>
+                    <p><strong>RX Bytes:</strong> <span>${iface.rxbytes || 'N/A'}</span></p>
                 </div>
                 `;
                 }
             });
             wanstat.innerHTML = html;
         } else {
-            wanstat.innerHTML = `<p>${t('network.no_wan_interface')}</p>`;
+            wanstat.innerHTML = `<p>No WAN interface configured</p>`;
         }
             
         })
         .catch(error => {
             console.error("Fetch Error:", error);
-            document.getElementById("errorMessage").innerHTML = `<p style="color: red;">${t('common.error_prefix', { message: error.message })}</p>`;
+            document.getElementById("errorMessage").innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
         });
 }
 
@@ -267,14 +248,14 @@ function fetchOthStatus() {
                     html += `
                     <div class="interface">
                         <h3><strong>${iface.iface || 'N/A'}</strong></h3>
-                        <p><strong>${t('common.mac_address')}:</strong><span>${iface.MAC || 'N/A'}</span></p>
-                        <p><strong>${t('common.ip_address')}:</strong> <span>${iface.IP || 'N/A'}</span></p>
-                        <p><strong>${t('common.subnet_mask')}:</strong> <span>${iface.netmask || 'N/A'}</span></p>
-                        <p><strong>${t('common.protocol')}:</strong> <span>${iface.proto || 'N/A'}</span></p>
-                        <p><strong>${t('common.tx_packets')}:</strong> <span>${iface.txpkt || 'N/A'}</span></p>
-                        <p><strong>${t('common.rx_packets')}:</strong> <span>${iface.rxpkt || 'N/A'}</span></p>
-                        <p><strong>${t('common.tx_bytes')}:</strong> <span>${iface.txbytes || 'N/A'}</span></p>
-                        <p><strong>${t('common.rx_bytes')}:</strong> <span>${iface.rxbytes || 'N/A'}</span></p>
+                        <p><strong>MAC Address:</strong><span>${iface.MAC || 'N/A'}</span></p>
+                        <p><strong>IP Addr:</strong> <span>${iface.IP || 'N/A'}</span></p>
+                        <p><strong>Subnet Mask:</strong> <span>${iface.netmask || 'N/A'}</span></p>
+                        <p><strong>Protocol:</strong> <span>${iface.proto || 'N/A'}</span></p>
+                        <p><strong>TX Packets:</strong> <span>${iface.txpkt || 'N/A'}</span></p>
+                        <p><strong>RX Packets:</strong> <span>${iface.rxpkt || 'N/A'}</span></p>
+                        <p><strong>TX Bytes:</strong> <span>${iface.txbytes || 'N/A'}</span></p>
+                        <p><strong>RX Bytes:</strong> <span>${iface.rxbytes || 'N/A'}</span></p>
                     </div>
                     `;
                     lanstat.innerHTML = html;
@@ -284,10 +265,11 @@ function fetchOthStatus() {
         })
         .catch(error => {
             console.error("Fetch Error:", error);
-            document.getElementById("errorMessage").innerHTML = `<p style="color: red;">${t('common.error_prefix', { message: error.message })}</p>`;
+            document.getElementById("errorMessage").innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
         });
 }
 
 function refreshStatus() {
     fetchLanStatus();
 }
+
