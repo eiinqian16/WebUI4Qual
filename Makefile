@@ -80,7 +80,10 @@ define Package/webUI/install
 	
 	$(INSTALL_DIR) $(1)/www/webUI/db/
 	$(CP) $(PKG_BUILD_DIR)/db/* $(1)/www/webUI/db/
-	
+
+	$(INSTALL_DIR) $(1)/www/webUI/lang/
+	$(CP) $(PKG_BUILD_DIR)/lang/* $(1)/www/webUI/lang/
+
 	$(CP) $(1)/www/webUI/ov/fw_version $(BIN_DIR)/
 endef
 
