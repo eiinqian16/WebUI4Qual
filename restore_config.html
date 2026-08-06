@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Restore Config</title>
+    <link rel="stylesheet" href="css/system.css">
+</head>
+
+<body>
+    <div class="box">
+        <h1 data-i18n="restore.backup_title">Backup Configuration</h1>
+        <p class="description" data-i18n="restore.backup_desc">Backup configuration as compressed folder</p>
+        <hr>
+        <div id="backup">
+            <input type="checkbox" id="dlLocal">
+            <label for="dlLocal" data-i18n="restore.download_local">Download to local PC</label>
+            <br>
+            <br>
+            <button onclick="backup_config()" data-i18n="restore.backup_title">Backup Configuration</button>
+        </div>
+    </div>
+    <br>
+
+    <div class="box">
+        <h1 data-i18n="restore.restore_title">Restore Configuration</h1>
+        <p class="description" data-i18n="restore.restore_desc">Restore Configuration from file</p>
+        <hr>
+        <div id="restore">
+            <input type="file" id="backupFile" accept=".tar.gz">
+            <br>
+            <br>
+            <div id="loading-overlay">
+                <div class="loading-spinner"></div>
+                <div id="loading-text">Compex</div>
+            </div>
+            <button onclick="uploadBackup()" data-i18n="common.upload">Upload</button>
+            <div id="backup-popup" class="popup hidden">
+                <div class="popup-content">
+                    <h3 data-i18n="restore.backup_upload_title">Backup Upload</h3>
+                    <p data-i18n="restore.check_hash_desc">Please check hash of upload.</p>
+                    <hr>
+                    <p><strong data-i18n="restore.md5_colon">MD5: </strong><span id="md5sum"></span></p>
+                    <p><strong data-i18n="restore.sha256_colon">SHA256: </strong><span id="sha256sum"></span></p>
+                    <button onclick="confirmBackup()" data-i18n="restore.restore_button">Restore</button>
+                    <button onclick="closePopup()" data-i18n="common.cancel">Cancel</button>
+                </div>
+            </div>
+            <div id="uploadStatus"></div>
+        </div>
+    </div>
+</body>
+
+</html>

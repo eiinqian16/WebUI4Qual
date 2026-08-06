@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Firmware Update</title>
+    <link rel="stylesheet" href="css/system.css">
+</head>
+
+<body>
+    <div class="box">
+        <h1 data-i18n="firmware.update_title">Update Firmware</h1>
+        <p class="description" data-i18n="firmware.update_desc">Update firmware using sysupgrade image.</p>
+        <hr>
+        <input type="file" id="fwFile" accept=".bin">
+        <br>
+        <br>
+        <div id="loading-overlay">
+            <div class="loading-spinner"></div>
+            <div id="loading-text">Compex</div>
+        </div>
+        <button onclick="uploadFirmware()" data-i18n="common.upload">Upload</button>
+        <div id="popup" class="popup hidden">
+            <div class="popup-content">
+                <h3 data-i18n="firmware.upload_title">Firmware Upload</h3>
+                <p data-i18n="firmware.check_hash_desc">Please check hash of firmware.</p>
+                <hr>
+                <p><strong data-i18n="firmware.validation_colon">Validation: </strong><span id="status"></span></p>
+                <p><strong data-i18n="restore.md5_colon">MD5: </strong><span id="md5sum"></span></p>
+                <p><strong data-i18n="restore.sha256_colon">SHA256: </strong><span id="sha256sum"></span></p>
+                <button onclick="confirmUpgrade()" data-i18n="firmware.upgrade_button">Upgrade</button>
+                <button onclick="closePopup()" data-i18n="common.cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <br>
+</body>
+
+</html>

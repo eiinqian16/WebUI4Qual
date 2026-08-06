@@ -1,20 +1,40 @@
+function changeLanguage(lang) {
+    let select = document.getElementById('langSelect');
+    if (select) select.disabled = true;
+
+    i18n.setLanguage(lang).then(() => {
+        getLoginCred();
+    }).finally(() => {
+        // getLoginCred() rebuilds the form, so no need to re-enable the old select
+    });
+}
+
 function getLoginCred() {
     const loginCont = document.getElementById("login");
     let html = `
-    <form id="login">
+    <form id="loginForm">
         <div class="container">
-            <a href="https://compex.com.sg/" target="_blank">
-                <img src="/logo/logo.png" alt="Logo">
-            </a>
+            <div class="login-header-row">
+                <a href="https://www.airioncomm.com/" target="_blank">
+                    <img src="/logo/logo.png" alt="Logo">
+                </a>
+                <div class="lang-switcher-login">
+                    <select id="langSelect" aria-label="Language / Bahasa / 语言" onchange="changeLanguage(this.value)">
+                        <option value="en">English</option>
+                        <option value="ms">Bahasa Melayu</option>
+                        <option value="zh">中文</option>
+                    </select>
+                </div>
+            </div>
 
             <br>
-            <label class="auth-title">Authorization Required</label>
+            <label class="auth-title" data-i18n="login.title">Authorization Required</label>
             <br>
-            <label class="auth-desc">Please enter your username and password.</label>
+            <label class="auth-desc" data-i18n="login.description">Please enter your username and password.</label>
             <br>
-            <input type="text" placeholder="Enter Username" id="uname" name="uname" required>
+            <input type="text" placeholder="Enter Username" id="uname" name="uname" required data-i18n-placeholder="login.username_placeholder">
 
-            <input type="password" placeholder="Enter Password" id="pwd" name="pwd">
+            <input type="password" placeholder="Enter Password" id="pwd" name="pwd" data-i18n-placeholder="login.password_placeholder">
 
             <!--
             <div class="chkbox">
@@ -23,16 +43,21 @@ function getLoginCred() {
             </div>
             -->
             <p><p>
-            <button type="button" onclick="validateCred()">Login</button>
+            <button type="button" onclick="validateCred()" data-i18n="login.login_button">Login</button>
         </div>
     </form>
     `;
     loginCont.innerHTML = html;
 
-    document.getElementById("login").addEventListener("keypress", function (event) {
+    let select = document.getElementById("langSelect");
+    if (select) select.value = i18n.currentLang;
+
+    i18n.applyTranslations(loginCont);
+
+    document.getElementById("loginForm").addEventListener("keypress", function (event) {
         if (event.key === "Enter") {
-            event.preventDefault(); 
-            validateCred(); 
+            event.preventDefault();
+            validateCred();
         }
     });
 }
@@ -43,11 +68,11 @@ function validateCred() {
     let loginBtn = document.querySelector("button");
 
     if (!name) {
-        alert("Username is required!");
+        alert(t("login.username_required"));
         return;
     }
 
-    loginBtn.innerHTML = `<span class="loader"></span> Logging in...`;
+    loginBtn.innerHTML = `<span class="loader"></span> ${t("login.logging_in")}`;
     loginBtn.disabled = true;
 
     fetch("/cgi-bin/validate_login.sh", {
@@ -55,32 +80,33 @@ function validateCred() {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `name=${encodeURIComponent(name)}&pwd=${encodeURIComponent(pwd)}`
     })
-    .then(response => response.json()) 
-    .then(data => {
-        console.log("Login Response:", data);
+        .then(response => response.json())
+        .then(data => {
+            console.log("Login Response:", data);
 
-        setTimeout(() => {
-            if (data.status === "Success") {
-                sessionStorage.setItem("sessionID", data.session_id);
-                console.log("Stored sessionID:", sessionStorage.getItem("sessionID")); 
-                window.location.href = "index.html#overview";
-            } else {
-                document.getElementById("output").innerText = data.status;
-            }
-            
-            loginBtn.innerHTML = "Login";
-            loginBtn.disabled = false;
-        }, 2000);
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        document.getElementById("output").innerText = `Request failed: ${error.message}`;
-        
-        setTimeout(() => {
-            loginBtn.innerHTML = "Login";
-            loginBtn.disabled = false;
-        }, 2000);
-    });
+            setTimeout(() => {
+                if (data.status === "Success") {
+                    sessionStorage.setItem("sessionID", data.session_id);
+                    console.log("Stored sessionID:", sessionStorage.getItem("sessionID"));
+                    window.location.href = "index.html#overview";
+                } else {
+                    alert(data.status);
+                    //document.getElementById("output").innerText = data.status;
+                }
+
+                loginBtn.innerHTML = t("login.login_button");
+                loginBtn.disabled = false;
+            }, 2000);
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            document.getElementById("output").innerText = t("login.request_failed", { error: error.message });
+
+            setTimeout(() => {
+                loginBtn.innerHTML = t("login.login_button");
+                loginBtn.disabled = false;
+            }, 2000);
+        });
 }
 
 function showPwd() {
