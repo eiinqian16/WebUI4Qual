@@ -3,21 +3,21 @@ let sys_timezone = null;
 
 function showTimeConfig() {
     let html = `
-        <h1>System Time</h1>
-        <p class="description">Configure system time of router</p>
+        <h1>${t('time.title')}</h1>
+        <p class="description">${t('time.desc')}</p>
         <hr>
         <div class="time-row">
-            <span class="time-label">System Time:</span>
+            <span class="time-label">${t('advanced.system_time_label')}</span>
             <span class="time-value" id="current-time"></span>
         </div>
         <div class="time-row">
-            <label class="time-label" for="timezone-select">Timezone:</label>
+            <label class="time-label" for="timezone-select">${t('time.timezone_label')}</label>
             <select id="timezone-select">
-                <option value="">--- Loading timezones... ---</option>
+                <option value="">${t('time.loading_timezones')}</option>
             </select>
         </div>
         <br>
-        <button onclick="saveAndApply()">Save and Apply</button>
+        <button onclick="saveAndApply()">${t('eco.save_apply_button')}</button>
     `;
 
     document.getElementById('time-container').innerHTML = html;
@@ -43,7 +43,7 @@ async function initSysClock() {
     }
     catch (error) {
         console.error("DEBUG CLOCK ERROR:", error);
-        document.getElementById('current-time').innerText = "Sync Error";
+        document.getElementById('current-time').innerText = t('advanced.sync_error');
     }
 }
 
@@ -75,7 +75,7 @@ async function loadTimeZones() {
         timezoneData = await resp.json();
 
         const select = document.getElementById('timezone-select');
-        select.innerHTML = '<option value-"">-- Select Timezone --</option>';
+        select.innerHTML = `<option value-"">${t('time.select_timezone')}</option>`;
         const groups = {};
         timezoneData.forEach(tz => {
             const region = tz.zone_name.split('/')[0];
@@ -103,7 +103,7 @@ async function loadTimeZones() {
     } catch (error) {
         console.error("Failed to load timezones:", error);
         const select = document.getElementById('timezone-select');
-        select.innerHTML = '<option value="">-- Failed to load --</option>';
+        select.innerHTML = `<option value="">${t('time.failed_to_load')}</option>`;
     }
 }
 
@@ -113,7 +113,7 @@ async function saveAndApply() {
     const selectedZoneName = select.options[select.selectedIndex]?.dataset.zoneName;
 
     if (!selectTz) {
-        alert("Please select a timezone");
+        alert(t('time.select_timezone_required'));
         return;
     }
 
@@ -134,15 +134,15 @@ async function saveAndApply() {
             setTimeout(async () => {
                 await initSysClock();
             }, 2000);
-            alert(`Timezone updated to ${selectedZoneName}`);
+            alert(t('time.timezone_updated', { zone: selectedZoneName }));
         }
         else {
-            alert(`Failed to set timezone: ${result.error}`);
+            alert(t('time.set_timezone_failed', { error: result.error }));
         }
     }
     catch (error) {
         console.error("Save failed:", error);
-        alert("Failed to apply timezone. Check the console for details.");
+        alert(t('time.apply_timezone_failed'));
     }
 }
 

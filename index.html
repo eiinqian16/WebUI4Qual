@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="css/wifi_status_style.css">
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/advanced_v1.css">
+    <link rel="stylesheet" href="css/lang_switcher.css">
+    <script src="js/i18n.js"></script>
     <script src="js/index.js"></script>
     <script src="js/system.js"></script>
     <script src="js/reboot.js"></script>
@@ -31,11 +33,19 @@
         <a href="https://www.airioncomm.com/" class="logo-container" target="_blank">
             <img src="/logo/logo.png" alt="WebUI Logo" class="logo">
         </a>
-        <br><br>
+
+        <div class="lang-switcher">
+            <select id="langSelect" aria-label="Language / Bahasa / 语言" onchange="changeLanguage(this.value)">
+                <option value="en">English</option>
+                <option value="ms">Bahasa Melayu</option>
+                <option value="zh">中文</option>
+            </select>
+        </div>
+        <br>
 
         <ul>
             <li onclick="showSection('overview');">
-                <a href="#">Overview</a>
+                <a href="#" data-i18n="nav.overview">Overview</a>
                 <img src="/logo/overview.png">
             </li>
             <!--
@@ -45,42 +55,42 @@
             </li>
 -->
             <li class="sidebar-dropdown">
-                <span onclick="toggleDropdown('wireless')">Wireless</span>
+                <span onclick="toggleDropdown('wireless')" data-i18n="nav.wireless">Wireless</span>
                 <img src="/logo/wifi.png">
             </li>
             <ul id="wireless" class="dropdownContent">
-                <li onclick="showSection('wireless');"><a href="#">Wireless Settings</a></li>
-                <li onclick="showSection('ezmesh');"><a href="#">EzMesh Settings</a></li>
-                <li onclick="showSection('cellular');"><a href="#">Cellular Settings</a></li>
-                <li onclick="showSection('advanced');"><a href="#">Advanced</a></li>
+                <li onclick="showSection('wireless');"><a href="#" data-i18n="nav.wireless_settings">Wireless Settings</a></li>
+                <li onclick="showSection('ezmesh');"><a href="#" data-i18n="nav.ezmesh_settings">EzMesh Settings</a></li>
+                <li onclick="showSection('cellular');"><a href="#" data-i18n="nav.cellular_settings">Cellular Settings</a></li>
+                <li onclick="showSection('advanced');"><a href="#" data-i18n="nav.advanced">Advanced</a></li>
             </ul>
             <li class="sidebar-dropdown">
-                <span onclick="toggleDropdown('network')">Network</span>
+                <span onclick="toggleDropdown('network')" data-i18n="nav.network">Network</span>
                 <img src="/logo/network.png">
             </li>
             <ul id="network" class="dropdownContent">
-                <li onclick="showSection('lan_stat');"><a href="#">Status</a></li>
-                <li onclick="showSection('lan_config');"><a href="#">LAN/WAN</a></li>
-                <li onclick="showSection('dhcp');"><a href="#">DHCP</a></li>
+                <li onclick="showSection('lan_stat');"><a href="#" data-i18n="nav.status">Status</a></li>
+                <li onclick="showSection('lan_config');"><a href="#" data-i18n="nav.lan_wan">LAN/WAN</a></li>
+                <li onclick="showSection('dhcp');"><a href="#" data-i18n="nav.dhcp">DHCP</a></li>
             </ul>
             <li class="sidebar-dropdown">
-                <span onclick="toggleDropdown('system')">System</span>
+                <span onclick="toggleDropdown('system')" data-i18n="nav.system">System</span>
                 <img src="/logo/system.jpg">
             </li>
             <ul id="system" class="dropdownContent">
-                <li onclick="showSection('factory_reset');"><a href="#">Reset/Reboot</a></li>
-                <li onclick="showSection('restore_config');"><a href='#'>Backup & Restore</a></li>
-                <li onclick="showSection('firmware_update');"><a href='#'>Firmware Upgrade</a></li>
-                <li onclick="showSection('system_log');"><a href='#'>System Log</a></li>
-                <li onclick="showSection('eco');"><a href='#'>Eco Mode</a></li>
-                <li onclick="showSection('time');"><a href='#'>Time</a></li>
+                <li onclick="showSection('factory_reset');"><a href="#" data-i18n="nav.reset_reboot">Reset/Reboot</a></li>
+                <li onclick="showSection('restore_config');"><a href='#' data-i18n="nav.backup_restore">Backup & Restore</a></li>
+                <li onclick="showSection('firmware_update');"><a href='#' data-i18n="nav.firmware_upgrade">Firmware Upgrade</a></li>
+                <li onclick="showSection('system_log');"><a href='#' data-i18n="nav.system_log">System Log</a></li>
+                <li onclick="showSection('eco');"><a href='#' data-i18n="nav.eco_mode">Eco Mode</a></li>
+                <li onclick="showSection('time');"><a href='#' data-i18n="nav.time">Time</a></li>
             </ul>
             <li onclick="showSection('user')" ;>
-                <a href="#">Administration</a>
+                <a href="#" data-i18n="nav.administration">Administration</a>
                 <img src="/logo/admin.png" style="filter: brightness(15);">
             </li>
             <li onclick="logout()" ;>
-                <a href="#">Logout</a>
+                <a href="#" data-i18n="nav.logout">Logout</a>
                 <img src="/logo/logout.png" style="filter: brightness(15);">
             </li>
         </ul>

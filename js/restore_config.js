@@ -4,9 +4,9 @@ function backup_config() {
         .then(data => {
             const local = document.getElementById("dlLocal");
             if (data.status === "success") {
-                alert("Backup created: " + data.file);
+                alert(t('restore.backup_created', { file: data.file }));
             } else {
-                alert("Backup failed!");
+                alert(t('restore.backup_failed'));
             }
 
             if (local.checked) {
@@ -15,7 +15,7 @@ function backup_config() {
         })
         .catch(err => {
             console.error("Error running backup:", err);
-            alert("Error running backup script.");
+            alert(t('restore.backup_script_error'));
         });
 }
 
@@ -24,7 +24,7 @@ function uploadBackup() {
     const fileInput = document.getElementById("backupFile");
 
     if (!fileInput.files.length) {
-        alert("No file selected.");
+        alert(t('restore.no_file_selected'));
         return;
     }
 
@@ -42,28 +42,28 @@ function uploadBackup() {
         document.getElementById("backup-popup").classList.remove("hidden");
     })
     .catch(err => {
-        alert("Upload failed: " + err)
+        alert(t('restore.upload_failed', { error: err }))
         hideLoading();
     });
 }
-    
+
 function confirmBackup() {
     fetch("/cgi-bin/restore_config.sh")
         .then(response => response.json())
         .then(data => {
             if (data.status === "success") {
-                alert("Configuration restored successfully. Rebooting...")
+                alert(t('restore.restore_success'))
                 waitForReboot();
             }
             else {
-                alert("Restore failed: " + (data.error) || "Unknown Error" );
+                alert(t('restore.restore_failed', { error: data.error || t('wireless.unknown_error') }));
             }
         })
 }
 
 function downloadConfig(filename) {
     if(!filename) {
-        alert("No backup found");
+        alert(t('restore.no_backup_found'));
     }
 
     const encodedFilename = encodeURIComponent(filename);
@@ -100,7 +100,7 @@ function waitForReboot() {
                 // still rebooting...
                 if (Date.now() - start > timeout) {
                     clearInterval(interval);
-                    alert("Router did not come back online. Check manually.");
+                    alert(t('restore.router_offline'));
                 }
             });
     }, checkInterval);

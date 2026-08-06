@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", loadPowerMode);
 async function setPowerMode() {
     const selected = document.querySelector('input[name="powerMode"]:checked');
     if (!selected) {
-        return alert('Please select a mode');
+        return alert(t('eco.select_mode_required'));
     }
 
     const mode = selected.value;
@@ -66,15 +66,15 @@ async function setPowerMode() {
         const data = await resp.json();
 
         if (data.status === "OK") {
-            alert(`Applied ${data.applied_mode.toUpperCase()} mode successfully!`);
+            alert(t('eco.mode_applied_success', { mode: data.applied_mode.toUpperCase() }));
             loadPowerMode();
         }
         else {
-            alert(`failed: ${data.error || "Unknown error"}`);
+            alert(t('eco.mode_apply_failed', { error: data.error || t('wireless.unknown_error') }));
         }
     } catch (error) {
         console.error("Eco mode switch failed:", error);
-        alert(`Request failed. The system may be applying changes and restarting Wi-Fi.`);
+        alert(t('eco.request_failed_restarting'));
     }
 }
 
@@ -105,7 +105,7 @@ async function initEcoClock() {
     }
     catch (error) {
         console.error("DEBUG CLOCK ERROR:", error);
-        document.getElementById('currentTime').innerText = "Sync Error";
+        document.getElementById('currentTime').innerText = t('advanced.sync_error');
     }
 }
 
@@ -144,8 +144,8 @@ function updateEcoMasterToggle(isActive) {
 
 function toggleEcoScheduleWithConfirmation() {
     const stateToSet = !isEcoMasterScheduleActive;
-    const title = stateToSet ? "Enable Wireless Schedule?" : "Disable Wireless Schedule?";
-    const message = stateToSet ? "Enabling this feature might cause temporary disruption to the wireless connection. Continue?" : "Disabling this schedule will turn on wireless connection immediately. Continue?";
+    const title = stateToSet ? t('eco.enable_schedule_title') : t('eco.disable_schedule_title');
+    const message = stateToSet ? t('eco.enable_schedule_message') : t('eco.disable_schedule_message');
 
     document.getElementById('eco-confirmation-title').textContent = title;
     document.getElementById('eco-confirmation-message').textContent = message;
@@ -179,11 +179,11 @@ async function confirmEcoToggle(confirmed) {
                 console.log('Schedule entry saved:', result);
             }
 
-            alertSuccess(`Wireless Schedule ${newState ? 'Enabled' : 'Disabled'} and ALL configuration data sent.`);
+            alertSuccess(t('eco.schedule_toggle_success', { state: newState ? t('common.enabled') : t('common.disabled') }));
         }
         catch (error) {
             console.error("Error sending schedule status:", error);
-            alertSuccess(`Failed to update status: ${error.message}. Configuration reverted.`);
+            alertSuccess(t('advanced.schedule_toggle_failed', { message: error.message }));
             updateEcoMasterToggle(!newState);
         }
     }
@@ -217,7 +217,7 @@ async function fetchEcoSchedules() {
     }
     catch (error) {
         console.error("Error fetching schedules from /config/schedule:", error);
-        alertSuccess(`Failed to fetch schedules: ${error.message}. Displaying empty list.`);
+        alertSuccess(t('advanced.fetch_schedules_failed', { message: error.message }));
         return [];
     }
 }
@@ -226,7 +226,7 @@ function openEcoAddModal() {
     const modalTitle = document.getElementById('modal-eco-title');
     const editIdInput = document.getElementById('edit-eco-id');
 
-    if (modalTitle) modalTitle.textContent = "Add Schedule Entry";
+    if (modalTitle) modalTitle.textContent = t('advanced.add_schedule_entry_title');
     if (editIdInput) editIdInput.value = "";
 
     currentEcoScheduleConfig.repeatDays = ['Su', 'M', 'Tu', 'W', 'Th', 'F', 'Sa'];
@@ -277,11 +277,11 @@ function hideEcoModal(backdropElement) {
 function editEcoConfig(id) {
     const entry = getEcoConfigId(id);
     if (!entry) {
-        alertSuccess("Error: Could not find schedule entry to edit.");
+        alertSuccess(t('advanced.schedule_not_found_edit'));
         return;
     }
 
-    document.getElementById('modal-eco-title').textContent = "Edit Schedule Entry";
+    document.getElementById('modal-eco-title').textContent = t('advanced.edit_schedule_entry_title');
     document.getElementById('edit-eco-id').value = entry.id;
     populateEcoTime();
     document.getElementById('off-hour-eco').value = entry.offHour;
@@ -324,11 +324,11 @@ async function deleteEcoConfig(id) {
 
         savedEcoSchedules = savedEcoSchedules.filter(entry => entry.id !== id);
         renderEcoScheduleList();
-        alertSuccess("Schedule entry deleted successfully.");
+        alertSuccess(t('advanced.schedule_deleted_success'));
     }
     catch (error) {
         console.error("Error deleting schedule:", error);
-        alertSuccess(`Failed to delete schedule: ${error.message}`);
+        alertSuccess(t('eco.schedule_delete_failed', { message: error.message }));
     }
 }
 
@@ -419,31 +419,33 @@ function renderEcoScheduleList() {
     if (savedEcoSchedules.length === 0) {
         scheduleList.innerHTML = `
         <div class="schedule-placeholder">
-            <span>No schedules configured yet. </span>
+            <span>${t('advanced.no_schedules_text')}</span>
         </div>
         `;
         return;
     }
 
+    const DAY_KEYS = { Su: 'advanced.day_su', M: 'advanced.day_mon', Tu: 'advanced.day_tue', W: 'advanced.day_wed', Th: 'advanced.day_thu', F: 'advanced.day_fri', Sa: 'advanced.day_sat' };
+
     savedEcoSchedules.forEach(entry => {
-        const repeatDaysText = (entry.repeatDays || []).join(', ');
+        const repeatDaysText = (entry.repeatDays || []).map(d => DAY_KEYS[d] ? t(DAY_KEYS[d]) : d).join(', ');
         const newEntry = document.createElement('div');
 
         newEntry.style.cssText = 'padding: 0.75rem; background-color: white; border: 1px solid #93c5fd; border-radius: 0.5rem; color: #374151; display: flex; justify-content: space-between; align-items: center;';
 
         newEntry.innerHTML = `
         <span>
-            <strong>Configured</strong>:
-            Off at ${entry.offTime}, On at ${entry.onTime}
-            <span style="color: #6b7280; margin-left: 10px;">(Repeat: ${repeatDaysText})</span>
+            <strong>${t('eco.configured_label')}</strong>:
+            ${t('eco.off_on_time_text', { off: entry.offTime, on: entry.onTime })}
+            <span style="color: #6b7280; margin-left: 10px;">${t('eco.repeat_days_text', { days: repeatDaysText })}</span>
         </span>
         <div style="display: flex; gap: 0.5rem;">
-            <button class="icon-only-btn" onclick="editEcoConfig('${entry.id}')" title="Edit">
-                <img src="/logo/edit.png" alt="Edit"
+            <button class="icon-only-btn" onclick="editEcoConfig('${entry.id}')" title="${t('common.edit')}">
+                <img src="/logo/edit.png" alt="${t('common.edit')}"
                 style="width: 20px; height: 20px; filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);">
             </button>
-            <button class="icon-only-btn" onclick="deleteEcoConfig('${entry.id}')" title="Delete">
-                <img src="/logo/bin.png" alt="Delete"
+            <button class="icon-only-btn" onclick="deleteEcoConfig('${entry.id}')" title="${t('common.delete')}">
+                <img src="/logo/bin.png" alt="${t('common.delete')}"
                 style="width: 20px; height: 20px; filter: invert(27%) sepia(91%) saturate(7352%) hue-rotate(358deg) brightness(104%) contrast(107%);">
             </button>
         </div>
@@ -456,7 +458,7 @@ function handleEcoSave() {
     const editId = document.getElementById('edit-eco-id')?.value;
 
     if (currentEcoScheduleConfig.repeatDays.length === 0) {
-        alertSuccess("Please select at least 1 day for schedule.");
+        alertSuccess(t('advanced.select_one_day'));
         return;
     }
 
@@ -489,7 +491,7 @@ function handleEcoSave() {
         if (index !== -1) {
             const finalData = { ...newScheduleEntry, id: editId };
             savedEcoSchedules[index] = finalData;
-            alertSuccess("Schedule entry successfully updated.");
+            alertSuccess(t('advanced.schedule_updated_success'));
             console.log(finalData);
         }
     }
@@ -497,7 +499,7 @@ function handleEcoSave() {
         const newId = generateEcoUUID();
         const finalData = { ...newScheduleEntry, id: newId };
         savedEcoSchedules.push(finalData);
-        alertSuccess("New schedule entry saved.");
+        alertSuccess(t('advanced.schedule_added_success'));
         console.log(finalData);
     }
 

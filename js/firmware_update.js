@@ -2,7 +2,7 @@ function uploadFirmware() {
     showLoading();
     const fileInput = document.getElementById("fwFile");
     if (!fileInput.files.length) {
-        alert("No file selected.");
+        alert(t('restore.no_file_selected'));
         return;
     }
 
@@ -22,7 +22,7 @@ function uploadFirmware() {
         document.getElementById("popup").classList.remove("hidden");
     })
     .catch(err => {
-        alert("Upload failed: " + err)
+        alert(t('restore.upload_failed', { error: err }))
         hideLoading();
     });
 }
@@ -32,7 +32,7 @@ function confirmUpgrade() {
     fetch("/cgi-bin/upgrade_fw.sh", { method: "POST" })
     .then(res => res.text())
     .then(txt => alert(txt))
-    .catch(err => alert("Upgrade failed: " + err));
+    .catch(err => alert(t('firmware.upgrade_failed', { error: err })));
     closePopup();
 }
 
@@ -40,7 +40,8 @@ function closePopup() {
     document.getElementById("popup").classList.add("hidden");
 }
 
-function showLoading(message = "Flashing ...") {
+function showLoading(message) {
+    if (message === undefined) message = t('firmware.flashing');
     let overlay = document.getElementById("loading-overlay");
     let loadingText = document.getElementById("loading-text");
 

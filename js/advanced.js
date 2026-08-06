@@ -91,7 +91,7 @@ function initAckTimeout() {
 
             const submitBtn = document.createElement("button");
             submitBtn.type = "submit";
-            submitBtn.textContent = "SET ACK TIMEOUT";
+            submitBtn.textContent = t('advanced.set_ack_timeout_button');
             submitBtn.className = "ack-button";
 
             submitDiv.appendChild(submitBtn);
@@ -116,7 +116,7 @@ function initAckTimeout() {
                     }).then(response => response.text())
                         .then(data => {
                             console.log("Server Response:", data);
-                            alert("Done！");
+                            alert(t('advanced.ack_timeout_done'));
                         })
                         .catch(error => console.error("Error saving ACK timeout:", error));
                 };
@@ -154,7 +154,7 @@ async function initAdvClock() {
     }
     catch (error) {
         console.error("DEBUG CLOCK ERROR:", error);
-        document.getElementById('currentTime').innerText = "Sync Error";
+        document.getElementById('currentTime').innerText = t('advanced.sync_error');
     }
 }
 
@@ -193,8 +193,8 @@ function updateMasterToggle(isActive) {
 
 function toggleScheduleWithConfirmation() {
     const stateToSet = !isMasterScheduleActive;
-    const title = stateToSet ? "Enable Wireless Schedule?" : "Disable Wireless Schedule?";
-    const message = stateToSet ? "Enabling this feature might cause temporary disruption to the wireless connection. Continue?" : "Disabling this schedule will turn on wireless connection immediately. Continue?";
+    const title = stateToSet ? t('advanced.enable_schedule_title') : t('advanced.disable_schedule_title');
+    const message = stateToSet ? t('advanced.enable_schedule_message') : t('advanced.disable_schedule_message');
 
     document.getElementById('confirmation-title').textContent = title;
     document.getElementById('confirmation-message').textContent = message;
@@ -228,11 +228,11 @@ async function confirmToggle(confirmed) {
                 console.log('Schedule entry saved:', result);
             }
 
-            alertSuccess(`Wireless Schedule ${newState ? 'Enabled' : 'Disabled'} and ALL configuration data sent.`);
+            alertSuccess(t('advanced.schedule_toggle_success', { state: newState ? t('common.enabled') : t('common.disabled') }));
         }
         catch (error) {
             console.error("Error sending schedule status:", error);
-            alertSuccess(`Failed to update status: ${error.message}. Configuration reverted.`);
+            alertSuccess(t('advanced.schedule_toggle_failed', { message: error.message }));
             updateMasterToggle(!newState);
         }
     }
@@ -266,7 +266,7 @@ async function fetchSchedules() {
     }
     catch (error) {
         console.error("Error fetching schedules from /config/schedule:", error);
-        alertSuccess(`Failed to fetch schedules: ${error.message}. Displaying empty list.`);
+        alertSuccess(t('advanced.fetch_schedules_failed', { message: error.message }));
         return [];
     }
 }
@@ -275,7 +275,7 @@ function openAddModal() {
     const modalTitle = document.getElementById('modal-title');
     const editIdInput = document.getElementById('edit-id');
 
-    if (modalTitle) modalTitle.textContent = "Add Schedule Entry";
+    if (modalTitle) modalTitle.textContent = t('advanced.add_schedule_entry_title');
     if (editIdInput) editIdInput.value = "";
 
     currentScheduleConfig.repeatDays = ['Su', 'M', 'Tu', 'W', 'Th', 'F', 'Sa'];
@@ -317,11 +317,11 @@ function hideModal(backdropElement) {
 function editConfig(id) {
     const entry = getConfigId(id);
     if (!entry) {
-        alertSuccess("Error: Could not find schedule entry to edit.");
+        alertSuccess(t('advanced.schedule_not_found_edit'));
         return;
     }
 
-    document.getElementById('modal-title').textContent = "Edit Schedule Entry";
+    document.getElementById('modal-title').textContent = t('advanced.edit_schedule_entry_title');
     document.getElementById('edit-id').value = entry.id;
 
     const parsedOff = parseTime(entry.offTime);
@@ -353,12 +353,12 @@ function editConfig(id) {
 }
 
 async function deleteConfig(id) {
-    const userConfirmed = confirm("Are you sure you want to delete this schedule entry?");
+    const userConfirmed = confirm(t('advanced.confirm_delete_schedule'));
     if (!userConfirmed) return;
 
     const index = savedSchedules.findIndex(entry => entry.id === id);
     if (index === -1) {
-        alertSuccess("Error: Could not find schedule entry to delete.");
+        alertSuccess(t('advanced.schedule_not_found_delete'));
         return;
     }
 
@@ -389,11 +389,11 @@ async function deleteConfig(id) {
             updateMasterToggle(false);
         }
 
-        alertSuccess("Schedule entry deleted successfully.");
+        alertSuccess(t('advanced.schedule_deleted_success'));
 
     } catch (error) {
         console.error("Delete failed:", error);
-        alertSuccess("Failed to delete schedule.");
+        alertSuccess(t('advanced.schedule_delete_failed'));
     }
 }
 
@@ -417,7 +417,7 @@ function handleSave() {
     const repeatDays = [...currentScheduleConfig.repeatDays];
 
     if (repeatDays.length === 0) {
-        alert("Please select at least one day for the schedule.");
+        alert(t('advanced.select_one_day'));
         return;
     }
 
@@ -433,9 +433,9 @@ function handleSave() {
             closeAddModal();
 
             console.log("Updated schedule entry:", entry);
-            alertSuccess("Schedule entry updated successfully.");
+            alertSuccess(t('advanced.schedule_updated_success'));
         } else {
-            alertSuccess("Error: Could not find schedule entry to update.");
+            alertSuccess(t('advanced.schedule_not_found_update'));
         }
     } else {
         const newEntry = {
@@ -452,7 +452,7 @@ function handleSave() {
         closeAddModal();
 
         console.log("Added new schedule entry:", newEntry);
-        alertSuccess("New schedule entry added successfully.");
+        alertSuccess(t('advanced.schedule_added_success'));
     }
 }
 
@@ -474,7 +474,7 @@ async function sendScheduleToBackend(scheduleArray) {
         }
     } catch (error) {
         console.error("Error sending schedule to backend:", error);
-        alertSuccess(`Failed to save schedule: ${error.message}`);
+        alertSuccess(t('advanced.schedule_save_failed', { message: error.message }));
     }
 }
 
@@ -488,25 +488,28 @@ function renderScheduleList() {
     if (savedSchedules.length === 0) {
         listContainer.innerHTML = `
             <div class="schedule-placeholder">
-                <span>No schedules configured yet.</span>
+                <span>${t('advanced.no_schedules_text')}</span>
             </div>
         `;
         return;
     }
 
+    const DAY_KEYS = { Su: 'advanced.day_su', M: 'advanced.day_mon', Tu: 'advanced.day_tue', W: 'advanced.day_wed', Th: 'advanced.day_thu', F: 'advanced.day_fri', Sa: 'advanced.day_sat' };
+    const localizeDays = days => days.map(d => DAY_KEYS[d] ? t(DAY_KEYS[d]) : d).join(', ');
+
     listContainer.innerHTML = savedSchedules.map(entry => `
         <div class="schedule-item">
             <div class="schedule-item-content">
                 <div class="schedule-item-time">${entry.offTime} - ${entry.onTime}</div>
-                <div class="schedule-item-days">${entry.repeatDays.join(', ')}</div>
+                <div class="schedule-item-days">${localizeDays(entry.repeatDays)}</div>
             </div>
             <div class="schedule-item-actions">
-                <button class="icon-only-btn" onclick="editConfig('${entry.id}')" title="Edit">
-                    <img src="/logo/edit.png" alt="Edit" 
+                <button class="icon-only-btn" onclick="editConfig('${entry.id}')" title="${t('common.edit')}">
+                    <img src="/logo/edit.png" alt="${t('common.edit')}"
                     style="width: 20px; height: 20px; filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);">
                 </button>
-                <button class="icon-only-btn" onclick="deleteConfig('${entry.id}')" title="Delete">
-                    <img src="/logo/bin.png" alt="Delete" 
+                <button class="icon-only-btn" onclick="deleteConfig('${entry.id}')" title="${t('common.delete')}">
+                    <img src="/logo/bin.png" alt="${t('common.delete')}"
                         style="width: 20px; height: 20px; filter: invert(27%) sepia(91%) saturate(7352%) hue-rotate(358deg) brightness(104%) contrast(107%);">
                 </button>
             </div>
@@ -643,11 +646,11 @@ function openDenyList() {
                 <table class="deny-table">
                     <thead>
                         <tr>
-                            <th>Access Point</th>
-                            <th>Device Name</th>
-                            <th>MAC Address</th>
-                            <th>IP Address</th>
-                            <th style="text-align:center;">Modify</th>
+                            <th>${t('advanced.access_point')}</th>
+                            <th>${t('common.device_name')}</th>
+                            <th>${t('common.mac_address')}</th>
+                            <th>${t('common.ip_address')}</th>
+                            <th style="text-align:center;">${t('common.modify')}</th>
                         </tr>
                     </thead>
                     <tbody>`;
@@ -656,7 +659,7 @@ function openDenyList() {
                 html += `
                     <tr>
                         <td colspan="5" style="text-align:center; padding: 20px; color: #666;">
-                            No devices blocked.
+                            ${t('advanced.no_devices_blocked')}
                         </td>
                     </tr>`;
             } else {
@@ -668,9 +671,9 @@ function openDenyList() {
                             <td>${dev.mac}</td>
                             <td>${dev.ip}</td>
                             <td style="text-align:center;">
-                                <button class="icon-only-btn access-action-btn" onclick="unblockDevice('${dev.mac}','${dev.hostname}', '${dev.ssid}')" title="Unblock">
-                                   <img src="/logo/bin.png" alt="Unblock" class="green-icon">
-                                   <span class="access-action-text">Unblock</span>
+                                <button class="icon-only-btn access-action-btn" onclick="unblockDevice('${dev.mac}','${dev.hostname}', '${dev.ssid}')" title="${t('advanced.unblock')}">
+                                   <img src="/logo/bin.png" alt="${t('advanced.unblock')}" class="green-icon">
+                                   <span class="access-action-text">${t('advanced.unblock')}</span>
                                 </button>
                             </td>
                         </tr>`;
@@ -682,7 +685,7 @@ function openDenyList() {
         })
         .catch(err => {
             console.error("Fetch error:", err);
-            container.innerHTML = '<p style="color:red; text-align:center;">Error loading list.</p>';
+            container.innerHTML = `<p style="color:red; text-align:center;">${t('advanced.error_loading_list')}</p>`;
         });
 }
 
@@ -697,7 +700,7 @@ window.openAddDeviceModal = function () {
         modal.innerHTML = `
             <div class="modal-box">
                 <div class="modal-header">
-                    <h3 id="modal-title">Add Device</h3>
+                    <h3 id="modal-title">${t('advanced.add_device_title')}</h3>
                     <span class="close-x" onclick="closeAddDeviceModalBtn()">&times;</span>
                 </div>
                 <div class="modal-body">
@@ -705,21 +708,21 @@ window.openAddDeviceModal = function () {
                         <table class="popup-table">
                             <thead>
                                 <tr>
-                                    <th>Access Point</th>
-                                    <th>Device Name</th>
-                                    <th>IP</th>
-                                    <th>MAC Address</th>
-                                    <th>Modify</th>
+                                    <th>${t('advanced.access_point')}</th>
+                                    <th>${t('common.device_name')}</th>
+                                    <th>${t('advanced.ip_short')}</th>
+                                    <th>${t('common.mac_address')}</th>
+                                    <th>${t('common.modify')}</th>
                                 </tr>
                             </thead>
                             <tbody id="popupDeviceListBody">
-                                <tr><td colspan="5" style="text-align:center; padding:20px;">Scanning for devices...</td></tr>
+                                <tr><td colspan="5" style="text-align:center; padding:20px;">${t('advanced.scanning_devices')}</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button onclick="closeAddDeviceModalBtn()" class="btn-secondary">CANCEL</button>
+                    <button onclick="closeAddDeviceModalBtn()" class="btn-secondary">${t('common.cancel_upper')}</button>
                 </div>
             </div>
         `;
@@ -757,11 +760,11 @@ function fetchAvailableDevices() {
         .then(data => {
             const tbody = document.getElementById('popupDeviceListBody');
             if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:10px;">No active devices found.</td></tr>';
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:10px;">${t('advanced.no_active_devices')}</td></tr>`;
                 return;
             }
             tbody.innerHTML = data.map(dev => {
-                const name = dev.hostname || 'Unknown';
+                const name = dev.hostname || t('common.unknown');
                 return `
                 <tr>
                     <td>${dev.ssid}</td>
@@ -770,8 +773,8 @@ function fetchAvailableDevices() {
                     <td>${dev.mac}</td>
                     <td>
                         <button class="blockBtn access-action-btn" onclick="blockDevice('${dev.mac}', '${name}', '${dev.ssid}')">
-                            <img src="${blockIcon}" alt="Block" class="blockBtnIcon">
-                            <span class="access-action-text">Block</span>
+                            <img src="${blockIcon}" alt="${t('wireless.block')}" class="blockBtnIcon">
+                            <span class="access-action-text">${t('wireless.block')}</span>
                         </button>
                     </td>
                 </tr>`;
@@ -780,7 +783,7 @@ function fetchAvailableDevices() {
 }
 
 function blockDevice(mac, devName, ap) {
-    if (confirm(`Confirm adding '${devName}' into deny list?`)) {
+    if (confirm(t('wireless.confirm_add_deny_list', { name: devName }))) {
         const url = `/cgi-bin/deny_list.sh?action=add&mac=${encodeURIComponent(mac)}&ssid=${encodeURIComponent(ap)}&policy=deny`;
 
         fetch(url)
@@ -789,26 +792,26 @@ function blockDevice(mac, devName, ap) {
                 try {
                     const data = JSON.parse(text);
                     if (data.result === "success" || data.status === "Success") {
-                        alert(`Success: ${devName} has been blocked.`);
+                        alert(t('wireless.block_success', { name: devName }));
                         if (typeof closeAddDeviceModalBtn === "function") closeAddDeviceModalBtn();
                         if (typeof openDenyList === 'function') openDenyList();
                     } else {
-                        alert(data.message || "Failed to block device.");
+                        alert(data.message || t('advanced.block_failed_default'));
                     }
                 } catch (e) {
                     console.error("Server returned non-JSON:", text);
-                    alert("Router error: Script returned invalid format. Check console.");
+                    alert(t('wireless.router_error_invalid_format'));
                 }
             })
             .catch(error => {
                 console.error('Fetch error:', error);
-                alert("Failed to communicate with router.");
+                alert(t('wireless.communicate_failed'));
             });
     }
 }
 
 function unblockDevice(mac, devName, ap) {
-    const confirmation = confirm(`Confirm removing '${devName}' from deny list?\n\nThis will allow it to access the Internet.`)
+    const confirmation = confirm(t('advanced.confirm_unblock', { name: devName }))
 
     if (confirmation) {
         const params = new URLSearchParams({
@@ -827,15 +830,15 @@ function unblockDevice(mac, devName, ap) {
             })
             .then(data => {
                 if (data.result === "success" || data.status === "Success") {
-                    alert(`Success: ${devName} (${mac}) has been unblocked.`);
+                    alert(t('advanced.unblock_success', { name: devName, mac: mac }));
                     if (typeof openDenyList === 'function') openDenyList();
                 } else {
-                    alert(data.message || "Failed to unblock device.");
+                    alert(data.message || t('advanced.unblock_failed_default'));
                 }
             })
             .catch(error => {
                 console.error('Fetch error:', error);
-                alert("failed to communicate with router.");
+                alert(t('wireless.communicate_failed'));
             });
     }
 }

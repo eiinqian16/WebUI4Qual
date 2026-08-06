@@ -80,7 +80,7 @@ function initEzmesh() {
 		if (toggleController.checked) {
 			// Only force reset if switching from agent → controller
 			if (currentRole === "agent") {
-				alert("Board must be factory reset before switching to Controller mode!");
+				alert(t('ezmesh.factory_reset_controller'));
 				toggleController.checked = false;
 				return;
 			}
@@ -98,7 +98,7 @@ function initEzmesh() {
 		if (toggleAgent.checked) {
 			// Only force reset if switching from controller → agent
 			if (currentRole === "controller") {
-				alert("Board must be factory reset before switching to Agent mode!");
+				alert(t('ezmesh.factory_reset_agent'));
 				toggleAgent.checked = false;
 				return;
 			}
@@ -223,10 +223,10 @@ function initEzmesh() {
 	function updateStartButton() {
 		// Scenario A: EZMesh is already running
 		if (currentRole === "controller" || currentRole === "agent") {
-			startBtn.textContent = "Disable EZMesh";
+			startBtn.textContent = t('ezmesh.disable_ezmesh');
 			startBtn.classList.add("active", "danger"); // 'danger' class can be styled as red/grey in CSS
 			startBtn.dataset.enabled = "true";
-			startBtn.dataset.action = "stop"; 
+			startBtn.dataset.action = "stop";
 			startBtn.style.opacity = 1;
 
 			// Lock out toggles from being changed while active
@@ -238,7 +238,7 @@ function initEzmesh() {
 		// Scenario B: EZMesh is NOT running (Configuring mode)
 		toggleController.disabled = false;
 		toggleAgent.disabled = false;
-		startBtn.textContent = "Start EZMesh";
+		startBtn.textContent = t('ezmesh.start_ezmesh');
 		startBtn.classList.remove("danger");
 		startBtn.dataset.action = "start";
 
@@ -290,7 +290,7 @@ function initEzmesh() {
 		if (toggleController.checked) {
 			// Only force reset if switching from agent → controller
 			if (currentRole === "agent") {
-				alert("Board must be factory reset before switching to Controller mode!");
+				alert(t('ezmesh.factory_reset_controller'));
 				toggleController.checked = false;
 				return;
 			}
@@ -308,7 +308,7 @@ function initEzmesh() {
 		if (toggleAgent.checked) {
 			// Only force reset if switching from controller → agent
 			if (currentRole === "controller") {
-				alert("Board must be factory reset before switching to Agent mode!");
+				alert(t('ezmesh.factory_reset_agent'));
 				toggleController.checked = false;
 				return;
 			}
@@ -329,14 +329,10 @@ function initEzmesh() {
 
 		// --- HANDLE DISABLE NETWORK ACTION ---
 		if (currentAction === "stop") {
-			const confirmDisable = confirm(
-				"Are you sure you want to disable EZMesh?\n\n" +
-				"This will stop the mesh network and disconnect all agent nodes. Your Wi-Fi will temporarily reboot.\n\n" +
-				"Continue?"
-			);
+			const confirmDisable = confirm(t('ezmesh.confirm_disable'));
 			if (!confirmDisable) return;
 
-			showLoading("Disabling EZMesh... Please wait around 1 minute");
+			showLoading(t('ezmesh.disabling'));
 
 			// Changed body payload to explicitly post role=none
 			fetch('/cgi-bin/ezmesh.sh', {
@@ -349,8 +345,8 @@ function initEzmesh() {
 
 				setTimeout(() => {
 					hideLoading();
-					alert("EZMesh has been successfully disabled.");
-					
+					alert(t('ezmesh.disable_success'));
+
 					// Reset internal states back to baseline
 					currentRole = "none";
 					selectedRole = null;
@@ -362,22 +358,18 @@ function initEzmesh() {
 			})
 			.catch(err => {
 				hideLoading();
-				alert("Failed to disable EZMesh. Please try again.");
+				alert(t('ezmesh.disable_failed'));
 			});
 
 			return; // Stop execution here for the disable workflow
 		}
 
 		// --- HANDLE EXISTING START ACTION ---
-		const confirmation = confirm(
-			"After setting the EZMesh role, the current Wi-Fi settings will be replaced with the EZMesh default configuration.\n\n" +
-			"Please change the SSID or password only after EZMesh setup is completed.\n\n" +
-			"Continue?"
-		);
+		const confirmation = confirm(t('ezmesh.confirm_start'));
 
 		if (!confirmation) return;
 
-		showLoading(`Starting EZMesh as ${selectedRole}... Please wait around 1 minute`);
+		showLoading(t('ezmesh.starting_as', { role: selectedRole === 'controller' ? t('ezmesh.controller') : t('ezmesh.agent') }));
 
 		fetch('/cgi-bin/ezmesh.sh', {
 			method: 'POST',
@@ -389,11 +381,7 @@ function initEzmesh() {
 
 			setTimeout(() => {
 				hideLoading();
-				alert(
-					"EZMesh start process completed.\n\n" +
-					"Please go to the wireless settings to view your wireless status.\n\n" +
-					"Important Note: Press the WPS button on both the controller and the agent to automatically pair their wireless configurations!"
-				);
+				alert(t('ezmesh.start_complete'));
 				// Elevate selected role to active running role
 				currentRole = selectedRole;
 				updateStartButton();
@@ -401,25 +389,21 @@ function initEzmesh() {
 		})
 		.catch(err => {
 			hideLoading();
-			alert("Failed to start EZMesh. Please try again.");
+			alert(t('ezmesh.start_failed'));
 		});
 	});
 
 	// --- WPS Button ---
 	wpsBtn.addEventListener("click", () => {
 		if (!selectedRole) {
-			alert("Please select a role (Controller or Agent) before starting WPS pairing.");
+			alert(t('ezmesh.select_role_first'));
 			return;
 		}
 
-		const ok = confirm(
-			"This will start WPS pairing.\n\n" +
-			"Make sure both the Controller and Agent are powered on.\n" +
-			"Continue?"
-		);
+		const ok = confirm(t('ezmesh.confirm_wps'));
 		if (!ok) return;
 
-		showLoading("Starting WPS pairing... Please wait 2 minutes");
+		showLoading(t('ezmesh.wps_starting'));
 
 		fetch('/cgi-bin/wps.sh', {
 			method: 'POST',
@@ -432,11 +416,11 @@ function initEzmesh() {
 			})
 			.then(output => {
 				hideLoading();
-				alert("WPS pairing started.\n\nPress the WPS button on the other device to complete the pairing process.");
+				alert(t('ezmesh.wps_started'));
 			})
 			.catch(err => {
 				hideLoading();
-				alert("Failed to start WPS. Please try again.");
+				alert(t('ezmesh.wps_failed'));
 			});
 	});
 

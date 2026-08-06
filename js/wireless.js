@@ -118,11 +118,11 @@ function buildWifiInfoText(wifi) {
     const infoParts = [];
 
     if (wifi.current_channel) {
-        infoParts.push(`Current Channel: ${wifi.current_channel}`);
+        infoParts.push(t('wireless.current_channel', { channel: wifi.current_channel }));
     }
 
     if (wifi.bitrate) {
-        infoParts.push(`Bitrate: ${wifi.bitrate}`);
+        infoParts.push(t('wireless.bitrate', { bitrate: wifi.bitrate }));
     }
 
     return infoParts.join(' | ');
@@ -142,7 +142,7 @@ function renderWifiList() {
                 <td>
                     <div class="main-wifi-header">
                         <div class="wifi-header">
-                            <h3>WiFi Device (${wifi.device}) - Bands: ${wifi.supported_bands || 'Unknown'}</h3>
+                            <h3>${t('wireless.device_heading', { device: wifi.device, bands: wifi.supported_bands || t('common.unknown') })}</h3>
                             <div class="wifi-header-content">
                                 <p class="wifi-info" data-device="${wifi.device}">
                                     ${buildWifiInfoText(wifi)}
@@ -150,8 +150,8 @@ function renderWifiList() {
                             </div>
                         </div>
                         <div class="header-buttons">
-                            <button class="scan-btn" data-device="${wifi.device}">Scan</button>
-                            <button class="add-btn" data-device="${wifi.device}">Add</button>
+                            <button class="scan-btn" data-device="${wifi.device}">${t('common.scan')}</button>
+                            <button class="add-btn" data-device="${wifi.device}">${t('common.add')}</button>
                         </div>
                     </div>
                 </td>
@@ -167,16 +167,16 @@ function renderWifiList() {
                     <div class="ssid-mode-bssid-wrapper">
                         <span class="ssid">${iface.ssid}</span>
                         <div class="mode-bssid">
-                            <span class="mode">${iface.mode === "ap" ? "Master" : "Client"}</span>
-                            <span class="bssid" data-iface="${iface.iface}">${iface.bssid || "Unknown"}</span>
+                            <span class="mode">${iface.mode === "ap" ? t('wireless.mode_master') : t('wireless.mode_client')}</span>
+                            <span class="bssid" data-iface="${iface.iface}">${iface.bssid || t('common.unknown')}</span>
                         </div>
                     </div>
                 </td>
 
 
                 <td class="actions">
-                    <button class="edit-btn" data-device="${wifi.device}" data-iface="${iface.iface}">Edit</button>
-                    <button class="delete-btn" data-iface="${iface.iface}">Delete</button>
+                    <button class="edit-btn" data-device="${wifi.device}" data-iface="${iface.iface}">${t('common.edit')}</button>
+                    <button class="delete-btn" data-iface="${iface.iface}">${t('common.delete')}</button>
                 </td>
             `;
 
@@ -229,7 +229,7 @@ function updateWifiInfoUI() {
         wifi.interfaces.forEach(iface => {
             const bssidElement = document.querySelector(`.bssid[data-iface="${iface.iface}"]`);
             if (bssidElement) {
-                bssidElement.textContent = `BSSID : ${iface.bssid || "Unknown"}`;
+                bssidElement.textContent = t('wireless.bssid_label', { bssid: iface.bssid || t('common.unknown') });
             }
         });
     });
@@ -333,37 +333,37 @@ async function openEditModal_v2(device, iface) {
     let cipherOptions = "";
 
     let modalHtml = `                                                                                                                                                                                                                                    
-        <h4>WiFi Configuration</h4>                                                                                     
+        <h4>${t('wireless.wifi_configuration')}</h4>                                                                                     
         <table>                                                                                                               
-            <tr><td>SSID:</td><td><input type="text" id="iface-ssid-${iface}" value="${ifaceConfig.ssid || ''}"></td></tr>    
+            <tr><td>${t('common.ssid_colon')}</td><td><input type="text" id="iface-ssid-${iface}" value="${ifaceConfig.ssid || ''}"></td></tr>    
                                                                                                                 
             <tr>                                                                                                                   
-                <td>Encryption:</td>                                                                                               
-                <td>                                                                                                               
+                <td>${t('common.encryption_colon')}</td>
+                <td>
                     <select id="iface-encryption-${iface}" onchange="updateCipherOptions('${iface}', document.getElementById('iface-mode-${iface}').value,'${device}'); togglePasswordField('${iface}');">
                     </select>                                                                                               
                 </td>                                                                                                              
             </tr>  
             <tr id="cipher-row-${iface}" style="display: none;">
-                <td>Cipher Mode:</td>
+                <td>${t('wireless.cipher_mode_colon')}</td>
                 <td>
                     <select id="iface-cipher-${iface}"></select>
                 </td>
             </tr>
             <tr id="password-row-${iface}" style="display: ${encryptionValue === "none" ? "none" : "table-row"};">
-                <td>Password:</td>
+                <td>${t('common.password_colon')}</td>
                 <td>
-                    <input type="password" id="iface-key-${iface}" 
-                           value="${ifaceConfig.sae_password || ifaceConfig.key || ''}" 
-                           ${encryptionValue === "sae" ? "placeholder='SAE Password'" : ""}>
+                    <input type="password" id="iface-key-${iface}"
+                           value="${ifaceConfig.sae_password || ifaceConfig.key || ''}"
+                           ${encryptionValue === "sae" ? `placeholder='${t('wireless.sae_password_placeholder')}'` : ""}>
                 </td>
             </tr>
             <tr>                                                                                                                   
-                <td>Disabled:</td>                                                                                        
-                <td>                                                                                                          
-                    <select id="device-disabled-${device}">                                                                        
-                        <option value="0" ${wifi.disabled == "0" ? "selected" : ""}>Enabled</option>                      
-                        <option value="1" ${wifi.disabled == "1" ? "selected" : ""}>Disabled</option>               
+                <td>${t('common.disabled_colon')}</td>
+                <td>
+                    <select id="device-disabled-${device}">
+                        <option value="0" ${wifi.disabled == "0" ? "selected" : ""}>${t('common.enabled')}</option>
+                        <option value="1" ${wifi.disabled == "1" ? "selected" : ""}>${t('common.disabled')}</option>
                     </select>                                                                                                 
                 </td>                                                                                                         
             </tr>                                                                                         
@@ -375,68 +375,68 @@ async function openEditModal_v2(device, iface) {
                     <input type="checkbox" id="WifiAdvToggle">
                     <span class="slider round"></span>
                 </label>
-                <span class="toggle-label" id="toggle-label"><strong>Advanced Configurations</strong></span>
+                <span class="toggle-label" id="toggle-label"><strong>${t('wireless.advanced_configurations')}</strong></span>
         </div>
 		
 		<div id="wifiAdv" display="none">
-			<h4>Advanced Configuration: ${device}</h4>                                                                                   
+			<h4>${t('wireless.advanced_configuration_device', { device: device })}</h4>                                                                                   
 			<table>                                                                                                               
 				<tr>                                                                                                              
-					<td>Channel:</td>                                                                                             
-			<td>                                                                                                               
-				<select id="device-channel-${device}" onchange="updateChannelBand('${device}', '${iface}')">                                                                
-				${channelOptionsHtml}                                                                                 
-				</select>                                                                                    
-			</td>                                                                                               
-				</tr>                                                                                                             
-				<tr>                                                                                                                   
-					<td>TX Power:</td>                                                                                        
-					<td>                                                                                                          
-						<select id="device-txpower-${device}">                                                       
-							${txpowerOptions}                                                                            
-						</select>                                                                                          
-					</td>                                                                                                              
-				</tr>                                                                                                         
-				<tr>                                                                                                              
-					<td>Country:</td>                                                                                
-					<td>                                                                                                 
+					<td>${t('common.channel_colon')}</td>
+			<td>
+				<select id="device-channel-${device}" onchange="updateChannelBand('${device}', '${iface}')">
+				${channelOptionsHtml}
+				</select>
+			</td>
+				</tr>
+				<tr>
+					<td>${t('wireless.tx_power_colon')}</td>
+					<td>
+						<select id="device-txpower-${device}">
+							${txpowerOptions}
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td>${t('common.country_colon')}</td>
+					<td>
 						<select id="device-country-${device}">
-                            <option value="">Loading countries...</option>
-                        </select>                                                                
-						<span id="country-error-${device}" style="color: red; font-size: 0.9em;"></span>                      
-					</td>                                                                                                         
+                            <option value="">${t('common.loading_countries')}</option>
+                        </select>
+						<span id="country-error-${device}" style="color: red; font-size: 0.9em;"></span>
+					</td>
 				</tr>
-				<tr>                                                                                                     
-					<td>HW Mode:</td>                                                                              
-					<td>                                                                                                               
-						<select id="device-hwmode-${device}" onchange="updateHtmode('${device}')">                            
-							${hwmodeOptions}                                                                                      
-						</select>                                                                                                      
-					</td>                                                                                                     
+				<tr>
+					<td>${t('wireless.hw_mode_colon')}</td>
+					<td>
+						<select id="device-hwmode-${device}" onchange="updateHtmode('${device}')">
+							${hwmodeOptions}
+						</select>
+					</td>
 				</tr>
-				<tr id="htmode-row-${device}">                                                                                         
-					<td>HT Mode:</td>                                                                                         
-					<td>                                                                                                          
-						<select id="device-htmode-${device}"></select>                                                                 
-					</td>                                                                                                     
+				<tr id="htmode-row-${device}">
+					<td>${t('wireless.ht_mode_colon')}</td>
+					<td>
+						<select id="device-htmode-${device}"></select>
+					</td>
 				</tr>
-                <tr>                                                                                                                   
-					<td>Mode:</td>                                                                                                     
-					<td>                                                                                                               
-						<select id="iface-mode-${iface}" 
+                <tr>
+					<td>${t('common.mode_colon')}</td>
+					<td>
+						<select id="iface-mode-${iface}"
 								onchange="updateCipherOptions('${iface}', this.value,'${device}'); togglePasswordField('${iface}');">
-							<option value="ap" ${ifaceConfig.mode === "ap" ? "selected" : ""}>Access Point (AP)</option>               
-							<option value="sta" ${ifaceConfig.mode === "sta" ? "selected" : ""}>Station (STA)</option>                 
-						</select>                                                                                                      
-					</td>                                                                                                              
+							<option value="ap" ${ifaceConfig.mode === "ap" ? "selected" : ""}>${t('wireless.mode_ap')}</option>
+							<option value="sta" ${ifaceConfig.mode === "sta" ? "selected" : ""}>${t('wireless.mode_sta')}</option>
+						</select>
+					</td>
 				</tr>                                                                                                                                                                                                                                                                                                                                                                                                                
 			</table>                                                                                                                
 		</div>
 		
-        <button class="modal-reset-btn" onclick="resetConfig('${device}', '${iface}')">Reset</button>
+        <button class="modal-reset-btn" onclick="resetConfig('${device}', '${iface}')">${t('common.reset')}</button>
         <div class="modal-action-row">
-		    <button class="modal-save-btn" onclick="saveConfig('${device}', '${iface}')">Save</button>
-            <button class="modal-close-btn" onclick="closeEditModal()">Close</button>
+		    <button class="modal-save-btn" onclick="saveConfig('${device}', '${iface}')">${t('common.save')}</button>
+            <button class="modal-close-btn" onclick="closeEditModal()">${t('common.close')}</button>
         </div>
     `;
 
@@ -749,7 +749,7 @@ async function validateCountryCode(device) {
             return true;
         }
         else {
-            countryError.textContent = "Please select a valid country";
+            countryError.textContent = t('wireless.select_valid_country');
             dropdown.classList.add("input-error");
             return false;
         }
@@ -776,14 +776,14 @@ function saveConfig(device, iface) {
     let encryption = getSelectedValue(`iface-encryption-${iface}`);
 
     if (encryption !== "none" && password.length < 8) {
-        alert("Password must be at least 8 characters.");
+        alert(t('wireless.password_min_length'));
         //ssidInput.focus();
         hideLoading();
         return;
     }
 
     if (!validateCountryCode(device)) {
-        alert("Invalid country code! Please choose a country.");
+        alert(t('wireless.invalid_country_code'));
         return false;
     }
 
@@ -868,7 +868,7 @@ function saveConfig(device, iface) {
     }
 
     if (!iface || iface.trim() === "") {
-        alert("Error: No iface provided for modification.");
+        alert(t('wireless.no_iface_error'));
         hideLoading();
         return;
     }
@@ -928,7 +928,7 @@ function saveConfig(device, iface) {
         })
         .catch(err => {
             console.error('Error saving configuration:', err);
-            alert('Failed to save configuration.');
+            alert(t('wireless.save_failed'));
         })
         .finally(() => {
             hideLoading();
@@ -946,13 +946,13 @@ function closeEditModal() {
 }
 
 function deleteIface(iface) {
-    if (!confirm(`确定要删除 ${iface} 吗？`)) {
+    if (!confirm(t('wireless.confirm_delete_iface', { iface: iface }))) {
         return;
     }
 
     const deleteBtn = document.querySelector(`.delete-btn[data-iface="${iface}"]`);
     if (deleteBtn) {
-        deleteBtn.textContent = "Deleting...";
+        deleteBtn.textContent = t('common.deleting');
         deleteBtn.disabled = true;
     }
 
@@ -971,18 +971,18 @@ function deleteIface(iface) {
             if (data.includes("Done")) {
                 getConfig();
             } else {
-                console.log("删除完成，但未检测到 Done，可能 WiFi 还在重启...");
+                console.log("Delete completed, but 'Done' not detected, WiFi may still be restarting...");
                 return new Promise(resolve => setTimeout(resolve, 1000));
             }
         })
         .catch(error => {
             console.error("Error:", error);
-            alert("删除失败！");
+            alert(t('wireless.delete_failed'));
         })
         .finally(() => {
             hideLoading();
             if (deleteBtn) {
-                deleteBtn.textContent = "Delete";
+                deleteBtn.textContent = t('common.delete');
                 deleteBtn.disabled = false;
             }
             disableButtons(false);
@@ -1118,10 +1118,10 @@ async function openAddModal(device) {
     let modalHtml = `
         <div class="add-interface-modal">
         <div class="add-interface-form">
-        <h3>Add Interface to ${device}</h3>
+        <h3>${t('wireless.add_interface_to', { device: device })}</h3>
         <table>
             <tr>
-                <td>Channel:</td>
+                <td>${t('common.channel_colon')}</td>
                 <td>
                     <select id="device-channel-${device}" onchange="updateChannelBand('${device}', 'new')">
                         ${channelOptionsHtml}
@@ -1129,7 +1129,7 @@ async function openAddModal(device) {
                 </td>
             </tr>
             <tr>
-                <td>TX Power:</td>
+                <td>${t('wireless.tx_power_colon')}</td>
                 <td>
                     <select id="device-txpower-${device}">
                         ${txpowerOptions}
@@ -1137,14 +1137,14 @@ async function openAddModal(device) {
                 </td>
             </tr>
             <tr>
-                <td>Country:</td>
+                <td>${t('common.country_colon')}</td>
                 <td>
                     <input type="text" id="device-country-${device}" value="${wifi.country || ''}" oninput="validateCountryCode('${device}')">
                     <span id="country-error-${device}" style="color: red; font-size: 0.9em;"></span>
                 </td>
             </tr>
             <tr>
-                <td>HW Mode:</td>
+                <td>${t('wireless.hw_mode_colon')}</td>
                 <td>
                     <select id="device-hwmode-${device}" onchange="updateAddHtmode('${device}', '${defaultHtmode}', ${JSON.stringify(htModesObject).replace(/"/g, '&quot;')})">
                         ${hwmodeOptions}
@@ -1152,7 +1152,7 @@ async function openAddModal(device) {
                 </td>
             </tr>
             <tr id="htmode-row-${device}">
-                <td>HT Mode:</td>
+                <td>${t('wireless.ht_mode_colon')}</td>
                 <td>
                     <select id="device-htmode-${device}">
                         ${htmodeOptions}
@@ -1160,51 +1160,51 @@ async function openAddModal(device) {
                 </td>
             </tr>
             <tr>
-                <td>Disabled:</td>
+                <td>${t('common.disabled_colon')}</td>
                 <td>
                     <select id="device-disabled-${device}">
-                        <option value="0" selected>Enabled</option>
-                        <option value="1">Disabled</option>
+                        <option value="0" selected>${t('common.enabled')}</option>
+                        <option value="1">${t('common.disabled')}</option>
                     </select>
                 </td>
             </tr>
         </table>
 
-        <h3>New Interface</h3>
+        <h3>${t('wireless.new_interface')}</h3>
         <table>
-            <tr><td>SSID:</td><td><input type="text" id="iface-ssid-new" value="myAP" required></td></tr>
+            <tr><td>${t('common.ssid_colon')}</td><td><input type="text" id="iface-ssid-new" value="myAP" required></td></tr>
             <tr>
-                <td>Mode:</td>
+                <td>${t('common.mode_colon')}</td>
                 <td>
                     <select id="iface-mode-new" onchange="updateCipherOptions('new', this.value,'${device}'); togglePasswordField('new');">
-                        <option value="ap" selected>Access Point (AP)</option>
-                        <option value="sta">Station (STA)</option>
+                        <option value="ap" selected>${t('wireless.mode_ap')}</option>
+                        <option value="sta">${t('wireless.mode_sta')}</option>
                     </select>
                 </td>
             </tr>
             <tr>
-                <td>Encryption:</td>
+                <td>${t('common.encryption_colon')}</td>
                                 <td>
                     <select id="iface-encryption-new" onchange="updateCipherOptions('new', document.getElementById('iface-mode-new').value,'${device}'); togglePasswordField('new');">
                     </select>
                 </td>
             </tr>
             <tr id="cipher-row-new" style="display: none;">
-                <td>Cipher Mode:</td>
+                <td>${t('wireless.cipher_mode_colon')}</td>
                 <td>
                     <select id="iface-cipher-new"></select>
                 </td>
             </tr>
             <tr id="password-row-new" style="display:none;">
-                <td>Password:</td>
+                <td>${t('common.password_colon')}</td>
                 <td><input type="password" id="iface-key-new"></td>
             </tr>
             </div>
         </table>
 
         <div class="add-interface-actions">
-            <button onclick="saveNewInterface('${device}')">Save</button>
-            <button class="modal-close-btn" onclick="closeEditModal()">Close</button>
+            <button onclick="saveNewInterface('${device}')">${t('common.save')}</button>
+            <button class="modal-close-btn" onclick="closeEditModal()">${t('common.close')}</button>
         </div>
         </div>
     `;
@@ -1259,7 +1259,7 @@ function updateAddHtmode(device, defaultHtmode, hwModesData = null) {
 
     if (!hwModesData || Object.keys(hwModesData).length === 0) {
         console.warn("No HW Modes found, hiding HT Mode select.");
-        htmodeSelect.innerHTML = `<option value="">No HT Modes Available</option>`;
+        htmodeSelect.innerHTML = `<option value="">${t('wireless.no_ht_modes')}</option>`;
         htmodeRow.style.display = "none";
         return;
     }
@@ -1270,7 +1270,7 @@ function updateAddHtmode(device, defaultHtmode, hwModesData = null) {
 
     if (!matchedHwmode) {
         console.warn(`Warning: HW Mode '${hwmode}' not found in`, hwModesData);
-        htmodeSelect.innerHTML = `<option value="">No HT Modes Available</option>`;
+        htmodeSelect.innerHTML = `<option value="">${t('wireless.no_ht_modes')}</option>`;
         htmodeRow.style.display = "none";
         return;
     }
@@ -1297,7 +1297,7 @@ function updateAddHtmode(device, defaultHtmode, hwModesData = null) {
         console.log("Final HT Modes HTML:", htmodeSelect.innerHTML);
     } else {
         console.warn("No HT Modes Available");
-        htmodeSelect.innerHTML = `<option value="">No HT Modes Available</option>`;
+        htmodeSelect.innerHTML = `<option value="">${t('wireless.no_ht_modes')}</option>`;
     }
 }
 
@@ -1309,7 +1309,7 @@ function saveNewInterface(device) {
     const closeButton = document.querySelector(".modal-close-btn");
 
     saveButton.disabled = true;
-    saveButton.textContent = "Saving...";
+    saveButton.textContent = t('common.saving');
     closeButton.disabled = true;
 
     showLoading();
@@ -1397,17 +1397,17 @@ function saveNewInterface(device) {
                 closeEditModal();
                 getConfig();
             } else {
-                alert("Failed to save configuration.");
+                alert(t('wireless.save_failed'));
             }
         })
         .catch(err => {
             console.error('Error saving new interface:', err);
-            alert("Error: Could not save the configuration.");
+            alert(t('wireless.save_error'));
         })
         .finally(() => {
             hideLoading();
             saveButton.disabled = false;
-            saveButton.textContent = "Save";
+            saveButton.textContent = t('common.save');
             closeButton.disabled = false;
         });
 }
@@ -1428,7 +1428,7 @@ async function startScan(device) {
         showScanResult(data);
     } catch (err) {
         console.error('Error during scanning:', err);
-        alert('Failed to scan networks.');
+        alert(t('wireless.scan_failed'));
     } finally {
         hideLoading();
     }
@@ -1450,18 +1450,18 @@ function showScanResult(scanData) {
         return signalB - signalA;
     });
     console.log("Sorted Scan Data:", scanData.results);
-    let resultHtml = `<h3>Scan Result for ${scanData.device}</h3><div class="scan-results-list">`;
+    let resultHtml = `<h3>${t('wireless.scan_result_for', { device: scanData.device })}</h3><div class="scan-results-list">`;
     resultHtml += `
         <table class="scan-table">
             <thead>
                 <tr>
-                    <th>Signal (dBm)</th>
-                    <th>SSID</th>
-                    <th>Channel</th>
-                    <th>BSSID</th>
-                    <th>Mode</th>
-                    <th>Encryption</th>
-                    <th>Join</th>
+                    <th>${t('common.signal_dbm')}</th>
+                    <th>${t('common.ssid')}</th>
+                    <th>${t('common.channel')}</th>
+                    <th>${t('wireless.bssid')}</th>
+                    <th>${t('common.mode')}</th>
+                    <th>${t('common.encryption')}</th>
+                    <th>${t('common.join')}</th>
                 </tr>
             </thead>
             <tbody>
@@ -1469,17 +1469,17 @@ function showScanResult(scanData) {
 
     scanData.results.forEach(result => {
         if (result.ssid) {
-            let encryption = result.encryption ? (result.encryption.includes("Open") ? "none" : result.encryption) : "Unknown";
+            let encryption = result.encryption ? (result.encryption.includes("Open") ? "none" : result.encryption) : t('common.unknown');
             resultHtml += `
                 <tr>
                     <td>${result.signal} dBm</td>
                     <td>${result.ssid}</td>
                     <td>${result.channel || 'N/A'}</td>
                     <td>${result.bssid || 'N/A'}</td>
-                    <td>${result.mode || 'Unknown'}</td>
+                    <td>${result.mode || t('common.unknown')}</td>
                     <td>${encryption}</td>
                     <td>
-                        <button class="join-btn" onclick="joinNetwork('${scanData.device}', '${result.ssid}', '${result.bssid}', '${result.channel}', '${result.encryption}')">Join</button>
+                        <button class="join-btn" onclick="joinNetwork('${scanData.device}', '${result.ssid}', '${result.bssid}', '${result.channel}', '${result.encryption}')">${t('common.join')}</button>
                     </td>
                 </tr>
             `;
@@ -1487,7 +1487,7 @@ function showScanResult(scanData) {
     });
 
     resultHtml += `</tbody></table></div>`;
-    resultHtml += `<div class="scan-modal-footer"><button class="modal-close-btn" onclick="closeScanModal()">Close</button></div>`;
+    resultHtml += `<div class="scan-modal-footer"><button class="modal-close-btn" onclick="closeScanModal()">${t('common.close')}</button></div>`;
 
     modalContent.innerHTML = resultHtml;
     if (typeof window.lockBodyScroll === "function") {
@@ -1512,18 +1512,18 @@ function showPasswordModal(ssid, callback) {
     modal.classList.add("modal", "show");
     modal.innerHTML = `
         <div class="modal-content">
-            <h3>Connect to ${ssid}</h3>
-            <label>Password:</label>
+            <h3>${t('wireless.connect_to', { ssid: ssid })}</h3>
+            <label>${t('common.password_colon')}</label>
             <div class="password-wrapper">
                 <input type="password" id="wifi-password"
-                       onmousedown="this.type='text'" 
-                       onmouseup="this.type='password'" 
+                       onmousedown="this.type='text'"
+                       onmouseup="this.type='password'"
                        onmouseleave="this.type='password'"
                        autofocus>
             </div>
             <div class="modal-actions">
-                <button id="join-btn">Join</button>
-                <button id="cancel-btn">Cancel</button>
+                <button id="join-btn">${t('common.join')}</button>
+                <button id="cancel-btn">${t('common.cancel')}</button>
             </div>
         </div>`;
 
@@ -1561,7 +1561,7 @@ async function joinNetwork(device, ssid, bssid, channel, encryption) {
     if (encryption !== "Open") {
         showPasswordModal(ssid, async (password) => {
             if (!password) {
-                alert("Password is required.");
+                alert(t('wireless.password_required'));
                 return;
             }
             await sendJoinRequest(device, ssid, bssid, channel, encryption, password);
@@ -1593,11 +1593,11 @@ async function sendJoinRequest(device, ssid, bssid, channel, encryption, passwor
             closeScanModal();
             getConfig();
         } else {
-            alert(`Failed to join ${ssid}: ${result.error || "Unknown error"}`);
+            alert(t('wireless.join_failed', { ssid: ssid, error: result.error || t('wireless.unknown_error') }));
         }
     } catch (err) {
         console.error("Join network error:", err);
-        alert("Error joining the network.");
+        alert(t('wireless.join_network_error'));
     } finally {
         hideLoading();
     }
@@ -1654,8 +1654,8 @@ function updateStationsTable(stationsData) {
     }
 
     if (!stationsData || stationsData.length === 0) {
-        table2g.innerHTML = '<tr><td colspan="5">No clients connected</td></tr>';
-        table5g.innerHTML = '<tr><td colspan="5">No clients connected</td></tr>';
+        table2g.innerHTML = `<tr><td colspan="5">${t('wireless.no_clients_connected')}</td></tr>`;
+        table5g.innerHTML = `<tr><td colspan="5">${t('wireless.no_clients_connected')}</td></tr>`;
         return;
     }
 
@@ -1664,9 +1664,9 @@ function updateStationsTable(stationsData) {
 
     stationsData.forEach(station => {
         const blockIcon = "logo/block.png"
-        const blockBtn = `<button class="blockBtn" onclick="blockDevice('${station.mac}', '${station.hostname}', '${station.ssid}')" title="Block Device">
-                                <img src="${blockIcon}" alt="Block" class="blockBtnIcon">
-                                <span class="blockBtnText">Block</span>
+        const blockBtn = `<button class="blockBtn" onclick="blockDevice('${station.mac}', '${station.hostname}', '${station.ssid}')" title="${t('wireless.block_device_title')}">
+                                <img src="${blockIcon}" alt="${t('wireless.block')}" class="blockBtnIcon">
+                                <span class="blockBtnText">${t('wireless.block')}</span>
                               </button>
             `;
         const row = `
@@ -1692,7 +1692,7 @@ function updateStationsTable(stationsData) {
 }
 
 function blockDevice(mac, devName, ap) {
-    if (confirm(`Confirm adding '${devName}' into deny list?`)) {
+    if (confirm(t('wireless.confirm_add_deny_list', { name: devName }))) {
         const url = `/cgi-bin/deny_list.sh?action=add&mac=${encodeURIComponent(mac)}&ssid=${encodeURIComponent(ap)}&policy=deny`;
 
         fetch(url)
@@ -1701,18 +1701,18 @@ function blockDevice(mac, devName, ap) {
                 try {
                     const data = JSON.parse(text);
                     if (data.status === "success") {
-                        alert(`Success: ${devName} has been blocked.`);
+                        alert(t('wireless.block_success', { name: devName }));
                         closeAddDeviceModalBtn();
                         if (typeof openDenyList === 'function') openDenyList();
                     }
                 } catch (e) {
                     console.error("Server returned non-JSON:", text);
-                    alert("Router error: Script returned invalid format. Check console.");
+                    alert(t('wireless.router_error_invalid_format'));
                 }
             })
             .catch(error => {
                 console.error('Fetch error:', error);
-                alert("Failed to communicate with router.");
+                alert(t('wireless.communicate_failed'));
             });
     }
 }
@@ -1754,12 +1754,12 @@ toggleMloOptions();
 
 function setupMLO() {
     showLoading();
-    document.getElementById("loading-text").textContent = "Applying MLO settings...";
+    document.getElementById("loading-text").textContent = t('wireless.applying_mlo');
 
     const isEnabled = document.getElementById("mlo-enabled").checked;
     if (!isEnabled) {
-        alert("Disabling MLO will reboot the device.");
-        document.getElementById("loading-text").textContent = "Device is rebooting... Please wait.";
+        alert(t('wireless.mlo_disable_confirm'));
+        document.getElementById("loading-text").textContent = t('wireless.device_rebooting');
 
         fetch('/cgi-bin/mlo_setup.sh', {
             method: 'POST',
@@ -1775,7 +1775,7 @@ function setupMLO() {
             })
             .catch(error => {
                 console.error("Error disabling MLO:", error);
-                alert("Failed to disable MLO.");
+                alert(t('wireless.mlo_disable_failed'));
                 hideLoading();
                 closeMloModal();
             })
@@ -1788,14 +1788,14 @@ function setupMLO() {
     const password = passwordInput.value.trim();
 
     if (!ssid) {
-        alert("SSID is required.");
+        alert(t('wireless.ssid_required'));
         ssidInput.focus();
         hideLoading();
         return;
     }
 
     if (!password || password.length < 8) {
-        alert("Password must be at least 8 characters.");
+        alert(t('wireless.password_min_length'));
         passwordInput.focus();
         hideLoading();
         return;
@@ -1807,7 +1807,7 @@ function setupMLO() {
     if (document.getElementById("mlo-6G").checked) selectedBands.push("6G");
 
     if (selectedBands.length < 2) {
-        alert("Please select at least two bands.");
+        alert(t('wireless.select_two_bands'));
         hideLoading();
         return;
     }
@@ -1831,7 +1831,7 @@ function setupMLO() {
         })
         .catch(error => {
             console.error("Error applying MLO setup:", error);
-            alert("Failed to apply MLO setup.");
+            alert(t('wireless.mlo_setup_failed'));
         })
         .finally(() => {
             hideLoading();
@@ -1868,7 +1868,7 @@ function checkDeviceReboot(attempts = 0) {
                 console.log(`Device not ready, retrying... (${attempts + 1})`);
                 setTimeout(() => checkDeviceReboot(attempts + 1), 3000);
             } else {
-                alert("Device took too long to reboot. Try refreshing manually.");
+                alert(t('wireless.reboot_timeout'));
             }
         });
 }

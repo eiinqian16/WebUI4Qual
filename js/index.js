@@ -1,6 +1,22 @@
 let loadedScripts = {}; // Track loaded scripts
 let currentSection = null; // Track current section
 
+function changeLanguage(lang) {
+    let select = document.getElementById('langSelect');
+    if (select) select.disabled = true;
+
+    i18n.setLanguage(lang).then(() => {
+        // i18n.setLanguage already re-translates static markup document-wide.
+        // Dynamically-rendered section content (built by JS template strings)
+        // needs its section reloaded so it regenerates text in the new language.
+        let sectionToReload = currentSection;
+        currentSection = null;
+        loadSection(sectionToReload || 'overview');
+    }).finally(() => {
+        if (select) select.disabled = false;
+    });
+}
+
 function loadSection(section) {
     // Prevent duplicate section loads
     if (currentSection === section) {
@@ -11,6 +27,7 @@ function loadSection(section) {
 
     fetch(section + '.html')
         .then(response => response.text())
+        .then(html => i18n.init().then(() => html))
         .then(html => {
             let mainContent = document.querySelector('#main-content');
             if (!mainContent) {
@@ -18,6 +35,7 @@ function loadSection(section) {
                 return;
             }
             mainContent.innerHTML = html;
+            i18n.applyTranslations(mainContent);
 
             if (section === 'overview') {
                 loadScript('js/process_json.js', () => {
@@ -347,6 +365,11 @@ window.redirectToTime = function(event) {
 
 // CONSOLIDATED DOMContentLoaded - Only ONE listener now!
 document.addEventListener("DOMContentLoaded", () => {
+    i18n.init().then(() => {
+        let select = document.getElementById('langSelect');
+        if (select) select.value = i18n.currentLang;
+    });
+
     // Session check
     let sessionID = sessionStorage.getItem("sessionID");
 

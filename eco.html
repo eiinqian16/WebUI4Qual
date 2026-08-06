@@ -11,22 +11,22 @@
 
 <body>
     <div class="box eco-page-box">
-        <h1>Eco Mode</h1>
-        <p class="description">Set Eco Mode to save power.</p>
+        <h1 data-i18n="eco.title">Eco Mode</h1>
+        <p class="description" data-i18n="eco.desc">Set Eco Mode to save power.</p>
         <hr>
-        <h3>Power Mode:</h3>
+        <h3 data-i18n="eco.power_mode_label">Power Mode:</h3>
 
         <label class="mode-option">
             <input type="radio" name="powerMode" id="normalMode" value="normal">
-            <label for="normalMode">Normal Mode</label><br>
-            <span class="modeDesc">When working in Normal Mode, the router operates at full performance. LEDs and Wi-Fi
+            <label for="normalMode" data-i18n="eco.normal_mode">Normal Mode</label><br>
+            <span class="modeDesc" data-i18n="eco.normal_mode_desc">When working in Normal Mode, the router operates at full performance. LEDs and Wi-Fi
                 work normally.</span><br>
         </label>
         <br>
         <label class="mode-option">
             <input type="radio" name="powerMode" id="ecoMode" value="eco">
-            <label for="ecoMode">Eco Mode</label><br>
-            <span class="modeDesc">When working in Eco Mode, LEDs are turned off and Wi-Fi performance is
+            <label for="ecoMode" data-i18n="eco.title">Eco Mode</label><br>
+            <span class="modeDesc" data-i18n="eco.eco_mode_desc">When working in Eco Mode, LEDs are turned off and Wi-Fi performance is
                 reduced.</span>
         </label>
         <br>
@@ -35,50 +35,50 @@
         <br>
         <br>
         <span id="eco-save-btn" class="eco-save-btn">
-            <button onclick="setPowerMode()">Save and Apply</button>
+            <button onclick="setPowerMode()" data-i18n="eco.save_apply_button">Save and Apply</button>
         </span>
     </div>
     <div class="box">
         <div id="eco-schedule">
-            <h1>Eco Mode Schedule</h1>
-            <p class="description">Create schedule to turn on low power mode.</p>
+            <h1 data-i18n="eco.schedule_title">Eco Mode Schedule</h1>
+            <p class="description" data-i18n="eco.schedule_desc">Create schedule to turn on low power mode.</p>
             <hr>
             <div style="padding-bottom: 1.5rem; border-bottom: 1px solid #e5e7eb;">
                 <div class="setting-row">
-                    <label>Eco Mode Schedule:</label>
+                    <label data-i18n="eco.schedule_label">Eco Mode Schedule:</label>
                     <!-- This toggle triggers the confirmation dialog -->
                     <div id="master-eco-toggle" class="toggle-switch" onclick="toggleEcoScheduleWithConfirmation()">
                     </div>
                 </div>
 
                 <div class="setting-row">
-                    <label>System Time:</label>
-                    <div id="currentTime" class="current-time-display">Loading...</div>
+                    <label data-i18n="advanced.system_time_label">System Time:</label>
+                    <div id="currentTime" class="current-time-display" data-i18n="common.loading">Loading...</div>
                 </div>
 
                 <div class="eco-note">
                     <p style="font-size: 0.875rem;">
-                        <span class="highlight">Note:</span> Please ensure router is connected to Internet and system
-                        time shown is correct. Only enabled schedule entries will be saved.
+                        <span class="highlight" data-i18n="common.note_label_plain">Note:</span> <span data-i18n="advanced.time_note_text">Please ensure router is connected to Internet and system
+                        time shown is correct. Only enabled schedule entries will be saved.</span>
                     </p>
                 </div>
 
                 <div class="config-time">
-                    <button onclick="window.redirectToTime(event)">Configure Time</button>
+                    <button onclick="window.redirectToTime(event)" data-i18n="advanced.configure_time_button">Configure Time</button>
                 </div>
             </div>
 
             <!-- Schedule List Section -->
             <div style="margin-top: 1.5rem;">
-                <h2 class="schedule-list-header">Scheduled Entries</h2>
+                <h2 class="schedule-list-header" data-i18n="advanced.scheduled_entries_title">Scheduled Entries</h2>
 
                 <div id="schedule-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
                     <div class="schedule-placeholder">
-                        <span>No schedules configured yet.</span>
+                        <span data-i18n="advanced.no_schedules_text">No schedules configured yet.</span>
                     </div>
                 </div>
 
-                <button onclick="openEcoAddModal()" class="btn-add">
+                <button onclick="openEcoAddModal()" class="btn-add" data-i18n="advanced.add_schedule_button">
                     + Add Schedule
                 </button>
             </div>
@@ -92,18 +92,18 @@
             <div id="confirmation-dialog"
                 class="confirmation-dialog bg-white rounded-xl p-6 shadow-2xl w-full max-w-sm text-center">
                 <!-- Ensure IDs match the JS: eco-confirmation-title and eco-confirmation-message -->
-                <h4 id="eco-confirmation-title" class="text-lg font-bold mb-2 text-gray-800">Toggle Eco Schedule?</h4>
-                <p id="eco-confirmation-message" class="text-sm text-gray-600 mb-4">
+                <h4 id="eco-confirmation-title" class="text-lg font-bold mb-2 text-gray-800" data-i18n="eco.toggle_schedule_title">Toggle Eco Schedule?</h4>
+                <p id="eco-confirmation-message" class="text-sm text-gray-600 mb-4" data-i18n="advanced.toggle_schedule_message">
                     Confirming will send the full configuration payload to the backend script via a POST request.
                     Continue?
                 </p>
                 <div class="flex justify-center gap-3">
                     <button onclick="confirmEcoToggle(false)"
-                        class="px-4 py-2 text-sm font-semibold rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition duration-150">
+                        class="px-4 py-2 text-sm font-semibold rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition duration-150" data-i18n="common.cancel_upper">
                         CANCEL
                     </button>
                     <button onclick="confirmEcoToggle(true)"
-                        class="px-4 py-2 text-sm font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition duration-150">
+                        class="px-4 py-2 text-sm font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition duration-150" data-i18n="common.confirm_upper">
                         CONFIRM
                     </button>
                 </div>
@@ -120,7 +120,7 @@
 
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h3 id="modal-eco-title">Add Schedule</h3>
+                    <h3 id="modal-eco-title" data-i18n="advanced.add_schedule_title">Add Schedule</h3>
                     <button onclick="closeEcoAddModal()" style="border: none; background: none; cursor: pointer;">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
                             style="width: 1.5rem; height: 1.5rem; color: #9ca3af;">
@@ -153,7 +153,7 @@
                     <!-- 3. Eco Off Time -->
                     <div style="display: flex; flex-direction: column; gap: 1rem;">
                         <div class="form-row items-center">
-                            <label class="form-label">Eco Off Time:</label>
+                            <label class="form-label" data-i18n="eco.off_time_label">Eco Off Time:</label>
                             <div class="time-picker-group">
                                 <!-- Options populated by populateEcoTime() -->
                                 <select id="off-hour-eco" class="text-input"></select>
@@ -171,7 +171,7 @@
 
                         <!-- Time Picker Row 2 (On Time) -->
                         <div class="form-row items-center">
-                            <label class="form-label">Eco On Time:</label>
+                            <label class="form-label" data-i18n="eco.on_time_label">Eco On Time:</label>
                             <div class="time-picker-group">
                                 <!-- Options populated by populateEcoTime() -->
                                 <select id="on-hour-eco" class="text-input"></select>
@@ -184,22 +184,22 @@
                                     <option value="AM" selected>AM</option>
                                     <option value="PM">PM</option>
                                 </select>
-                                <span style="color: #9ca3af; font-size: 0.875rem;">(next day)</span>
+                                <span style="color: #9ca3af; font-size: 0.875rem;" data-i18n="advanced.next_day_label">(next day)</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- 4. Repeat Days -->
                     <div class="form-row" style="align-items: center;">
-                        <label class="form-label">Repeat:</label>
+                        <label class="form-label" data-i18n="advanced.repeat_label">Repeat:</label>
                         <div id="day-eco-toggles" class="day-eco-toggles-container">
-                            <div id="day-Su" data-day="Su" class="day-eco-toggle selected">Su</div>
-                            <div id="day-M" data-day="M" class="day-eco-toggle selected">M</div>
-                            <div id="day-T" data-day="Tu" class="day-eco-toggle selected">Tu</div>
-                            <div id="day-W" data-day="W" class="day-eco-toggle selected">W</div>
-                            <div id="day-Th" data-day="Th" class="day-eco-toggle selected">Th</div>
-                            <div id="day-F" data-day="F" class="day-eco-toggle selected">F</div>
-                            <div id="day-Sa" data-day="Sa" class="day-eco-toggle selected">Sa</div>
+                            <div id="day-Su" data-day="Su" class="day-eco-toggle selected" data-i18n="advanced.day_su">Su</div>
+                            <div id="day-M" data-day="M" class="day-eco-toggle selected" data-i18n="advanced.day_mon">M</div>
+                            <div id="day-T" data-day="Tu" class="day-eco-toggle selected" data-i18n="advanced.day_tue">Tu</div>
+                            <div id="day-W" data-day="W" class="day-eco-toggle selected" data-i18n="advanced.day_wed">W</div>
+                            <div id="day-Th" data-day="Th" class="day-eco-toggle selected" data-i18n="advanced.day_thu">Th</div>
+                            <div id="day-F" data-day="F" class="day-eco-toggle selected" data-i18n="advanced.day_fri">F</div>
+                            <div id="day-Sa" data-day="Sa" class="day-eco-toggle selected" data-i18n="advanced.day_sat">Sa</div>
                         </div>
                     </div>
 
@@ -207,10 +207,10 @@
 
                 <!-- Modal Footer -->
                 <div class="modal-footer">
-                    <button onclick="handleEcoCancel()" class="btn-cancel-modal">
+                    <button onclick="handleEcoCancel()" class="btn-cancel-modal" data-i18n="common.cancel_upper">
                         CANCEL
                     </button>
-                    <button onclick="handleEcoSave()" class="btn-save-modal">
+                    <button onclick="handleEcoSave()" class="btn-save-modal" data-i18n="common.save_upper">
                         SAVE
                     </button>
                 </div>

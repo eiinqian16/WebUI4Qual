@@ -10,13 +10,13 @@ function configDhcp() {
         body += "isEnabled=" + encodeURIComponent(isEnabled);
 
         if (!validateIP(startIp)) {
-            alert("Invalid IP address! Please enter a correct IPv4 address.");
+            alert(t('network.invalid_ip'));
             return false;
         }
         body += "&startIp=" + encodeURIComponent(startIp);
 
         if (!validateIP(endIp)) {
-            alert("Invalid IP address! Please enter a correct IPv4 address.");
+            alert(t('network.invalid_ip'));
             return false;
         }
         body += "&endIp=" + encodeURIComponent(endIp);
@@ -30,7 +30,7 @@ function configDhcp() {
         //document.getElementById("bodyOutput").innerText = `<p>unchecked loop: ${body}`;;
     }
 
-    let confirmation = confirm(`Saving and applying the changes will cause short network interruptions. Continue?`)
+    let confirmation = confirm(t('network.confirm_dhcp_changes'))
 
     if (confirmation) {
         fetch("/cgi-bin/config_dhcp.sh", {
@@ -67,22 +67,22 @@ function fetchCurDhcpConfig() {
             let html = "";
             isChecked = data.isEnabled === "Enabled" ? "checked" : "";
             html += `<div class="dhcp">
-            <h1>DHCP Configuration</h1>
-            <p class="description">Dynamically assign IP addresses to connected devices</p>
+            <h1>${t('network.dhcp_config_title')}</h1>
+            <p class="description">${t('network.dhcp_config_desc')}</p>
             <hr style="width:100%;text-align:left;margin-left:0">
             `
             const curDhcp = document.getElementById("curDhcp");
             if (data.isEnabled == "Enabled") {
                 html += `
                 <div class="container">
-                <p id="isEnabled"><strong>DHCP server:</strong><span>${data.isEnabled || 'N/A'}</span></p>
-                <p><strong>Current lease pool:</strong><span>${data.startIp || 'N/A'} - ${data.endIp || 'N/A'}</span></p>
-                <p><strong>Current lease time:</strong><span>${data.leasetime || 'N/A'} hours</span></p>
+                <p id="isEnabled"><strong>${t('network.dhcp_server_colon')}</strong><span>${data.isEnabled || 'N/A'}</span></p>
+                <p><strong>${t('network.current_lease_pool_colon')}</strong><span>${data.startIp || 'N/A'} - ${data.endIp || 'N/A'}</span></p>
+                <p><strong>${t('network.current_lease_time_colon')}</strong><span>${data.leasetime || 'N/A'}${t('network.hours_suffix')}</span></p>
                 </div>
                 `
             } else if (data.isEnabled == "Disabled") {
                 html += `
-                <p><strong>DHCP server:</strong><span>${data.isEnabled || 'N/A'}</span></p>
+                <p><strong>${t('network.dhcp_server_colon')}</strong><span>${data.isEnabled || 'N/A'}</span></p>
                 `
             }
 
@@ -101,16 +101,16 @@ function fetchCurDhcpConfig() {
             html += `
             <div id="dhcpConfigWrapper">
                 <form class=dhcpForm id="dhcpConfig">
-                    <label for="startIp">IP Address Pool:</label>
+                    <label for="startIp">${t('network.ip_address_pool_label')}</label>
                     <input type="text" id="startIp" name="startIp" required>
                     <label for="endIp">-</label>
                     <input type="text" id="endIp" name="endIp" required>
                     <br>
-                    <label for="leasetime">Lease Time: </label>
-                    <input type="number" id="leasetime" name="leasetime" required><span> hours</span>
+                    <label for="leasetime">${t('network.lease_time_colon')}</label>
+                    <input type="number" id="leasetime" name="leasetime" required><span>${t('network.hours_suffix')}</span>
                 </form>
                 <br>
-                <button id="dhcpSave" onclick="configDhcp()">Save</button>
+                <button id="dhcpSave" onclick="configDhcp()">${t('common.save')}</button>
                 </div>
             </div>
             `;
@@ -123,7 +123,7 @@ function fetchCurDhcpConfig() {
                 toggleDhcpConfig();
 
                 if (!this.checked) {
-                    userConfirm = confirm("Disabling DHCP will stop automatic IP assignment. Continue?")
+                    userConfirm = confirm(t('network.confirm_disable_dhcp'))
                     if (userConfirm) {
                         disableDhcp();
                     }
@@ -136,7 +136,7 @@ function fetchCurDhcpConfig() {
         })
         .catch(error => {
             console.error("Fetch Error:", error);
-            document.getElementById("errorMessage").innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            document.getElementById("errorMessage").innerHTML = `<p style="color: red;">${t('common.error_prefix', { message: error.message })}</p>`;
         });
 }
 
@@ -147,16 +147,16 @@ function toggleDhcpConfig() {
 
     if (checkbox.checked) {
         configWrapper.style.display = "block";
-        label.innerHTML = "<strong>DHCP Server Enabled</strong>";
+        label.innerHTML = `<strong>${t('network.dhcp_server_enabled')}</strong>`;
     }
     else {
         configWrapper.style.display = "none";
-        label.innerHTML = "<strong>DHCP server Disabled</strong>";
+        label.innerHTML = `<strong>${t('network.dhcp_server_disabled')}</strong>`;
     }
 }
 
 function disableDhcp() {
-    showLoading("Disabling DHCP Server ...");
+    showLoading(t('network.disabling_dhcp_server'));
 
     fetch('/cgi-bin/disable_dhcp.sh')
         .then(response => {
@@ -167,7 +167,7 @@ function disableDhcp() {
         })
         .then(data => {
             if (data.trim() === "SUCCESS") {
-                alert("DHCP has been disabled. The page will reload.");
+                alert(t('network.dhcp_disabled_success'));
                 setTimeout(() => {
                     location.reload();
                 }, 2000);
@@ -175,7 +175,7 @@ function disableDhcp() {
         })
         .catch(error => {
             console.error("Error:", error);
-            alert("Error disabling DHCP: " + error.message);
+            alert(t('network.error_disabling_dhcp', { message: error.message }));
             document.getElementById('dhcpToggle').checked = true;
             toggleDhcpConfig();
         })
@@ -197,11 +197,11 @@ function fetchDchpClient() {
             let html = "";
             html += `
             <div class="dhcp">
-            <h1>DHCP Leases</h1>
-            <p class="description">Devices using IP address leased by DHCP server</p>
+            <h1>${t('network.dhcp_leases_title')}</h1>
+            <p class="description">${t('network.dhcp_leases_desc')}</p>
             <hr style="width:100%;text-align:left;margin-left:0">`
             if (isJsonEmpty(data)) {
-                html += `<h3>No Client Information Available</h3></div>`;
+                html += `<h3>${t('network.no_client_info')}</h3></div>`;
                 clients.innerHTML = html;
                 return;
             }
@@ -209,34 +209,34 @@ function fetchDchpClient() {
             html += `
             <table>
                 <tr>
-                    <th>Hostname</th>
-                    <th>MAC</th>
-                    <th>IP Address</th>
-                    <th>Lease Expiration Date</th>
+                    <th>${t('common.hostname')}</th>
+                    <th>${t('network.mac_short')}</th>
+                    <th>${t('common.ip_address')}</th>
+                    <th>${t('network.lease_expiration_date')}</th>
                 </tr>
             `;
             data.forEach(client => {
                 const hostname = client.hostname && typeof client.hostname === "string" && client.hostname.includes('*')
-                    ? 'Unknown'
-                    : client.hostname || 'Unknown';
+                    ? t('common.unknown')
+                    : client.hostname || t('common.unknown');
                 html += `
                 <tr>
                     <td>${hostname}</td>
-                    <td>${client.mac || 'Unknown'}</td>
-                    <td>${client.ip || 'Unknown'}</td>
-                    <td>${client.expDate || 'Unknown'}</td>
+                    <td>${client.mac || t('common.unknown')}</td>
+                    <td>${client.ip || t('common.unknown')}</td>
+                    <td>${client.expDate || t('common.unknown')}</td>
                 </tr>
                 `;
             });
             html += `</table>
             <br>
-            <button onclick="refreshPage()">Refresh</button>
+            <button onclick="refreshPage()">${t('common.refresh')}</button>
             </div>`
             clients.innerHTML = html;
         })
         .catch(error => {
             console.error("Fetch Error:", error);
-            document.getElementById("errorMessage").innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            document.getElementById("errorMessage").innerHTML = `<p style="color: red;">${t('common.error_prefix', { message: error.message })}</p>`;
         });
 }
 

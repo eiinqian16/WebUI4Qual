@@ -13,18 +13,18 @@
 <body>
 
   <div class="box">
-    <h1>Factory Reset</h1>
-    <p class="description">Click the button below to reset your board to factory settings.</p>
+    <h1 data-i18n="system.factory_reset_title">Factory Reset</h1>
+    <p class="description" data-i18n="system.factory_reset_desc">Click the button below to reset your board to factory settings.</p>
     <hr>
-    <button onclick="resetBoard()">Reset Board</button>
+    <button onclick="resetBoard()" data-i18n="system.reset_board_button">Reset Board</button>
     <p id="reset-status" class="status-message"></p>
   </div>
 
   <div class="box">
-    <h1>Reboot</h1>
-    <p class="description">Click the button below to reboot your device.</p>
+    <h1 data-i18n="system.reboot_title">Reboot</h1>
+    <p class="description" data-i18n="system.reboot_desc">Click the button below to reboot your device.</p>
     <hr>
-    <button onclick="rebootBoard()">Reboot</button>
+    <button onclick="rebootBoard()" data-i18n="system.reboot_button">Reboot</button>
     <p id="status" style="color: red; font-weight: bold;"></p>
   </div>
 

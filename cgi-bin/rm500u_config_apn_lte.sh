@@ -56,6 +56,7 @@ slot=${slot:-""}
 service=${service:-""}
 
 case "$service" in
+    NR5G-SA|NR5G-NSA|AUTO) : ;; # preserve literal token for AT+QNWPREFCFG="mode_pref",<token>
     *5G*) service="NR5G" ;;
     *lte*) service="LTE" ;;
 esac
@@ -267,5 +268,4 @@ if ! check_internet; then
     disable_data_call
     sleep 2
     set_data_call
-    /etc/init.d/network restart
 fi

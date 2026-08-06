@@ -20,7 +20,7 @@ async function configCellular() {
 
     if (auto === false) {
         if (!carrier) {
-            alert("Carrier selection needed for configuration!");
+            alert(t('cellular.carrier_required'));
             return false;
         }
 
@@ -35,12 +35,16 @@ async function configCellular() {
                 band = "NR5G";
             }
         }
+        else if (service === "NR5G-SA" || service === "NR5G-NSA") {
+            // RM500U-only options; still an NR5G APN lookup, SA/NSA only affects the mode_pref AT command below.
+            band = "NR5G";
+        }
         else {
             band = service;
         }
 
         if (!band) {
-            alert("Cellular sevice needed for configuration!");
+            alert(t('cellular.service_required'));
             return false;
         }
 
@@ -48,13 +52,13 @@ async function configCellular() {
         if (carrier === "others") {
             apn = document.getElementById("adLteApn").value.trim();
             if (!apn) {
-                alert("Please enter an APN for manual configuration!");
+                alert(t('cellular.apn_required'));
                 return false;
             }
         } else {
             apn = await getApn(carrier, band);
             if (!apn) {
-                alert(`Could not find APN for carrier '${carrier}' on ${band}. Please select 'Others (Manual)' and enter the APN manually.`);
+                alert(t('cellular.apn_not_found', { carrier: carrier, band: band }));
                 return false;
             }
         }
@@ -65,17 +69,25 @@ async function configCellular() {
             else if (band === "LTE") serviceValue = "lte";
         }
 
+        // RM500U: send the exact SA/NSA/AUTO token the user picked to AT+QNWPREFCFG="mode_pref",<token>,
+        // instead of the generic NR5G-SA fallback above.
+        if (model.includes("RM500U")) {
+            if (service === "NR5G-SA") serviceValue = "NR5G-SA";
+            else if (service === "NR5G-NSA") serviceValue = "NR5G-NSA";
+            else if (service === "AUTO") serviceValue = "AUTO";
+        }
+
         body = "apn=" + encodeURIComponent(apn) +
             "&service=" + encodeURIComponent(serviceValue) +
             "&slot=" + encodeURIComponent(slot);
     }
 
-    let confirmation = confirm(`Saving and applying the cause network interruptions. Continue?`);
+    let confirmation = confirm(t('cellular.confirm_save'));
 
     console.log(body);
 
     if (confirmation) {
-        showLoading("Configuring LTE network ...");
+        showLoading(t('cellular.configuring_network'));
         let url;
         if (!auto) {
             console.log("Manual configuration triggered. Detecting model for script selection...");
@@ -129,9 +141,9 @@ async function configCellular() {
             hideLoading();
 
             if (verified) {
-                alert(`Success!`);
+                alert(t('common.success'));
             } else {
-                alert(`Configuration applied, but cellular status could not be fully verified. Please check the status page.`);
+                alert(t('cellular.config_applied_unverified'));
             }
 
             location.reload();
@@ -349,7 +361,7 @@ async function getCurCell() {
         }
 
         if (cellularInfo.noCellularInfo) {
-            document.getElementById("cellularStat").innerText = "No cellular connection detected";
+            document.getElementById("cellularStat").innerText = t('cellular.no_connection_detected');
             return false;
         }
 
@@ -362,41 +374,41 @@ async function getCurCell() {
 
         cellInfo = document.getElementById("cellularStat");
         html += `
-        <h1>Cellular Status</h1>
-        <p class="description">View cellular information</p>
+        <h1>${t('cellular.status_title')}</h1>
+        <p class="description">${t('cellular.view_info_desc')}</p>
         <hr>
         `;
 
         if (cellularInfo) {
             if (cellularInfo.iface) {
-                html += `<p><strong>Device: </strong>${cellularInfo.iface || 'N/A'}</p>`
+                html += `<p><strong>${t('cellular.device_colon')}</strong>${cellularInfo.iface || 'N/A'}</p>`
             }
 
             if (cellularInfo.proto) {
                 if (cellularInfo.proto === "dhcp") {
-                    cellularInfo.proto = "DHCP client";
+                    cellularInfo.proto = t('common.dhcp_client');
                 }
-                html += `<p><strong>Connection Type: </strong>${cellularInfo.proto || 'N/A'}</p>`
+                html += `<p><strong>${t('cellular.connection_type_colon')}</strong>${cellularInfo.proto || 'N/A'}</p>`
             }
 
             if (cellularInfo.ip) {
-                html += `<p><strong>IP Address: </strong>${cellularInfo.ip || 'N/A'}</p>`
+                html += `<p><strong>${t('cellular.ip_address_colon')}</strong>${cellularInfo.ip || 'N/A'}</p>`
             }
 
             if (cellularInfo.subnet) {
-                html += `<p><strong>Subnet Mask: </strong>${cellularInfo.subnet || 'N/A'}</p>`
+                html += `<p><strong>${t('cellular.subnet_mask_colon')}</strong>${cellularInfo.subnet || 'N/A'}</p>`
             }
 
             if (cellularInfo.gateway) {
-                html += `<p><strong>Gateway: </strong>${cellularInfo.gateway || 'N/A'}</p>`
+                html += `<p><strong>${t('cellular.gateway_colon')}</strong>${cellularInfo.gateway || 'N/A'}</p>`
             }
 
             if (cellularInfo.bcast) {
-                html += `<p><strong>Broadcast Address: </strong>${cellularInfo.bcast || 'N/A'}</p>`
+                html += `<p><strong>${t('cellular.broadcast_address_colon')}</strong>${cellularInfo.bcast || 'N/A'}</p>`
             }
 
             if (carrier) {
-                html += `<p><strong>Telco Provider: </strong>${carrier || 'Not Connected'}</p>`
+                html += `<p><strong>${t('cellular.telco_provider_colon')}</strong>${carrier || t('cellular.not_connected')}</p>`
             }
 
             if (cellularInfo.rat) {
@@ -411,26 +423,26 @@ async function getCurCell() {
                         cellularInfo.rat = "5G-NSA";
                         break;
                     default:
-                        cellularInfo.rat = "Not Connected";
+                        cellularInfo.rat = t('cellular.not_connected');
                         break;
                 }
-                html += `<p><strong>Service: </strong>${cellularInfo.rat || 'Not Connected'}</p>`
+                html += `<p><strong>${t('cellular.service_colon')}</strong>${cellularInfo.rat || t('cellular.not_connected')}</p>`
             }
 
             if (cellularInfo.sim1iccid) {
-                html += `<p><strong>SIM 1 ICCID: </strong>${cellularInfo.sim1iccid || 'Not Detected'}</p>`
+                html += `<p><strong>${t('cellular.sim1_iccid_colon')}</strong>${cellularInfo.sim1iccid || t('cellular.not_detected')}</p>`
             }
 
             if (cellularInfo.sim2iccid) {
-                html += `<p><strong>SIM 2 ICCID: </strong>${cellularInfo.sim2iccid || 'Not Detected'}</p>`
+                html += `<p><strong>${t('cellular.sim2_iccid_colon')}</strong>${cellularInfo.sim2iccid || t('cellular.not_detected')}</p>`
             }
 
             if (cellularInfo.curSlot) {
-                html += `<p><strong>Selected SIM Slot: </strong>SIM slot ${cellularInfo.curSlot || 'Not Detected'}</p>`
+                html += `<p><strong>${t('cellular.selected_sim_slot_colon')}</strong>${t('cellular.sim_slot_value', { slot: cellularInfo.curSlot || t('cellular.not_detected') })}</p>`
             }
         }
         else if (!cellularInfo) {
-            html += `<p><strong>No cellular information found</strong></p>`
+            html += `<p><strong>${t('cellular.no_cellular_info')}</strong></p>`
         }
         cellInfo.innerHTML = html;
     }
@@ -444,8 +456,8 @@ function showConfigForm() {
     let html = "";
 
     html += `
-    <h1>Cellular Configuration</h1>
-    <p class="description">Configure cellular network</p>
+    <h1>${t('cellular.config_title')}</h1>
+    <p class="description">${t('cellular.configure_network_desc')}</p>
     <hr>
     `
     html += `
@@ -454,63 +466,78 @@ function showConfigForm() {
             <input type="checkbox" id="autoToggle">
             <span class="slider round"></span>
         </label>
-        <span class="toggle-label">Auto configure</span>
+        <span class="toggle-label">${t('cellular.auto_configure')}</span>
     </div>
     <div class="cellForm" id="autoConfig" style="display: block">
-        <p>Detecting configuration ...</p>
+        <p>${t('cellular.detecting_configuration')}</p>
     </div>
     <div class="cellForm" id="manualConfig" style="display: none">
         <form id="lteConfig">
             <br><br>
-            <label for="lteApn">Telco Provider: </label>
+            <label for="lteApn">${t('cellular.telco_provider_colon')}</label>
             <select class="lteApn-select" id="lteApn" name="lteApn" onchange="toggleAdvancedConfig()">
             </select>
             <br><br>
             <div id="advanced" style="display: none;">
-                <label for=adLte>APN: </label>
+                <label for=adLte>${t('cellular.apn_colon')}</label>
                 <input type="text" id="adLteApn"/>
                 <br><br>
             </div>
-            <label for="lteService">Service: </label>
+            <label for="lteService">${t('cellular.service_colon')}</label>
             <select class="lteService-select" id="lteService" name="lteService">
                 <option value="LTE">4G</option>
                 <option value="NR5G">5G</option>
                 <option value="AUTO" selected>AUTO</option>
             </select>
             <br><br>
-            <label for="simSlot">Sim slot: </label>
+            <label for="simSlot">${t('cellular.sim_slot_colon')}</label>
             <select class="simSlot-select" id="simSlot" name="simSlot">
                 <option value="1" selected>1</option>
                 <option value="2">2</option>
             </select>
             <br><br>
             <div id="username" style="display: none">
-                <label for=username>Username: </label>
+                <label for=username>${t('cellular.username_colon')}</label>
                 <input type="text" id="lteUsername"/>
                 <br><br>
             </div>
             <br><br>
             <div id="pin" style="display: none">
-                <label for=pin>Pin: </label>
+                <label for=pin>${t('cellular.pin_colon')}</label>
                 <input type="password" id="ltePin"/>
                 <br><br>
             </div>
         </form>
     </div>
     `;
-    html += `<button id="lteSave" onclick="configCellular()" style="display: none">Save</button>`;
+    html += `<button id="lteSave" onclick="configCellular()" style="display: none">${t('common.save')}</button>`;
     configForm.innerHTML = html;
 
     // Pre-select Service and SIM Slot based on current status
     (async () => {
         try {
+            const modelResp = await fetch('/modem_model', { cache: "no-store" });
+            const model = (await modelResp.text()).trim();
+            const svc = document.getElementById("lteService");
+
+            // RM500U supports AT+QNWPREFCFG="mode_pref",5G-SA/5G-NSA/AUTO, so let the
+            // user pick SA vs NSA explicitly instead of a single generic "5G" option.
+            if (model.includes("RM500U")) {
+                svc.innerHTML = `
+                    <option value="LTE">4G</option>
+                    <option value="NR5G-SA">${t('cellular.mode_5g_sa')}</option>
+                    <option value="NR5G-NSA">${t('cellular.mode_5g_nsa')}</option>
+                    <option value="AUTO" selected>AUTO</option>
+                `;
+            }
+
             const resp = await fetch('/modem_stats', { cache: "no-store" });
             const stats = await resp.json();
             if (stats.curSlot) document.getElementById("simSlot").value = stats.curSlot;
 
-            const svc = document.getElementById("lteService");
             if (stats.rat == "7") svc.value = "LTE";
-            else if (stats.rat == "11" || stats.rat == "13") svc.value = "NR5G";
+            else if (stats.rat == "11") svc.value = model.includes("RM500U") ? "NR5G-SA" : "NR5G";
+            else if (stats.rat == "13") svc.value = model.includes("RM500U") ? "NR5G-NSA" : "NR5G";
             else svc.value = "AUTO";
         } catch (e) { console.error("Error pre-selecting cellular config:", e); }
     })();
@@ -644,13 +671,13 @@ async function showBandConfig() {
         const db = await dbResp.json();
 
         if (!db[model]) {
-            bandContainer.innerHTML = `<p>Model ${model} not found in database.</p>`;
+            bandContainer.innerHTML = `<p>${t('cellular.model_not_found', { model: model })}</p>`;
             return;
         }
 
         const modelData = db[model];
-        let html = `<h1>Cellular Band Configuration</h1>
-                    <p class="description">Configure band for cellular network</p>
+        let html = `<h1>${t('cellular.band_config_title')}</h1>
+                    <p class="description">${t('cellular.configure_band_desc')}</p>
                     <hr>
         `;
 
@@ -670,24 +697,24 @@ async function showBandConfig() {
         };
 
         if (rat === "7") {
-            html += renderSection("4G LTE - FDD", modelData["LTE_FDD"], "B");
-            html += renderSection("4G LTE - TDD", modelData["LTE_TDD"], "B");
+            html += renderSection(t('cellular.lte_fdd'), modelData["LTE_FDD"], "B");
+            html += renderSection(t('cellular.lte_tdd'), modelData["LTE_TDD"], "B");
         } else if (rat === "11") {
-            html += renderSection("5G Standalone (SA) Bands", modelData["NR5G"], "N");
+            html += renderSection(t('cellular.nr5g_sa_bands'), modelData["NR5G"], "N");
         } else if (rat === "13") {
-            html += renderSection("4G LTE - FDD", modelData["LTE_FDD"], "B");
-            html += renderSection("4G LTE - TDD", modelData["LTE_TDD"], "B");
-            html += renderSection("5G NSA Bands", modelData["NR5G"], "N");
+            html += renderSection(t('cellular.lte_fdd'), modelData["LTE_FDD"], "B");
+            html += renderSection(t('cellular.lte_tdd'), modelData["LTE_TDD"], "B");
+            html += renderSection(t('cellular.nr5g_nsa_bands'), modelData["NR5G"], "N");
         } else {
-            bandContainer.innerHTML = `<p>No bands available for current RAT: ${rat}</p>`;
+            bandContainer.innerHTML = `<p>${t('cellular.no_bands_available', { rat: rat })}</p>`;
             return;
         }
 
         html += `
             <div class="band-action-container">
-                <button class="btn-green band-primary-action" onclick="applyBandLock()">Apply Band</button>
-                <button class="btn-green band-secondary-action" onclick="selectAllBands(true)">Select All</button>
-                <button class="btn-green band-secondary-action" onclick="selectAllBands(false)">Clear All</button>
+                <button class="btn-green band-primary-action" onclick="applyBandLock()">${t('cellular.apply_band')}</button>
+                <button class="btn-green band-secondary-action" onclick="selectAllBands(true)">${t('common.select_all')}</button>
+                <button class="btn-green band-secondary-action" onclick="selectAllBands(false)">${t('common.clear_all')}</button>
             </div>
         `;
 
@@ -740,7 +767,7 @@ async function applyBandLock() {
         .join(':');
 
     if (!selectedBands) {
-        alert("Please select at least one band.");
+        alert(t('cellular.select_one_band'));
         return;
     }
 
@@ -776,8 +803,8 @@ async function applyBandLock() {
         console.log("SRM810 detected, using srm810_set_band.sh for band lock");
     }
 
-    if (confirm(`Lock to ${cmdType}: ${selectedBands}?`)) {
-        if (typeof showLoading === "function") showLoading("Applying Band Lock...");
+    if (confirm(t('cellular.confirm_lock_band', { type: cmdType, bands: selectedBands }))) {
+        if (typeof showLoading === "function") showLoading(t('cellular.applying_band_lock'));
 
         try {
             const formData = new URLSearchParams();
@@ -807,20 +834,20 @@ async function applyBandLock() {
 
                     // Update UI components (checkAndRefresh handles showBandConfig internally)
                     await getAutoConfig();
-                    alert(`Success! Bands locked to ${result.active}.`);
+                    alert(t('cellular.band_lock_success', { active: result.active }));
                 } catch (error) {
                     console.error("Post-lock refresh failed:", error);
-                    alert(`Success! Bands locked to ${result.active}, but verification timed out.`);
+                    alert(t('cellular.band_lock_success_unverified', { active: result.active }));
                 } finally {
                     if (typeof hideLoading === "function") hideLoading();
                 }
             } else {
-                alert("Modem Error: " + result.message);
+                alert(t('cellular.modem_error', { message: result.message }));
                 if (typeof hideLoading === "function") hideLoading();
             }
         } catch (error) {
             console.error("Band lock failed:", error);
-            alert("Error: " + error.message);
+            alert(t('common.error_prefix', { message: error.message }));
             if (typeof hideLoading === "function") hideLoading();
         }
     }
@@ -896,7 +923,7 @@ async function getAutoConfig() {
 
         if (data) {
             if (carrier) {
-                html += `<p><strong>Telco Provider: </strong>${carrier || 'Not Connected'}</p>`;
+                html += `<p><strong>${t('cellular.telco_provider_colon')}</strong>${carrier || t('cellular.not_connected')}</p>`;
             }
 
             if (data.rat) {
@@ -911,54 +938,54 @@ async function getAutoConfig() {
                         data.rat = "5G-NSA";
                         break;
                     default:
-                        data.rat = "Not Connected";
+                        data.rat = t('cellular.not_connected');
                         break;
                 }
-                html += `<p><strong>Service: </strong>${data.rat || 'Not Connected'}</p>`;
+                html += `<p><strong>${t('cellular.service_colon')}</strong>${data.rat || t('cellular.not_connected')}</p>`;
             }
 
             if (data.operator) {
-                html += `<p><strong>PLMN: </strong>${data.operator || 'N/A'}</p>`;
+                html += `<p><strong>${t('cellular.plmn_colon')}</strong>${data.operator || 'N/A'}</p>`;
             }
 
             if (data.mcc) {
-                html += `<p><strong>MCC: </strong>${data.mcc || 'N/A'}</p>`;
+                html += `<p><strong>${t('cellular.mcc_colon')}</strong>${data.mcc || 'N/A'}</p>`;
             }
 
             if (data.mnc) {
-                html += `<p><strong>MNC: </strong>${data.mnc || 'N/A'}</p>`;
+                html += `<p><strong>${t('cellular.mnc_colon')}</strong>${data.mnc || 'N/A'}</p>`;
             }
 
             if (data.band) {
                 if (data.rat === "4G") {
-                    html += `<p><strong>Band: </strong>B${data.band || 'N/A'}</p>`;
+                    html += `<p><strong>${t('cellular.band_colon')}</strong>B${data.band || 'N/A'}</p>`;
                 }
                 else if (data.rat === "5G") {
-                    html += `<p><strong>Band: </strong>N${data.band || 'N/A'}</p>`;
+                    html += `<p><strong>${t('cellular.band_colon')}</strong>N${data.band || 'N/A'}</p>`;
                 }
                 else if (data.rat === "5G-NSA") {
-                    html += `<p><strong>Anchor Band: </strong>B${data.lte_band || 'N/A'}</p>
-                            <p><strong>Band: </strong>N${data.band || 'N/A'}</p>`;
+                    html += `<p><strong>${t('cellular.anchor_band_colon')}</strong>B${data.lte_band || 'N/A'}</p>
+                            <p><strong>${t('cellular.band_colon')}</strong>N${data.band || 'N/A'}</p>`;
                 }
             }
 
             if (data.rsrp) {
                 rankRsrp = classifyReceivePower(data.rsrp, data.rat);
-                html += `<p><strong>Receive Signal: </strong>${data.rsrp || 'N/A'} (${rankRsrp})</p>`;
+                html += `<p><strong>${t('cellular.receive_signal_colon')}</strong>${data.rsrp || 'N/A'} (${rankRsrp})</p>`;
             }
 
             if (data.rsrq) {
                 rankRsrq = classifyReceiveQuality(data.rsrq, data.rat);
-                html += `<p><strong>Receive Quality: </strong>${data.rsrq || 'N/A'} (${rankRsrq})</p>`;
+                html += `<p><strong>${t('cellular.receive_quality_colon')}</strong>${data.rsrq || 'N/A'} (${rankRsrq})</p>`;
             }
 
             if (data.snr) {
                 rankSnr = classifySNR(data.snr);
-                html += `<p><strong>SNR: </strong>${data.snr || 'N/A'} (${rankSnr})</p>`;
+                html += `<p><strong>${t('cellular.snr_colon')}</strong>${data.snr || 'N/A'} (${rankSnr})</p>`;
             }
         }
         else {
-            html += `<p>Not Connected</p>`;
+            html += `<p>${t('cellular.not_connected')}</p>`;
         }
         auto.innerHTML = html;
     }
@@ -972,19 +999,19 @@ function classifySNR(snr) {
     snr = parseFloat(snr);
 
     if (snr >= 25 && snr <= 40) {
-        result = "Excellent";
+        result = t('cellular.excellent');
     }
     else if (snr >= 9 && snr <= 24) {
-        result = "Good";
+        result = t('cellular.good');
     }
     else if (snr >= -7 && snr <= 8) {
-        result = "Fair";
+        result = t('cellular.fair');
     }
     else if (snr >= -40 && snr <= -9) {
-        result = "Poor";
+        result = t('cellular.poor');
     }
     else {
-        result = "Invalid SNR reading";
+        result = t('cellular.invalid_snr');
     }
     return result;
 }
@@ -995,40 +1022,40 @@ function classifyReceivePower(rsrp, band) {
 
     if (band === "4G") {
         if (rsrp >= -68 && rsrp <= -44) {
-            result = "Excellent";
+            result = t('cellular.excellent');
         }
         else if (rsrp >= -93 && rsrp <= -69) {
-            result = "Good";
+            result = t('cellular.good');
         }
         else if (rsrp >= -117 && rsrp <= -94) {
-            result = "Fair";
+            result = t('cellular.fair');
         }
         else if (rsrp >= -140 && rsrp <= -118) {
-            result = "Poor";
+            result = t('cellular.poor');
         }
         else {
-            result = "Invalid RSRP reading";
+            result = t('cellular.invalid_rsrp_reading');
         }
     }
     else if (band === "5G" || band === "5G-NSA") {
         if (rsrp >= -62 && rsrp <= -31) {
-            result = "Excellent";
+            result = t('cellular.excellent');
         }
         else if (rsrp >= -94 && rsrp <= -63) {
-            result = "Good";
+            result = t('cellular.good');
         }
         else if (rsrp >= -126 && rsrp <= -95) {
-            result = "Fair";
+            result = t('cellular.fair');
         }
         else if (rsrp >= -156 && rsrp <= -127) {
-            result = "Poor";
+            result = t('cellular.poor');
         }
         else {
-            result = "Invalid RSRP reading";
+            result = t('cellular.invalid_rsrp_reading');
         }
     }
     else {
-        result = "Invalid RSRP";
+        result = t('cellular.invalid_rsrp');
     }
     return result;
 }
@@ -1039,57 +1066,57 @@ function classifyReceiveQuality(rsrq, band) {
 
     if (band === "4G") {
         if (rsrq >= -7 && rsrq <= -3) {
-            result = "Excellent";
+            result = t('cellular.excellent');
         }
         else if (rsrq >= -12 && rsrq <= -8) {
-            result = "Good";
+            result = t('cellular.good');
         }
         else if (rsrq >= -17 && rsrq <= -13) {
-            result = "Fair";
+            result = t('cellular.fair');
         }
         else if (rsrq >= -20 && rsrq <= -18) {
-            result = "Poor";
+            result = t('cellular.poor');
         }
         else {
-            result = "Invalid RSRQ reading";
+            result = t('cellular.invalid_rsrq_reading');
         }
     }
     else if (band === "5G-NSA") {
         if (rsrq >= -6 && rsrq <= -3) {
-            result = "Excellent";
+            result = t('cellular.excellent');
         }
         else if (rsrq >= -10 && rsrq <= -7) {
-            result = "Good";
+            result = t('cellular.good');
         }
         else if (rsrq >= -14 && rsrq <= -11) {
-            result = "Fair";
+            result = t('cellular.fair');
         }
         else if (rsrq >= -20 && rsrq <= -15) {
-            result = "Poor";
+            result = t('cellular.poor');
         }
         else {
-            result = "Invalid RSRQ reading";
+            result = t('cellular.invalid_rsrq_reading');
         }
     }
     else if (band === "5G") {
         if (rsrq >= 4 && rsrq <= 20) {
-            result = "Excellent";
+            result = t('cellular.excellent');
         }
         else if (rsrq >= -13 && rsrq <= 3) {
-            result = "Good";
+            result = t('cellular.good');
         }
         else if (rsrq >= -30 && rsrq <= -14) {
-            result = "Fair";
+            result = t('cellular.fair');
         }
         else if (rsrq >= -43 && rsrq <= -31) {
-            result = "Poor";
+            result = t('cellular.poor');
         }
         else {
-            result = "Invalid RSRQ reading";
+            result = t('cellular.invalid_rsrq_reading');
         }
     }
     else {
-        result = "Invalid RSRQ";
+        result = t('cellular.invalid_rsrq');
     }
     return result;
 }
@@ -1177,13 +1204,13 @@ function showOthersOnly(select) {
 
     const noOpt = document.createElement("option");
     noOpt.value = "";
-    noOpt.text = "-- No operators found --";
+    noOpt.text = t('cellular.no_operators_found');
     noOpt.disabled = true;
     select.add(noOpt);
 
     const othersOpt = document.createElement("option");
     othersOpt.value = "others";
-    othersOpt.text = "Others (Manual)";
+    othersOpt.text = t('cellular.others_manual');
     select.add(othersOpt);
 
     select.value = "others";
@@ -1198,7 +1225,7 @@ async function populateCarrierOp() {
     select.innerHTML = "";
     const loadingOpt = document.createElement("option");
     loadingOpt.value = "";
-    loadingOpt.text = "Detecting operators ...";
+    loadingOpt.text = t('cellular.detecting_operators');
     loadingOpt.disabled = true;
     select.add(loadingOpt);
 
@@ -1236,7 +1263,7 @@ async function populateCarrierOp() {
 
             const othersOpt = document.createElement("option");
             othersOpt.value = "others";
-            othersOpt.text = "Others (Manual)";
+            othersOpt.text = t('cellular.others_manual');
             if (!matched) othersOpt.selected = true;
             select.add(othersOpt);
 

@@ -1,7 +1,7 @@
 function resetBoard() {
     const statusText = document.getElementById("reset-status") || document.getElementById("status");
 
-    let confirmation = confirm(`Saving and applying the changes will ERASE ALL YOUR SETTINGS and RESET TO FACTORY SETTINGS. Continue?`);
+    let confirmation = confirm(t('system.confirm_factory_reset'));
 
     if (confirmation) {
         fetch('/cgi-bin/reset.sh', {
@@ -10,16 +10,16 @@ function resetBoard() {
             .then(response => {
                 if (response.ok) {
                     showLoading();
-                    statusText.innerText = "Board reset triggered. Rebooting now...\nRefresh the web page when the board is ready...";
+                    statusText.innerText = t('system.reset_triggered');
                     setTimeout(() => {
                         checkDeviceReboot();
                     }, 7000);
                 } else {
-                    statusText.innerText = "Reset failed. Server responded with error.";
+                    statusText.innerText = t('system.reset_failed');
                 }
             })
             .catch(error => {
-                statusText.innerText = "Error contacting server: " + error;
+                statusText.innerText = t('system.error_contacting_server', { error: error });
             });
     }
 }
@@ -27,7 +27,7 @@ function resetBoard() {
 function rebootBoard() {
     const statusText = document.getElementById("reboot-status") || document.getElementById("status");
 
-    let confirmation = confirm(`Reboot device? Refresh web page manually when board is ready. Continue?`);
+    let confirmation = confirm(t('system.confirm_reboot'));
 
     if (confirmation) {
         showLoading();
@@ -37,16 +37,16 @@ function rebootBoard() {
             .then(response => {
                 if (response.ok) {
                     showLoading();
-                    statusText.innerText = "Board reboot triggered. Rebooting now...\nRefresh the web page when the board is ready...";
+                    statusText.innerText = t('system.reboot_triggered');
                     setTimeout(() => {
                         checkDeviceReboot();
                     }, 7000);
                 } else {
-                    statusText.innerText = "Reset failed. Server responded with error.";
+                    statusText.innerText = t('system.reset_failed');
                 }
             })
             .catch(error => {
-                statusText.innerText = "Error contacting server: " + error;
+                statusText.innerText = t('system.error_contacting_server', { error: error });
             });
     }
 }
@@ -93,7 +93,7 @@ function checkDeviceReboot(attempts = 0) {
                 console.log(`Device not ready, retrying... (${attempts + 1})`);
                 setTimeout(() => checkDeviceReboot(attempts + 1), 3000);
             } else {
-                alert("Device took too long to reboot. Try refreshing manually.");
+                alert(t('wireless.reboot_timeout'));
             }
         });
 }

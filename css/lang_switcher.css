@@ -1,0 +1,63 @@
+.lang-switcher {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 10px 14px;
+}
+
+.lang-switcher select {
+    width: 100%;
+    max-width: 190px;
+    padding: 6px 10px;
+    font-size: 13px;
+    font-family: Arial, sans-serif;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.08);
+    color: #f5f9fc;
+    cursor: pointer;
+}
+
+.lang-switcher select option {
+    color: #000;
+}
+
+.login-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.login-header-row a {
+    flex-shrink: 0;
+}
+
+.lang-switcher-login {
+    display: flex;
+    flex-shrink: 0;
+}
+
+.lang-switcher-login select {
+    padding: 6px 10px;
+    font-size: 13px;
+    font-family: Arial, sans-serif;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #222;
+    cursor: pointer;
+}
+
+@media (max-width: 480px) {
+    .login-header-row {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 1000px) {
+    .lang-switcher {
+        padding-bottom: 10px;
+    }
+}

@@ -8,6 +8,8 @@
         content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title> Login</title>
     <link rel="stylesheet" type="text/css" href="css/login.css">
+    <link rel="stylesheet" type="text/css" href="css/lang_switcher.css">
+    <script src="js/i18n.js"></script>
 </head>
 
 <body>
@@ -16,7 +18,7 @@
 
     <script src="js/login.js"></script>
     <script>
-        getLoginCred();
+        i18n.init().then(getLoginCred);
     </script>
 </body>
 <html>

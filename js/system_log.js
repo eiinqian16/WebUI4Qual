@@ -2,7 +2,7 @@ function loadTime() {
     const now = new Date();
      const dateElem = document.getElementById("date");
     if (dateElem) {
-        dateElem.innerHTML = `<p>Current Date: ${now.toLocaleString()}</p>`;
+        dateElem.innerHTML = `<p>${t('syslog.current_date', { date: now.toLocaleString() })}</p>`;
     }
 }
 setInterval(loadTime, 1000);
@@ -15,7 +15,7 @@ async function getLog() {
         return data;
     } catch (err) {
         console.error("Failed to get logs:", err);
-        return "Error fetching log";
+        return t('syslog.error_fetching_log');
     }
 }
 
@@ -102,9 +102,9 @@ function searchLog() {
     currentMatch = totalMatch > 0 ? 1 : 0;
 
     if (totalMatch > 0) highlightCurrentMatch();
-    document.getElementById("resultCount").textContent = `${totalMatch} results`;
-    document.getElementById("nextButton").innerHTML = `<button id="toggle" onclick="nextMatch()">Prev</button>`;
-    document.getElementById("prevButton").innerHTML = `<button id="toggle" onclick="prevMatch()">Next</button>`;
+    document.getElementById("resultCount").textContent = t('syslog.results_count', { count: totalMatch });
+    document.getElementById("nextButton").innerHTML = `<button id="toggle" onclick="nextMatch()">${t('common.prev')}</button>`;
+    document.getElementById("prevButton").innerHTML = `<button id="toggle" onclick="prevMatch()">${t('common.next')}</button>`;
 }
 
 function highlightCurrentMatch() {
@@ -116,7 +116,7 @@ function highlightCurrentMatch() {
     current.classList.add("active-match");
     current.scrollIntoView({ behaviour: "smooth", block: "center"});
 
-    document.getElementById("resultCount").textContent = `Results: ${currentMatch} / ${totalMatch}`;
+    document.getElementById("resultCount").textContent = t('syslog.results_position', { current: currentMatch, total: totalMatch });
 }
 
 function nextMatch() {

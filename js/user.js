@@ -2,32 +2,32 @@ function getCred() {
     const credCont = document.getElementById("cred-container");
     html = `
     <div class="usr">
-    <h1>Change Password</h1>
+    <h1>${t('user.change_password_title')}</h1>
     <hr style="width:100%;text-align:left;margin-left:0">
     <form id="cred">
         <div class="form-row">
-            <label for="oriPwd"><strong>Old Password:&nbsp;</strong></label>
+            <label for="oriPwd"><strong>${t('user.old_password_label')}&nbsp;</strong></label>
             <input type="password" id="oriPwd" name="oriPwd" required>
         </div>
         <br>
 
         <div class="form-row">
-            <label for="newPwd"><strong>New Password:&nbsp;</strong></label>
+            <label for="newPwd"><strong>${t('user.new_password_label')}&nbsp;</strong></label>
             <input type="password" id="newPwd" name="newPwd" required>
         </div>
         <br>
 
         <div class="form-row">
-            <label for="confirmPwd"><strong>Confirm New Password:&nbsp;</strong></label>
+            <label for="confirmPwd"><strong>${t('user.confirm_new_password_label')}&nbsp;</strong></label>
             <input type="password" id="confirmPwd" name="confirmPwd" required>
         </div>
         <br>
         <div class="chkbox">
             <input id="showPwdChk" type="checkbox" onclick="showPwd()">
-            <label for="showPwdChk">Show Password</label>
+            <label for="showPwdChk">${t('user.show_password')}</label>
         </div>
         <br>
-        <button type="button" onclick="changeCred()">Save Changes</button>
+        <button type="button" onclick="changeCred()">${t('user.save_changes_button')}</button>
     </form>
     </div>
     `;
@@ -45,17 +45,17 @@ function changeCred() {
     //document.getElementById("output").innerHTML = `oldPassword:${oPwd} newPassword:${nPwd} confirmPassword:${conPwd}`;
 
     if (!oPwd || !nPwd || !conPwd) {
-        alert("Please fill in all fields.");
+        alert(t('user.fill_all_fields'));
         return false;
     }
 
     if (oPwd === nPwd) {
-        alert("Old and new passwords are the same, please re-enter ...");
+        alert(t('user.same_password_error'));
         return false;
     }
 
     if (nPwd !== conPwd) {
-        alert("New password and confirm password do not match.");
+        alert(t('user.password_mismatch'));
         return false;
     }
 
@@ -76,18 +76,18 @@ function changeCred() {
                 let data = JSON.parse(text);
 
                 if (data.status === "Success") {
-                    alert("Password changed successfully");
+                    alert(t('user.password_changed_success'));
                 } else {
                     alert(data.status);
                 }
             } catch (error) {
                 console.error("JSON Parse Error:", error);
-                document.getElementById("output").innerText = `Invalid JSON: ${text}`;
+                document.getElementById("output").innerText = t('user.invalid_json', { text: text });
             }
         })
         .catch(error => {
             console.error("Error:", error);
-            document.getElementById("output").innerText = `Request failed: ${error.message}`;
+            document.getElementById("output").innerText = t('login.request_failed', { error: error.message });
         })
 }
 
