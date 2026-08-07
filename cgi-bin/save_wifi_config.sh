@@ -226,6 +226,20 @@ else
     uci set wireless.$DEVICE.htmode="$HTMODE"
 fi
 
+# 2.4GHz (band=1) at 40MHz channel width needs noscan=1, otherwise mac80211
+# background scanning can force the radio back down to 20MHz.
+if [ "$CURRENT_BAND" = "2" ]; then
+    case "$HTMODE" in
+        *40*)
+            echo "2.4GHz 40MHz width on $DEVICE, setting noscan=1" >> $LOG_FILE
+            uci set wireless.$DEVICE.noscan='1'
+            ;;
+        *)
+            uci -q delete wireless.$DEVICE.noscan
+            ;;
+    esac
+fi
+
 uci set wireless.$DEVICE.disabled="$DISABLED"
 
 if [ -z "$CHANNEL" ] || [ "$CHANNEL" = "null" ]; then
