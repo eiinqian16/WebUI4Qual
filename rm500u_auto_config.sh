@@ -129,12 +129,12 @@ set_data_call() {
     local retry=0
     local resp=""
     while [ $retry -lt 3 ]; do
-        resp=$(at_cmd 'AT+QNETDEVCTL=1,1,1' 5)
+        resp=$(at_cmd 'AT+QNETDEVCTL=3,1,1' 5)
         if echo "$resp" | grep -q "OK"; then
             return 0
         fi
         retry=$((retry + 1))
-        log "AT+QNETDEVCTL=1,1,1 failed, retrying ($retry/3)..."
+        log "AT+QNETDEVCTL=3,1,1 failed, retrying ($retry/3)..."
         sleep 2
     done
     return 1
