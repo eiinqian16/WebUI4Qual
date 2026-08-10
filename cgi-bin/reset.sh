@@ -14,6 +14,9 @@ case "$MODEM_MODEL" in
     "RG255"*)
         RESET_CMD='AT+QCFG="ResetFactory"'
         ;;
+    "RM500U"|"RM500U-"*)
+        RESET_CMD='AT+QCFG="ResetFactory"'
+        ;;
     "Asrmicro"|"A7908E")
         RESET_CMD="AT&F"
         ;;
