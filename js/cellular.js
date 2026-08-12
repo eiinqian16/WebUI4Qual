@@ -25,21 +25,19 @@ async function configCellular() {
         }
 
         if (service == "AUTO") {
-            if (statsData.rat == 7) {
+            if (model.includes("RM500U")) {
+                band = "AUTO";
+            } else if (statsData.rat == 7) {
                 band = "LTE";
-            }
-            else if (statsData.rat == 11) {
+            } else if (statsData.rat == 11) {
                 band = "NR5G";
-            }
-            else if (model.includes("RM500U")) {
-                band = "NR5G";
+            } else {
+                band = "AUTO";
             }
         }
         else if (service === "NR5G-SA" || service === "NR5G-NSA") {
-            // RM500U-only options; still an NR5G APN lookup, SA/NSA only affects the mode_pref AT command below.
             band = "NR5G";
-        }
-        else {
+        } else {
             band = service;
         }
 
@@ -64,17 +62,15 @@ async function configCellular() {
         }
 
         let serviceValue = band;
-        if (model.includes("RG255A") || model.includes("RM500U")) {
+        if (model.includes("RM500U")) {
+            if (service === "NR5G-SA" || service === "NR5G-NSA" || service === "AUTO") {
+                serviceValue = service;
+            } else if (band === "LTE") {
+                serviceValue = "lte";
+            }
+        } else if (model.includes("RG255A")) {
             if (band === "NR5G") serviceValue = "NR5G-SA";
             else if (band === "LTE") serviceValue = "lte";
-        }
-
-        // RM500U: send the exact SA/NSA/AUTO token the user picked to AT+QNWPREFCFG="mode_pref",<token>,
-        // instead of the generic NR5G-SA fallback above.
-        if (model.includes("RM500U")) {
-            if (service === "NR5G-SA") serviceValue = "NR5G-SA";
-            else if (service === "NR5G-NSA") serviceValue = "NR5G-NSA";
-            else if (service === "AUTO") serviceValue = "AUTO";
         }
 
         body = "apn=" + encodeURIComponent(apn) +
