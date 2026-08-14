@@ -1,14 +1,25 @@
-let loadedScripts = {}; // Track loaded scripts
-let currentSection = null; // Track current section
+let loadedScripts = {};
+let currentSection = null;
+
+let cellularAvailable = null;
+
+function checkCellularAvailable() {
+    return fetch('/modem_model', { cache: 'no-store' })
+        .then(response => response.ok ? response.text() : '')
+        .then(text => text.trim().length > 0)
+        .catch(() => false);
+}
+
+function applyCellularNavVisibility(available) {
+    let item = document.getElementById('cellularNavItem');
+    if (item) item.style.display = available ? '' : 'none';
+}
 
 function changeLanguage(lang) {
     let select = document.getElementById('langSelect');
     if (select) select.disabled = true;
 
     i18n.setLanguage(lang).then(() => {
-        // i18n.setLanguage already re-translates static markup document-wide.
-        // Dynamically-rendered section content (built by JS template strings)
-        // needs its section reloaded so it regenerates text in the new language.
         let sectionToReload = currentSection;
         currentSection = null;
         loadSection(sectionToReload || 'overview');
@@ -18,7 +29,6 @@ function changeLanguage(lang) {
 }
 
 function loadSection(section) {
-    // Prevent duplicate section loads
     if (currentSection === section) {
         console.log(`Section ${section} already loaded, skipping...`);
         return;
@@ -284,6 +294,11 @@ function showSection(section) {
         section = "overview";
     }
 
+    if (section === "cellular" && cellularAvailable === false) {
+        console.warn("No cellular modem detected on this unit, redirecting away from cellular section");
+        section = "overview";
+    }
+
     let currentHash = location.hash.replace("#", "") || "overview";
     
     console.log("test ", section);
@@ -370,6 +385,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (select) select.value = i18n.currentLang;
     });
 
+    // Kick off cellular hardware detection in parallel with session validation below.
+    const cellularCheckPromise = checkCellularAvailable();
+
     // Session check
     let sessionID = sessionStorage.getItem("sessionID");
 
@@ -390,22 +408,33 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = "login.html";
             return;
         }
-        
-        // Only load section after session is validated
-        let section = location.hash.replace("#", "") || "overview";
 
-        if (!section || section.trim() === "") {
-            console.warn("DOMContentLoaded detected empty section, defaulting to overview");
-            section = "overview";
-            history.replaceState(null, "", "#overview"); 
-        }
+        return cellularCheckPromise.then(available => {
+            cellularAvailable = available;
+            applyCellularNavVisibility(available);
 
-        loadSection(section);
+            // Only load section after session is validated
+            let section = location.hash.replace("#", "") || "overview";
 
-        let currentItem = document.querySelector(`[onclick="showSection('${section}');"]`);
-        if (currentItem) {
-            currentItem.classList.add("active");
-        }
+            if (!section || section.trim() === "") {
+                console.warn("DOMContentLoaded detected empty section, defaulting to overview");
+                section = "overview";
+                history.replaceState(null, "", "#overview");
+            }
+
+            if (section === "cellular" && !available) {
+                console.warn("No cellular modem detected on this unit, defaulting to overview");
+                section = "overview";
+                history.replaceState(null, "", "#overview");
+            }
+
+            loadSection(section);
+
+            let currentItem = document.querySelector(`[onclick="showSection('${section}');"]`);
+            if (currentItem) {
+                currentItem.classList.add("active");
+            }
+        });
     })
     .catch(error => {
         console.error("Error:", error);
