@@ -32,7 +32,17 @@ function confirmUpgrade() {
     fetch("/cgi-bin/upgrade_fw.sh", { method: "POST" })
     .then(res => res.text())
     .then(txt => alert(txt))
-    .catch(err => alert(t('firmware.upgrade_failed', { error: err })));
+    .catch(err => {
+        // sysupgrade tears down networking as part of flashing the image, so the
+        // browser sees this request fail even when the upgrade succeeds - that's
+        // expected, not an error. The device is rebooting; the user has to
+        // manually reconnect once it's back (this page can't reliably detect
+        // that on its own across a full firmware reboot - IP/route state on the
+        // client side can't be counted on to settle in time for a background poll).
+        console.warn("Fetch failed after triggering firmware upgrade (expected if the device is now rebooting):", err);
+        hideLoading();
+        alert(t('firmware.upgrade_in_progress'));
+    });
     closePopup();
 }
 
