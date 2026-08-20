@@ -5,7 +5,7 @@ echo ""
 
 tmp_img="/tmp/sysupgrade.bin"
 
-if [ ! -f "$tmp_img"]; then
+if [ ! -f "$tmp_img" ]; then
     echo "No uploaded image found!"
     exit 1
 fi
