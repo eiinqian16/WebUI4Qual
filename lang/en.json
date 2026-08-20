@@ -422,6 +422,7 @@
   "firmware.upgrade_button": "Upgrade",
   "firmware.upgrade_failed": "Upgrade failed: {error}",
   "firmware.flashing": "Flashing ...",
+  "firmware.upgrade_in_progress": "Connection to the router was lost - this is expected. The firmware upgrade is being applied and the device is rebooting. Do NOT power off the device. Please wait a few minutes, then manually reload this page or reconnect to the router to log in again.",
 
   "common.search": "Search",
   "common.prev": "Prev",

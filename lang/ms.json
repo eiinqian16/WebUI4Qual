@@ -422,6 +422,7 @@
   "firmware.upgrade_button": "Naik Taraf",
   "firmware.upgrade_failed": "Naik taraf gagal: {error}",
   "firmware.flashing": "Sedang mem-flash ...",
+  "firmware.upgrade_in_progress": "Sambungan ke penghala telah terputus - ini adalah perkara yang dijangka. Naik taraf firmware sedang dilaksanakan dan peranti sedang dimulakan semula. JANGAN matikan peranti. Sila tunggu beberapa minit, kemudian muat semula halaman ini secara manual atau sambung semula ke penghala untuk log masuk semula.",
 
   "common.search": "Cari",
   "common.prev": "Sebelum",

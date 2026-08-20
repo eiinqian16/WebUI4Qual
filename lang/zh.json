@@ -422,6 +422,7 @@
   "firmware.upgrade_button": "升级",
   "firmware.upgrade_failed": "升级失败：{error}",
   "firmware.flashing": "正在刷写…",
+  "firmware.upgrade_in_progress": "与路由器的连接已断开——这是正常现象。固件升级正在应用，设备正在重启。请勿关闭设备电源。请等待几分钟，然后手动刷新此页面或重新连接路由器以重新登录。",
 
   "common.search": "搜索",
   "common.prev": "上一个",
