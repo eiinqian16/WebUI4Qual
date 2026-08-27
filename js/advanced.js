@@ -7,14 +7,15 @@ if (typeof window.lockBodyScroll !== "function") {
 
         if (window._bodyScrollLockCount === 0) {
             const scrollY = window.scrollY || window.pageYOffset || 0;
+            const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
             body.dataset.scrollLockY = String(scrollY);
             body.classList.add("modal-open");
             body.style.position = "fixed";
             body.style.top = "-" + scrollY + "px";
-            body.style.left = "0";
-            body.style.right = "0";
-            body.style.width = "100%";
             body.style.overflow = "hidden";
+            if (scrollBarWidth > 0) {
+                body.style.paddingRight = scrollBarWidth + "px";
+            }
         }
 
         window._bodyScrollLockCount = 1;
@@ -30,10 +31,8 @@ if (typeof window.lockBodyScroll !== "function") {
         const scrollY = parseInt(body.dataset.scrollLockY || "0", 10);
         body.style.position = "";
         body.style.top = "";
-        body.style.left = "";
-        body.style.right = "";
-        body.style.width = "";
         body.style.overflow = "";
+        body.style.paddingRight = "";
         body.classList.remove("modal-open");
         delete body.dataset.scrollLockY;
         window.scrollTo(0, scrollY);
@@ -135,6 +134,7 @@ let currentScheduleConfig = {
 let savedSchedules = [];
 let adv_systemTime = null;
 let adv_timezone = null;
+let adv_clockInterval = null;
 
 async function initAdvClock() {
     try {
@@ -146,7 +146,8 @@ async function initAdvClock() {
         if (data && data.epoch) {
             adv_systemTime = new Date(data.epoch * 1000);
             updateAdvClock();
-            setInterval(updateAdvClock, 1000);
+            if (adv_clockInterval) clearInterval(adv_clockInterval);
+            adv_clockInterval = setInterval(updateAdvClock, 1000);
         }
         else {
             throw new Error("Invalid data format received");
@@ -495,13 +496,13 @@ function renderScheduleList() {
     }
 
     const DAY_KEYS = { Su: 'advanced.day_su', M: 'advanced.day_mon', Tu: 'advanced.day_tue', W: 'advanced.day_wed', Th: 'advanced.day_thu', F: 'advanced.day_fri', Sa: 'advanced.day_sat' };
-    const localizeDays = days => days.map(d => DAY_KEYS[d] ? t(DAY_KEYS[d]) : d).join(', ');
+    const dayBadges = days => days.map(d => `<span class="day-badge">${DAY_KEYS[d] ? t(DAY_KEYS[d]) : d}</span>`).join('');
 
     listContainer.innerHTML = savedSchedules.map(entry => `
         <div class="schedule-item">
             <div class="schedule-item-content">
                 <div class="schedule-item-time">${entry.offTime} - ${entry.onTime}</div>
-                <div class="schedule-item-days">${localizeDays(entry.repeatDays)}</div>
+                <div class="schedule-item-days">${dayBadges(entry.repeatDays)}</div>
             </div>
             <div class="schedule-item-actions">
                 <button class="icon-only-btn" onclick="editConfig('${entry.id}')" title="${t('common.edit')}">

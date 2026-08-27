@@ -7,14 +7,15 @@ if (typeof window.lockBodyScroll !== "function") {
 
         if (window._bodyScrollLockCount === 0) {
             const scrollY = window.scrollY || window.pageYOffset || 0;
+            const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
             body.dataset.scrollLockY = String(scrollY);
             body.classList.add("modal-open");
             body.style.position = "fixed";
             body.style.top = "-" + scrollY + "px";
-            body.style.left = "0";
-            body.style.right = "0";
-            body.style.width = "100%";
             body.style.overflow = "hidden";
+            if (scrollBarWidth > 0) {
+                body.style.paddingRight = scrollBarWidth + "px";
+            }
         }
 
         window._bodyScrollLockCount = 1;
@@ -30,10 +31,8 @@ if (typeof window.lockBodyScroll !== "function") {
         const scrollY = parseInt(body.dataset.scrollLockY || "0", 10);
         body.style.position = "";
         body.style.top = "";
-        body.style.left = "";
-        body.style.right = "";
-        body.style.width = "";
         body.style.overflow = "";
+        body.style.paddingRight = "";
         body.classList.remove("modal-open");
         delete body.dataset.scrollLockY;
         window.scrollTo(0, scrollY);
@@ -86,6 +85,7 @@ let currentEcoScheduleConfig = {
 let savedEcoSchedules = [];
 let eco_systemTime = null;
 let eco_timezone = null;
+let eco_clockInterval = null;
 
 async function initEcoClock() {
     try {
@@ -97,7 +97,8 @@ async function initEcoClock() {
         if (data && data.epoch) {
             eco_systemTime = new Date(data.epoch * 1000);
             updateEcoClock();
-            setInterval(updateEcoClock, 1000);
+            if (eco_clockInterval) clearInterval(eco_clockInterval);
+            eco_clockInterval = setInterval(updateEcoClock, 1000);
         }
         else {
             throw new Error("Invalid data format received");
@@ -426,20 +427,18 @@ function renderEcoScheduleList() {
     }
 
     const DAY_KEYS = { Su: 'advanced.day_su', M: 'advanced.day_mon', Tu: 'advanced.day_tue', W: 'advanced.day_wed', Th: 'advanced.day_thu', F: 'advanced.day_fri', Sa: 'advanced.day_sat' };
+    const dayBadges = days => (days || []).map(d => `<span class="day-badge">${DAY_KEYS[d] ? t(DAY_KEYS[d]) : d}</span>`).join('');
 
     savedEcoSchedules.forEach(entry => {
-        const repeatDaysText = (entry.repeatDays || []).map(d => DAY_KEYS[d] ? t(DAY_KEYS[d]) : d).join(', ');
         const newEntry = document.createElement('div');
-
-        newEntry.style.cssText = 'padding: 0.75rem; background-color: white; border: 1px solid #93c5fd; border-radius: 0.5rem; color: #374151; display: flex; justify-content: space-between; align-items: center;';
+        newEntry.className = 'schedule-item';
 
         newEntry.innerHTML = `
-        <span>
-            <strong>${t('eco.configured_label')}</strong>:
-            ${t('eco.off_on_time_text', { off: entry.offTime, on: entry.onTime })}
-            <span style="color: #6b7280; margin-left: 10px;">${t('eco.repeat_days_text', { days: repeatDaysText })}</span>
-        </span>
-        <div style="display: flex; gap: 0.5rem;">
+        <div class="schedule-item-content">
+            <div class="schedule-item-time">${t('eco.off_on_time_text', { off: entry.offTime, on: entry.onTime })}</div>
+            <div class="schedule-item-days">${dayBadges(entry.repeatDays)}</div>
+        </div>
+        <div class="schedule-item-actions">
             <button class="icon-only-btn" onclick="editEcoConfig('${entry.id}')" title="${t('common.edit')}">
                 <img src="/logo/edit.png" alt="${t('common.edit')}"
                 style="width: 20px; height: 20px; filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);">

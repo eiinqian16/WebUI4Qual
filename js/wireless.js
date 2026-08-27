@@ -7,14 +7,15 @@ if (typeof window.lockBodyScroll !== "function") {
 
         if (window._bodyScrollLockCount === 0) {
             const scrollY = window.scrollY || window.pageYOffset || 0;
+            const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
             body.dataset.scrollLockY = String(scrollY);
             body.classList.add("modal-open");
             body.style.position = "fixed";
             body.style.top = "-" + scrollY + "px";
-            body.style.left = "0";
-            body.style.right = "0";
-            body.style.width = "100%";
             body.style.overflow = "hidden";
+            if (scrollBarWidth > 0) {
+                body.style.paddingRight = scrollBarWidth + "px";
+            }
         }
 
         window._bodyScrollLockCount = 1;
@@ -30,10 +31,8 @@ if (typeof window.lockBodyScroll !== "function") {
         const scrollY = parseInt(body.dataset.scrollLockY || "0", 10);
         body.style.position = "";
         body.style.top = "";
-        body.style.left = "";
-        body.style.right = "";
-        body.style.width = "";
         body.style.overflow = "";
+        body.style.paddingRight = "";
         body.classList.remove("modal-open");
         delete body.dataset.scrollLockY;
         window.scrollTo(0, scrollY);
@@ -229,7 +228,7 @@ function updateWifiInfoUI() {
         wifi.interfaces.forEach(iface => {
             const bssidElement = document.querySelector(`.bssid[data-iface="${iface.iface}"]`);
             if (bssidElement) {
-                bssidElement.textContent = t('wireless.bssid_label', { bssid: iface.bssid || t('common.unknown') });
+                bssidElement.textContent = iface.bssid || t('common.unknown');
             }
         });
     });
@@ -442,10 +441,11 @@ async function openEditModal_v2(device, iface) {
 
 
     modalContent.innerHTML = modalHtml;
-    let detected = await detectCountry();
-    let currentCountry = detected || wifi.country || "US";
+    populateCountry(device, wifi.country || "US");
 
-    populateCountry(device, currentCountry);
+    detectCountry().then(detected => {
+        if (detected) populateCountry(device, detected);
+    });
 
     const wifiAdvCheckbox = document.getElementById('WifiAdvToggle');
     toggleWifiAdv();
@@ -514,10 +514,15 @@ async function populateCountry(device, currentCountryCode) {
 
 async function detectCountry() {
     try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+
         const resp = await fetch('https://ipapi.co/country/', {
             mode: 'cors',
-            headers: { 'Accept': 'text/plain' }
+            headers: { 'Accept': 'text/plain' },
+            signal: controller.signal
         });
+        clearTimeout(timeoutId);
 
         if (resp.ok) {
             const country = await resp.text();
