@@ -1,5 +1,6 @@
 let sys_serverTime = null;
 let sys_timezone = null;
+let sys_clockInterval = null;
 
 function showTimeConfig() {
     let html = `
@@ -35,7 +36,8 @@ async function initSysClock() {
         if (data && data.epoch) {
             sys_serverTime = new Date(data.epoch * 1000);
             updateSysClock();
-            setInterval(updateSysClock, 1000);
+            if (sys_clockInterval) clearInterval(sys_clockInterval);
+            sys_clockInterval = setInterval(updateSysClock, 1000);
         }
         else {
             throw new Error("Invalid data format received");
