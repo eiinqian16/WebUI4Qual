@@ -18,6 +18,24 @@ get_iccid() {
     fi
 }
 
+get_ble_mac() {
+    file="${1:-/tmp/ble_info}"
+
+    if [ ! -f "$file" ]; then
+        echo "ble_info file not found: $file" >&2
+        return 1
+    fi
+
+    bleMac=$(sed -n 's/.*MAC=\([0-9A-Fa-f:]\{17\}\).*/\1/p' "$file")
+
+    if [ -z "$bleMac" ]; then
+        echo "BLE MAC not found in $file" >&2
+        return 1
+    fi
+
+    echo "$bleMac"
+}
+
 # Main information gathering
 FW=$(cat /www/webUI/ov/fw_version 2>/dev/null)
 echo "Firmware version: ${FW:-N/A}"
@@ -103,3 +121,4 @@ echo "Modem Name: ${MODEM:-N/A}"
 # Get SIM ICCID information
 echo "SIM1 ICCID: $(get_iccid 1)"
 echo "SIM2 ICCID: $(get_iccid 2)"
+echo "BLE MAC: $(get_ble_mac || echo 'N/A')"
