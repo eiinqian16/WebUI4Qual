@@ -50,8 +50,20 @@ convertTime() {
     fi
     
     hour=$((hour % 24))
-    
+
     printf "%02d:%02d" "$hour" "$min"
+}
+
+# Parses a combined "H:MM AM/PM" string (the format offTime/onTime are
+# always stored in) into 24-hour "HH:MM" via convertTime.
+parseTimeStr() {
+    local timeStr="$1"
+    local hm="${timeStr%% *}"
+    local ampm="${timeStr##* }"
+    local hour="${hm%%:*}"
+    local min="${hm##*:}"
+
+    convertTime "$hour" "$min" "$ampm"
 }
 
 rebuildCron() {
@@ -98,17 +110,13 @@ rebuildCron() {
     while [ "$index" -lt "$total" ]; do
         block=$(echo "$scheduleData" | jsonfilter -e "@[$index]" 2>/dev/null)
         eId=$(echo "$block" | jsonfilter -e '@.id' 2>/dev/null)
-        eOffHr=$(echo "$block" | jsonfilter -e '@.offHour' 2>/dev/null)
-        eOffMin=$(echo "$block" | jsonfilter -e '@.offMinute' 2>/dev/null)
-        eOffAP=$(echo "$block" | jsonfilter -e '@.offAP' 2>/dev/null)
-        eOnHr=$(echo "$block" | jsonfilter -e '@.onHour' 2>/dev/null)
-        eOnMin=$(echo "$block" | jsonfilter -e '@.onMinute' 2>/dev/null)
-        eOnAP=$(echo "$block" | jsonfilter -e '@.onAP' 2>/dev/null)
+        eOffTime=$(echo "$block" | jsonfilter -e '@.offTime' 2>/dev/null)
+        eOnTime=$(echo "$block" | jsonfilter -e '@.onTime' 2>/dev/null)
 
         echo "[$(date)] Processing entry $index: ID=$eId" >> $LOG
 
-        cronOff=$(convertTime "$eOffHr" "$eOffMin" "$eOffAP")
-        cronOn=$(convertTime "$eOnHr" "$eOnMin" "$eOnAP")
+        cronOff=$(parseTimeStr "$eOffTime")
+        cronOn=$(parseTimeStr "$eOnTime")
 
         coffHr=${cronOff%:*}
         coffMin=${cronOff#*:}
@@ -227,12 +235,8 @@ if [ "$action" = "save" ]; then
     
     inc2g=$(echo "$POSTDATA" | jsonfilter -e '@.inc2g' 2>/dev/null)
     inc5g=$(echo "$POSTDATA" | jsonfilter -e '@.inc5g' 2>/dev/null)
-    offHr=$(echo "$POSTDATA" | jsonfilter -e '@.offHour' 2>/dev/null)
-    offMin=$(echo "$POSTDATA" | jsonfilter -e '@.offMinute' 2>/dev/null)
-    offAP=$(echo "$POSTDATA" | jsonfilter -e '@.offAP' 2>/dev/null)
-    onHr=$(echo "$POSTDATA" | jsonfilter -e '@.onHour' 2>/dev/null)
-    onMin=$(echo "$POSTDATA" | jsonfilter -e '@.onMinute' 2>/dev/null)
-    onAP=$(echo "$POSTDATA" | jsonfilter -e '@.onAP' 2>/dev/null)
+    offTimeStr=$(echo "$POSTDATA" | jsonfilter -e '@.offTime' 2>/dev/null)
+    onTimeStr=$(echo "$POSTDATA" | jsonfilter -e '@.onTime' 2>/dev/null)
 
     repeatDays=""
     repeatCount=0
@@ -249,8 +253,8 @@ if [ "$action" = "save" ]; then
 
     echo "[$(date)] Parsed ID=$id Repeat=[$repeatDays] RepeatCount=$repeatCount" >> $LOG
 
-    on24=$(convertTime "$onHr" "$onMin" "$onAP")
-    off24=$(convertTime "$offHr" "$offMin" "$offAP")
+    on24=$(parseTimeStr "$onTimeStr")
+    off24=$(parseTimeStr "$offTimeStr")
 
     echo "[$(date)] ON=$on24 OFF=$off24" >> $LOG
 
